@@ -28,3 +28,8 @@ def obtenerFicheroIt(path):
     else:
         fActual = path
     return fActual
+
+def leerFichero(fichero):
+    with open(fichero, 'rb') as f:
+        content = f.read()
+        return str(content.decode())

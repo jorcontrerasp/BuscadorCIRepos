@@ -10,7 +10,7 @@ print("Iniciando proceso...")
 try:
     # Generamos un token para consultar la API de GitHub a través de la librería.
     user = "jorcontrerasp"
-    token = "AAA"
+    token = aux.leerFichero("token")
     g = Github(user, token)
 
     query = """
@@ -23,7 +23,9 @@ try:
         is:public
     """
 
-    generator = g.search_repositories(query=query)
+    query2 = aux.leerFichero("query")
+
+    generator = g.search_repositories(query=query2)
 
     # Convertimos el generador en una lista de repositorios.
     repositories = list(generator)

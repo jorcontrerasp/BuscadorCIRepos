@@ -11,7 +11,7 @@ import herramientasCI as ci
 
 # Generamos un token para consultar la API de GitHub a través de la librería.
 user = "jorcontrerasp"
-token = "AAA"
+token = aux.leerFichero("token")
 g = Github(user, token)
 
 organizacion = "envoyproxy"
