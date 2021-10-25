@@ -1,9 +1,12 @@
 #AQUÍ se definirán las funciones de búsqueda.
 
-def busquedaGitHubApiRepos(listaRepositorios, df, df2):
+#Importamos las librerías necesarias.
+import auxiliares as aux
+
+def busquedaGitHubApiRepos(listaRepositorios):
     listaEncontrados = []
     for repo in listaRepositorios:
-        encontrado = buscarEnRepo(repo, "Criterios.criterio1.value", df)
+        encontrado = buscarRutaLiteralDesdeRaiz(repo, ".bazelci/presubmit.yml")
 
         # Si lo ha encontrado:
         # - lo añadimos a la listaEncontrados.
@@ -34,4 +37,27 @@ def buscarEnRaiz(repo, literal):
             encontrado = True
             print(str(content_file.path))
             break
+    return encontrado
+
+def buscarRutaLiteralDesdeRaiz(repo, ruta):
+    try:
+        repo.get_contents(ruta)
+        return True
+    except:
+        return False
+
+def buscarRutaLiteralDesdeRaiz2(repo, contents, literal):
+    encontrado = False
+    pLiteral = literal.split("/")
+    cLiteral = pLiteral.pop(0)
+    for contentFile in contents:
+        ficheroIt = aux.obtenerFicheroIt(contentFile.path)
+        if cLiteral == ficheroIt.lower():
+            if len(pLiteral) > 0:
+                if contentFile.type == "dir":
+                    contents = repo.get_contents(contentFile.path)
+                    encontrado = buscarRutaLiteralDesdeRaiz(repo, contents, '/'.join(pLiteral))
+                    break
+            else:
+                encontrado = True
     return encontrado

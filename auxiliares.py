@@ -20,3 +20,11 @@ def imprimirListaRepositorios(repositorios):
     for project in repositorios:
         project_name = project.full_name.split("/")[1]
         print(project.full_name)
+
+def obtenerFicheroIt(path):
+    if "/" in path:
+        pathArray = path.split("/")
+        fActual = pathArray[len(pathArray) - 1]
+    else:
+        fActual = path
+    return fActual
