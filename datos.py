@@ -76,6 +76,13 @@ def generarDataFrame(listaRepositorios):
 
     return df
 
+def actualizarDataFrame(repo, literal, herramientaCI, df):
+    valor = str(df.at[repo.full_name, herramientaCI.value])
+    if valor == " " or valor == "nan":
+        df.at[repo.full_name, herramientaCI.value] = "[" + literal + "]\n"
+    else:
+        df.at[repo.full_name, herramientaCI.value] += "[" + literal + "]\n"
+
 def generarEXCEL(df, pFichero):
     print("Generando fichero Excel...")
     df.to_excel(pFichero + ".xlsx")

@@ -4,7 +4,7 @@
 from github import Github
 from github.GithubException import UnknownObjectException
 import auxiliares as aux
-import busqueda as b1
+import busqueda as b
 import datos as d
 import herramientasCI as ci
 # import openpyxl --> esta hay que instalarla en el venv para que funcione el generarEXCEL.
@@ -31,13 +31,16 @@ if continuar:
     filteredRepos = [repo]
 
     df = d.generarDataFrame(filteredRepos)
-    d.generarEXCEL(df, "fExcelPruebas")
 
-    files = ci.getFicherosBusquedaCI(ci.HerramientasCI.CI1.value)
+    files = ci.getFicherosBusquedaCI(ci.HerramientasCI.CI11.value)
     for file in files:
         print(str(file))
 
     aux.imprimirListaRepositorios(filteredRepos)
-    listaEncontrados = b1.busquedaGitHubApiRepos(filteredRepos)
+
+    listaEncontrados = []
+    listaEncontrados = b.busquedaGitHubApiRepos(filteredRepos, df)
+
+    d.generarEXCEL(df, "fExcelPruebas")
 
     print(str(len(listaEncontrados)))

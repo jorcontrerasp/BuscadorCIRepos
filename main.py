@@ -4,6 +4,8 @@
 from github import Github
 import random
 import auxiliares as aux
+import datos as d
+import busqueda as b
 
 print("Iniciando proceso...")
 
@@ -25,7 +27,7 @@ try:
 
     query2 = aux.leerFichero("query")
 
-    generator = g.search_repositories(query=query2)
+    generator = g.search_repositories(query=query)
 
     # Convertimos el generador en una lista de repositorios.
     repositories = list(generator)
@@ -60,6 +62,16 @@ try:
 
     # Imprimimos la lista de repositorios
     aux.imprimirListaRepositorios(lRandom)
+
+    # Generamos un DataFrame donde irán los resultados.
+    df = d.generarDataFrame(lRandom)
+
+    # Aplicamos el proceso.
+    listaEncontrados = []
+    listaEncontrados = b.busquedaGitHubApiRepos(filteredRepos, df)
+
+    # Generamos un fichero EXCEL con los resultados.
+    d.generarEXCEL(df, "resultados")
 
     print("Proceso finalizado.")
 

@@ -2,14 +2,30 @@
 
 #Importamos las librerías necesarias.
 import auxiliares as aux
+import herramientasCI as ci
+import datos as d
 
-def busquedaGitHubApiRepos(listaRepositorios):
+def busquedaGitHubApiRepos(listaRepositorios, df):
     listaEncontrados = []
     for repo in listaRepositorios:
-        encontrado = buscarRutaLiteralDesdeRaiz(repo, ".bazelci/presubmit.yml")
+        encontrado1 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI1, [], df)
+        encontrado2 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI2, [], df)
+        encontrado3 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI3, [], df)
+        encontrado4 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI4, [], df)
+        encontrado5 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI5, [], df)
+        encontrado6 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI6, [], df)
+        encontrado7 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI7, [], df)
+        encontrado8 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI8, [], df)
+        encontrado9 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI9, [], df)
+        encontrado10 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI10, [], df)
+        encontrado11 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI11, [], df)
+        encontrado12 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI12, [], df)
+        encontrado13 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI13, [], df)
 
         # Si lo ha encontrado:
         # - lo añadimos a la listaEncontrados.
+        encontrado = encontrado1 or encontrado2 or encontrado3 or encontrado4 or encontrado5 or encontrado6 or encontrado7 \
+                     or encontrado8 or encontrado9 or encontrado10 or encontrado11 or encontrado12 or encontrado13
         if encontrado:
             listaEncontrados.append(repo)
 
@@ -39,14 +55,29 @@ def buscarEnRaiz(repo, literal):
             break
     return encontrado
 
-def buscarRutaLiteralDesdeRaiz(repo, ruta):
+def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df):
+    try:
+        if len(literales)==0:
+            literales = ci.getFicherosBusquedaCI(herramientaCI.value)
+
+        ruta = literales.pop(0)
+        repo.get_contents(ruta)
+        d.actualizarDataFrame(repo, ruta, herramientaCI, df)
+        return True
+    except:
+        if len(literales)>0:
+            return buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df)
+        else:
+            return False
+
+def buscarRutaLiteralDesdeRaiz2(repo, ruta):
     try:
         repo.get_contents(ruta)
         return True
     except:
         return False
 
-def buscarRutaLiteralDesdeRaiz2(repo, contents, literal):
+def buscarRutaLiteralDesdeRaiz3(repo, contents, literal):
     encontrado = False
     pLiteral = literal.split("/")
     cLiteral = pLiteral.pop(0)
