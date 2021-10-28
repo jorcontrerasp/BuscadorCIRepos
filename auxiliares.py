@@ -32,4 +32,10 @@ def obtenerFicheroIt(path):
 def leerFichero(fichero):
     with open(fichero, 'rb') as f:
         content = f.read()
-        return str(content.decode())
+        r = str(content.decode())
+        f.close()
+        return r
+
+def leerQuery(query):
+    q = leerFichero(query)
+    return q.replace("+", " ")

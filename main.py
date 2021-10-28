@@ -20,14 +20,14 @@ try:
         stars:>=500 
         forks:>=300 
         created:<2015-01-01 
-        pushed:>2020-01-01
-        archived:false
-        is:public
+        pushed:>2020-01-01 
+        archived:false 
+        is:public 
     """
 
-    query2 = aux.leerFichero("query")
+    q = aux.leerQuery("querys/query1")
 
-    generator = g.search_repositories(query=query)
+    generator = g.search_repositories(query=q)
 
     # Convertimos el generador en una lista de repositorios.
     repositories = list(generator)
@@ -54,17 +54,21 @@ try:
             filteredRepos.append(repo)
 
     # Seleccionamos N repositorios de manera aleatoria:
-    lRandom = []
-    while len(lRandom) < 20:
-        item = random.choice(filteredRepos)
-        if item not in lRandom:
-            lRandom.append(item)
+    randomizar = False
+    lFinal = []
+    if randomizar:
+        while len(lFinal) < 500:
+            item = random.choice(filteredRepos)
+            if item not in lFinal:
+                lFinal.append(item)
+    else:
+        lFinal = filteredRepos
 
     # Imprimimos la lista de repositorios
-    aux.imprimirListaRepositorios(lRandom)
+    aux.imprimirListaRepositorios(lFinal)
 
     # Generamos un DataFrame donde irán los resultados.
-    df = d.generarDataFrame(lRandom)
+    df = d.generarDataFrame(lFinal)
 
     # Aplicamos el proceso.
     listaEncontrados = []
