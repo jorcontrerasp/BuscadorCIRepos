@@ -6,6 +6,7 @@ import random
 import auxiliares as aux
 import datos as d
 import busqueda as b
+import montaQuery as mq
 
 print("Iniciando proceso...")
 
@@ -15,17 +16,9 @@ try:
     token = aux.leerFichero("token")
     g = Github(user, token)
 
-    query = """
-        language:java 
-        stars:>=500 
-        forks:>=300 
-        created:<2015-01-01 
-        pushed:>2020-01-01 
-        archived:false 
-        is:public 
-    """
+    q = aux.leerQuery("querys/query1") #20:45
 
-    q = aux.leerQuery("querys/query1")
+    query = mq.mQuery.getQueryIni()
 
     generator = g.search_repositories(query=q)
 
@@ -57,7 +50,7 @@ try:
     randomizar = False
     lFinal = []
     if randomizar:
-        while len(lFinal) < 500:
+        while len(lFinal) < 100:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)
@@ -66,18 +59,21 @@ try:
 
     # Imprimimos la lista de repositorios
     aux.imprimirListaRepositorios(lFinal)
+    print("Nº de repositorios: " + str(len(lFinal)))
 
-    # Generamos un DataFrame donde irán los resultados.
-    df = d.generarDataFrame(lFinal)
+    ejecutaProceso = False
+    if ejecutaProceso:
+        # Generamos un DataFrame donde irán los resultados.
+        df = d.generarDataFrame(lFinal)
 
-    # Aplicamos el proceso.
-    listaEncontrados = []
-    listaEncontrados = b.busquedaGitHubApiRepos(filteredRepos, df)
+        # Aplicamos el proceso.
+        listaEncontrados = []
+        listaEncontrados = b.busquedaGitHubApiRepos(filteredRepos, df)
 
-    # Generamos un fichero EXCEL con los resultados.
-    d.generarEXCEL(df, "resultados")
+        # Generamos un fichero EXCEL con los resultados.
+        d.generarEXCEL(df, "resultados")
 
-    print("Proceso finalizado.")
+        print("Proceso finalizado.")
 
 except:
     print("Se ha producido un ERROR inesperado.")
