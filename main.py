@@ -16,10 +16,8 @@ try:
     token = aux.leerFichero("token")
     g = Github(user, token)
 
-    q = aux.leerQuery("querys/query1") #20:45
-
-    query = mq.mQuery.getQueryIni()
-
+    q = aux.leerQuery("querys/query1")
+    #query = mq.mQuery.getQueryIni()
     generator = g.search_repositories(query=q)
 
     # Convertimos el generador en una lista de repositorios.

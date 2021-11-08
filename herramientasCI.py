@@ -29,16 +29,15 @@ def getFicherosBusquedaCI(herramientaCI):
         ficheros.append(".circleci/config.yml")
         ficheros.append(".circle-ci")
     elif herramientaCI in HerramientasCI.CI4.value:
-        ficheros.append(".github/workflows/**.yml")
-        ficheros.append(".github/workflows/**.yaml")
+        ficheros.append(".github/workflows") #**.yml o **.yaml
     elif herramientaCI in HerramientasCI.CI5.value:
         ficheros.append(".azure-pipelines/pipelines.yml")
         ficheros.append("azure-pipelines.yml")
     elif herramientaCI in HerramientasCI.CI6.value:
         ficheros.append("bamboo-specs/bamboo.yml")
         ficheros.append("bamboo-specs/bamboo.yaml")
-    elif herramientaCI in HerramientasCI.CI7.value:
-        ficheros.append("NO ME QUEDA CLARO")
+    #elif herramientaCI in HerramientasCI.CI7.value:
+        # NO ME QUEDA CLARO QUÉ AÑADIR EN ESTE CASO.
     elif herramientaCI in HerramientasCI.CI8.value:
         # ESTE IGUAL HAY QUE BUSCARLO EN EL REPO ENTERO, PUEDE ESTAR EN CUALQUIER RUTA.
         ficheros.append(".gitlab-ci.yml")
