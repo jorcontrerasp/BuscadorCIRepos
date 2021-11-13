@@ -1,79 +1,52 @@
 #TFG Grado en Ingeniería de Computadores
 
 #Importamos las librerías necesarias.
-from github import Github
-import random
-import auxiliares as aux
 import datos as d
-import busqueda as b
-import montaQuery as mq
+import github_search as ghs
+import gitlab_search as gls
 
-print("Iniciando proceso...")
+ejecutar = True
+ejecutaProcesoGithub = True
+ejecutaProcesoGitlab = True
 
-try:
-    # Generamos un token para consultar la API de GitHub a través de la librería.
-    user = "jorcontrerasp"
-    token = aux.leerFichero("token")
-    g = Github(user, token)
+def ejecutaProceso():
+    try:
+        print("Iniciando proceso...")
 
-    q = aux.leerQuery("querys/query1")
-    #query = mq.mQuery.getQueryIni()
-    generator = g.search_repositories(query=q)
+        if ejecutaProcesoGithub:
+            # Obtenemos la lista de repositorios Github.
+            lFinal = ghs.getRepositoriosGithub()
 
-    # Convertimos el generador en una lista de repositorios.
-    repositories = list(generator)
+            # Generamos un DataFrame donde irán los resultados.
+            df = d.generarDataFrame(lFinal, True)
 
-    # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
-    fRepos = "repos.pickle"
-    aux.generarPickle(fRepos, repositories)
-    repositories = aux.cargarRepositorios(fRepos)
+            # Aplicamos el proceso.
+            listaEncontrados = []
+            listaEncontrados = ghs.busquedaGitHubApiRepos(lFinal, df)
 
-    # Filtramos por el número de COMMITS.
-    boFiltrarCommits = False
+            # Generamos un fichero EXCEL con los resultados.
+            d.generarEXCEL(df, "resultados_github")
 
-    MAX_COMMITS = 10000
-    MIN_COMMITS = 1000
-    filteredRepos = []
+        if ejecutaProcesoGitlab:
+            # Obtenemos la lista de repositorios Gitlab.
+            lFinal = gls.getProyectosGitlab()
 
-    if boFiltrarCommits:
-        for repo in repositories:
-            commits = repo.get_commits().totalCount
-            if commits >= MIN_COMMITS and commits <= MAX_COMMITS:
-                filteredRepos.append(repo)
-    else:
-        for repo in repositories:
-            filteredRepos.append(repo)
+            # Generamos un DataFrame donde irán los resultados.
+            df2 = d.generarDataFrame(lFinal, False)
 
-    # Seleccionamos N repositorios de manera aleatoria:
-    randomizar = False
-    lFinal = []
-    if randomizar:
-        while len(lFinal) < 100:
-            item = random.choice(filteredRepos)
-            if item not in lFinal:
-                lFinal.append(item)
-    else:
-        lFinal = filteredRepos
+            # Aplicamos el proceso.
+            listaEncontrados = []
+            listaEncontrados = gls.busquedaGitLabApiRepos(lFinal, df2)
 
-    # Imprimimos la lista de repositorios
-    aux.imprimirListaRepositorios(lFinal)
-    print("Nº de repositorios: " + str(len(lFinal)))
-
-    ejecutaProceso = False
-    if ejecutaProceso:
-        # Generamos un DataFrame donde irán los resultados.
-        df = d.generarDataFrame(lFinal)
-
-        # Aplicamos el proceso.
-        listaEncontrados = []
-        listaEncontrados = b.busquedaGitHubApiRepos(filteredRepos, df)
-
-        # Generamos un fichero EXCEL con los resultados.
-        d.generarEXCEL(df, "resultados")
+            # Generamos un fichero EXCEL con los resultados.
+            d.generarEXCEL(df2, "resultados_gitlab")
 
         print("Proceso finalizado.")
 
-except:
-    print("Se ha producido un ERROR inesperado.")
-    raise
-    # FIN
+    except:
+        print("Se ha producido un ERROR inesperado.")
+        raise
+        # FIN
+
+if ejecutar:
+    ejecutaProceso()

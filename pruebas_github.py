@@ -4,14 +4,14 @@
 from github import Github
 from github.GithubException import UnknownObjectException
 import auxiliares as aux
-import busqueda as b
 import datos as d
 import herramientasCI as ci
+import github_search as ghs
 # import openpyxl --> esta hay que instalarla en el venv para que funcione el generarEXCEL.
 
-# Generamos un token para consultar la API de GitHub a través de la librería.
+# Generamos un github_token para consultar la API de GitHub a través de la librería.
 user = "jorcontrerasp"
-token = aux.leerFichero("token")
+token = aux.leerFichero("github_token")
 g = Github(user, token)
 
 organizacion = "envoyproxy"
@@ -39,7 +39,7 @@ if continuar:
     aux.imprimirListaRepositorios(filteredRepos)
 
     listaEncontrados = []
-    listaEncontrados = b.busquedaGitHubApiRepos(filteredRepos, df)
+    listaEncontrados = ghs.busquedaGitHubApiRepos(filteredRepos, df)
 
     d.generarEXCEL(df, "fExcelPruebas")
 

@@ -1,4 +1,4 @@
-class MontaQuery():
+class MontaGithubQuery():
     language = ""
     stars = ">=9000"
     forks = ">=600"
@@ -6,9 +6,6 @@ class MontaQuery():
     pushed = ">2021-01-01"
     archived = "false"
     qIs = "public"
-
-    def __init__(self):
-        print("INIT - MontaQuery.py")
 
     def getQueryIni(self):
         queryIni = ""
@@ -36,4 +33,4 @@ class MontaQuery():
 
         return queryIni
 
-mQuery = MontaQuery()
+mGithubQuery = MontaGithubQuery()

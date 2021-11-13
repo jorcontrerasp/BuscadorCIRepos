@@ -1,9 +1,61 @@
-#AQUÍ se definirán las funciones de búsqueda.
-
 #Importamos las librerías necesarias.
+from github import Github
+import random
 import auxiliares as aux
 import herramientasCI as ci
 import datos as d
+import montaGithubQuery as mq
+
+def getRepositoriosGithub():
+    # Generamos un github_token para consultar la API de GitHub a través de la librería.
+    user = "jorcontrerasp"
+    token = aux.leerFichero("github_token")
+    g = Github(user, token)
+
+    q = aux.leerQuery("github_querys/query1")
+    #query = mq.mGithubQuery.getQueryIni()
+    generator = g.search_repositories(query=q)
+
+    # Convertimos el generador en una lista de repositorios.
+    repositories = list(generator)
+
+    # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
+    fRepos = "github_repos.pickle"
+    aux.generarPickle(fRepos, repositories)
+    repositories = aux.cargarRepositorios(fRepos)
+
+    # Filtramos por el número de COMMITS.
+    boFiltrarCommits = False
+
+    MAX_COMMITS = 10000
+    MIN_COMMITS = 1000
+    filteredRepos = []
+
+    if boFiltrarCommits:
+        for repo in repositories:
+            commits = repo.get_commits().totalCount
+            if commits >= MIN_COMMITS and commits <= MAX_COMMITS:
+                filteredRepos.append(repo)
+    else:
+        for repo in repositories:
+            filteredRepos.append(repo)
+
+    # Seleccionamos N repositorios de manera aleatoria:
+    randomizar = True
+    lFinal = []
+    if randomizar:
+        while len(lFinal) < 100:
+            item = random.choice(filteredRepos)
+            if item not in lFinal:
+                lFinal.append(item)
+    else:
+        lFinal = filteredRepos
+
+    # Imprimimos la lista de repositorios
+    aux.imprimirListaRepositorios(lFinal)
+    print("Nº de repositorios: " + str(len(lFinal)))
+
+    return lFinal
 
 def busquedaGitHubApiRepos(listaRepositorios, df):
     listaEncontrados = []
@@ -56,13 +108,14 @@ def buscarEnRaiz(repo, literal):
     return encontrado
 
 def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df):
+    print("Buscando '" + herramientaCI.value + "' en '" + repo.full_name + "'")
     try:
         if len(literales)==0:
             literales = ci.getFicherosBusquedaCI(herramientaCI.value)
 
         ruta = literales.pop(0)
         repo.get_contents(ruta)
-        d.actualizarDataFrame(repo, ruta, herramientaCI, df)
+        d.actualizarDataFrame(repo, ruta, herramientaCI, True, df)
         return True
     except:
         if len(literales)>0:
