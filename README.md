@@ -24,4 +24,4 @@ $ pip install -r requirements.txt
 
 ## Licencia 📄
 
-Este proyecto está bajo la Licencia (Apache-2.0 License) - mirar el archivo [LICENSE](https://github.com/jorcontrerasp/BuscadorGitHubRepos/blob/main/LICENSE) para más detalles.
+Este proyecto está bajo la Licencia (Apache-2.0 License) - mirar el archivo [LICENSE](https://github.com/jorcontrerasp/BuscadorCIRepos/blob/main/LICENSE) para más detalles.
