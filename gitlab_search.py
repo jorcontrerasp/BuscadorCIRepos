@@ -4,9 +4,9 @@ import auxiliares as aux
 import herramientasCI as ci
 import datos as d
 
-N_MAX_PAGES = 1245
+N_MAX_PAGES = 12500
 N_MIN_STARS = 50
-N_MAX_RESULT_PROYECTS = 30
+N_MAX_RESULT_PROYECTS = 900
 LANGUAGE = ''
 
 def getProyectosGitlab():
@@ -17,36 +17,44 @@ def getProyectosGitlab():
     i = 1
     lista = []
     while i<=N_MAX_PAGES:
-        projects = gl.projects.list(visibility='public',
-                                    last_activity_after='2020-01-01T00:00:00Z',
-                                    page=i,
-                                    per_page=100)
-        print("Página " + str(i) + ": " + str(projects))
-        print("Nº Proyectos: " + str(len(projects)))
-        j = 0
-        for project in projects:
-            print("Tratando proyecto: " + str(j) + "/" + str(len(projects)))
-            boVacio = esRepositorioVacio(project)
-            if not boVacio:
-                stars = project.star_count
-                if stars >= N_MIN_STARS:
-                    if len(LANGUAGE)>0:
-                        languages = project.languages()
-                        for l in languages:
-                            if LANGUAGE.lower() == str(l).lower():
-                                lista.append(project)
-                                break
-                    else:
-                        lista.append(project)
+        try:
+            projects = gl.projects.list(visibility='public',
+                                        last_activity_after='2020-01-01T00:00:00Z',
+                                        pagination='keyset',
+                                        page=i,
+                                        #per_page=100,
+                                        order_by='id',
+                                        sort='asc')
 
-            tLista = len(lista)
-            print("L Resultado: " + str(tLista))
-            j = j + 1
+            print("Página " + str(i) + ": " + str(projects))
+            print("Nº Proyectos: " + str(len(projects)))
+            j = 0
+            for project in projects:
+                print("Tratando proyecto: " + str(j) + "/" + str(len(projects)))
+                boVacio = esRepositorioVacio(project)
+                if not boVacio:
+                    stars = project.star_count
+                    if stars >= N_MIN_STARS:
+                        if len(LANGUAGE)>0:
+                            languages = project.languages()
+                            for l in languages:
+                                if LANGUAGE.lower() == str(l).lower():
+                                    lista.append(project)
+                                    break
+                        else:
+                            lista.append(project)
+
+                tLista = len(lista)
+                print("L Resultado: " + str(tLista))
+                j = j + 1
+                if (tLista >= N_MAX_RESULT_PROYECTS):
+                    break
+            i = i + 1
             if (tLista >= N_MAX_RESULT_PROYECTS):
                 break
-        i = i + 1
-        if (tLista >= N_MAX_RESULT_PROYECTS):
-            break
+        except:
+            print("Se ha producido un ERROR de búsqueda en la página " + str(i) + ".")
+            i = i + 1
 
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
     fRepos = "gitlab_repos.pickle"
@@ -86,25 +94,29 @@ def busquedaGitLabApiRepos(listaProyectos, df):
 def buscaRutaGitlab(project, herramientaCI, df):
     print("Buscando '" + herramientaCI.value + "' en '" + project.attributes['path_with_namespace'] + "'")
     encontrado = False
-    paths = ci.getFicherosBusquedaCI(herramientaCI.value)
-    for path in paths:
-        items = project.repository_tree(all=True, path=path)
-        if len(items) == 0:
-            sPath = path.split("/")
-            fichero = sPath.pop(len(sPath) - 1)
-            path = "/".join(sPath)
+    try:
+        paths = ci.getFicherosBusquedaCI(herramientaCI.value)
+        for path in paths:
             items = project.repository_tree(all=True, path=path)
             if len(items) == 0:
-                encontrado = False
+                sPath = path.split("/")
+                fichero = sPath.pop(len(sPath) - 1)
+                path = "/".join(sPath)
+                items = project.repository_tree(all=True, path=path)
+                if len(items) == 0:
+                    encontrado = False
+                else:
+                    for item in items:
+                        iPath = item['path']
+                        if iPath == (path + "/" + fichero):
+                            encontrado = True
+                            d.actualizarDataFrame(project, path + "/" + fichero, herramientaCI, False, df)
             else:
-                for item in items:
-                    iPath = item['path']
-                    if iPath == (path + "/" + fichero):
-                        encontrado = True
-                        d.actualizarDataFrame(project, path + "/" + fichero, herramientaCI, False, df)
-        else:
-            encontrado = True
-            d.actualizarDataFrame(project, path, herramientaCI, False, df)
+                encontrado = True
+                d.actualizarDataFrame(project, path, herramientaCI, False, df)
+    except:
+        d.actualizarDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", herramientaCI, False, df)
+        print("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.")
 
     return encontrado
 
