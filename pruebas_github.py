@@ -30,7 +30,8 @@ if continuar:
 
     filteredRepos = [repo]
 
-    df = d.generarDataFrame(filteredRepos)
+    df = d.generarDataFrame(filteredRepos, True)
+    df2 = d.generarDataFrameContadores()
 
     files = ci.getFicherosBusquedaCI(ci.HerramientasCI.CI11.value)
     for file in files:
@@ -39,8 +40,9 @@ if continuar:
     aux.imprimirListaRepositorios(filteredRepos)
 
     listaEncontrados = []
-    listaEncontrados = ghs.busquedaGitHubApiRepos(filteredRepos, df)
+    listaEncontrados = ghs.busquedaGitHubApiRepos(filteredRepos, df, df2)
 
     d.generarEXCEL(df, "fExcelPruebas")
+    d.generarEXCEL(df2, "fExcelPruebas2")
 
     print(str(len(listaEncontrados)))

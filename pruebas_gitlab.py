@@ -20,10 +20,12 @@ languages = project.languages()
 #print("Proyecto '" + identificador + "' encontrado: " + str(encontrado))
 
 df = d.generarDataFrame(lProjects, False)
+df2 = d.generarDataFrameContadores()
 
-lEncontrados = gls.busquedaGitLabApiRepos(lProjects, df)
+lEncontrados = gls.busquedaGitLabApiRepos(lProjects, df, df2)
 
 d.generarEXCEL(df, "fExcelPruebas")
+d.generarEXCEL(df2, "fExcelPruebas2")
 
 print(str(len(lEncontrados)))
 

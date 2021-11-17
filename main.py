@@ -6,7 +6,7 @@ import github_search as ghs
 import gitlab_search as gls
 
 ejecutar = True
-ejecutaProcesoGithub = True
+ejecutaProcesoGithub = False
 ejecutaProcesoGitlab = True
 
 def ejecutaProceso():

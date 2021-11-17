@@ -4,7 +4,7 @@ import auxiliares as aux
 import herramientasCI as ci
 import datos as d
 
-N_MAX_PAGES = 12500
+N_MAX_SEARCHES = 2500
 N_MIN_STARS = 50
 N_MAX_RESULT_PROYECTS = 10
 LANGUAGE = ''
@@ -16,21 +16,30 @@ def getProyectosGitlab():
 
     i = 1
     lista = []
-    while i<=N_MAX_PAGES:
+    idAfter = 0
+    while i<=N_MAX_SEARCHES:
         try:
             projects = gl.projects.list(visibility='public',
                                         last_activity_after='2020-01-01T00:00:00Z',
+                                        #all=True,
                                         pagination='keyset',
-                                        page=i,
+                                        id_after=idAfter,
+                                        #use_keyset_pagination=True,
+                                        page=1,
                                         #per_page=100,
                                         order_by='id',
-                                        sort='asc')
+                                        sort='asc'
+                                        )
 
             print("Página " + str(i) + ": " + str(projects))
             print("Nº Proyectos: " + str(len(projects)))
             j = 0
             for project in projects:
                 print("Tratando proyecto: " + str(j) + "/" + str(len(projects)))
+
+                if(j==len(projects)-1):
+                    idAfter = project.attributes['id']
+
                 boVacio = esRepositorioVacio(project)
                 if not boVacio:
                     stars = project.star_count
