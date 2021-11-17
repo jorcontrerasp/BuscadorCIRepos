@@ -6,7 +6,7 @@ import datos as d
 
 N_MAX_PAGES = 12500
 N_MIN_STARS = 50
-N_MAX_RESULT_PROYECTS = 900
+N_MAX_RESULT_PROYECTS = 10
 LANGUAGE = ''
 
 def getProyectosGitlab():
@@ -63,23 +63,22 @@ def getProyectosGitlab():
 
     return lista
 
-def busquedaGitLabApiRepos(listaProyectos, df):
+def busquedaGitLabApiRepos(listaProyectos, df, df2):
     listaEncontrados = []
     for proyecto in listaProyectos:
-        encontrado0 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI0, df)
-        encontrado1 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI1, df)
-        encontrado2 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI2, df)
-        encontrado3 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI3, df)
-        encontrado4 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI4, df)
-        encontrado5 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI5, df)
-        encontrado6 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI6, df)
-        encontrado7 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI7, df)
-        encontrado8 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI8, df)
-        encontrado9 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI9, df)
-        encontrado10 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI10, df)
-        encontrado11 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI11, df)
-        encontrado12 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI12, df)
-        encontrado13 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI12, df)
+        encontrado1 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI1, df, df2)
+        encontrado2 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI2, df, df2)
+        encontrado3 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI3, df, df2)
+        encontrado4 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI4, df, df2)
+        encontrado5 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI5, df, df2)
+        encontrado6 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI6, df, df2)
+        encontrado7 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI7, df, df2)
+        encontrado8 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI8, df, df2)
+        encontrado9 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI9, df, df2)
+        encontrado10 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI10, df, df2)
+        encontrado11 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI11, df, df2)
+        encontrado12 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI12, df, df2)
+        encontrado13 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI12, df, df2)
 
         # Si lo ha encontrado:
         # - lo añadimos a la listaEncontrados.
@@ -88,10 +87,12 @@ def busquedaGitLabApiRepos(listaProyectos, df):
         if encontrado:
             listaEncontrados.append(proyecto)
 
+    d.actualizarTotalesDataFrameContadores(df, df2)
+
     return listaEncontrados
 
 
-def buscaRutaGitlab(project, herramientaCI, df):
+def buscaRutaGitlab(project, herramientaCI, df, df2):
     print("Buscando '" + herramientaCI.value + "' en '" + project.attributes['path_with_namespace'] + "'")
     encontrado = False
     try:
@@ -111,9 +112,11 @@ def buscaRutaGitlab(project, herramientaCI, df):
                         if iPath == (path + "/" + fichero):
                             encontrado = True
                             d.actualizarDataFrame(project, path + "/" + fichero, herramientaCI, False, df)
+                            d.actualizarDataFrameContadores(herramientaCI.value, df2)
             else:
                 encontrado = True
                 d.actualizarDataFrame(project, path, herramientaCI, False, df)
+                d.actualizarDataFrameContadores(herramientaCI.value, df2)
     except:
         d.actualizarDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", herramientaCI, False, df)
         print("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.")

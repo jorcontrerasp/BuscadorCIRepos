@@ -4,7 +4,6 @@
 from enum import Enum
 
 class HerramientasCI(Enum):
-    CI0 = "Pruebas"
     CI1 = "Jenkins"
     CI2 = "Travis"
     CI3 = "Circle CI"
@@ -21,8 +20,6 @@ class HerramientasCI(Enum):
 
 def getFicherosBusquedaCI(herramientaCI):
     ficheros = []
-    if herramientaCI in HerramientasCI.CI0.value:
-        ficheros.append(".gitlab/merge_request_templates/job-family-template.md")
     if herramientaCI in HerramientasCI.CI1.value:
         ficheros.append("Jenkinsfile")
     elif herramientaCI in HerramientasCI.CI2.value:

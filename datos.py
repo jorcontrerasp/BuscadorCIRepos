@@ -19,7 +19,6 @@ def generarDataFrame(listaRepositorios, boEsGithub):
     df = pd.DataFrame([],
                       index=[identificador],
                       columns=["URL", "Lenguaje"
-                                , ci.HerramientasCI.CI0.value
                                 ,ci.HerramientasCI.CI1.value
                                 , ci.HerramientasCI.CI2.value
                                 , ci.HerramientasCI.CI3.value
@@ -36,7 +35,6 @@ def generarDataFrame(listaRepositorios, boEsGithub):
                                ])
     df.at[identificador, "URL"] = url1
     df.at[identificador, "Lenguaje"] = language1
-    df.at[identificador, ci.HerramientasCI.CI0.value] = " "
     df.at[identificador, ci.HerramientasCI.CI1.value] = " "
     df.at[identificador, ci.HerramientasCI.CI2.value] = " "
     df.at[identificador, ci.HerramientasCI.CI3.value] = " "
@@ -65,7 +63,6 @@ def generarDataFrame(listaRepositorios, boEsGithub):
         df2 = pd.DataFrame([],
                           index=[identificador],
                           columns=["URL", "Lenguaje"
-                                    , ci.HerramientasCI.CI0.value
                                     , ci.HerramientasCI.CI1.value
                                     , ci.HerramientasCI.CI2.value
                                     , ci.HerramientasCI.CI3.value
@@ -82,7 +79,6 @@ def generarDataFrame(listaRepositorios, boEsGithub):
                                    ])
         df2.at[identificador, "URL"] = url
         df2.at[identificador, "Lenguaje"] = language
-        df2.at[identificador, ci.HerramientasCI.CI0.value] = " "
         df2.at[identificador, ci.HerramientasCI.CI1.value] = " "
         df2.at[identificador, ci.HerramientasCI.CI2.value] = " "
         df2.at[identificador, ci.HerramientasCI.CI3.value] = " "
@@ -110,6 +106,63 @@ def actualizarDataFrame(repo, literal, herramientaCI, boEsGithub, df):
         df.at[identificador, herramientaCI.value] = "[" + literal + "]\n"
     else:
         df.at[identificador, herramientaCI.value] += "[" + literal + "]\n"
+
+def generarDataFrameContadores():
+    print("Generando DataFrame de contadores...")
+    df = pd.DataFrame([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      index=[ci.HerramientasCI.CI1.value
+                            , ci.HerramientasCI.CI2.value
+                            , ci.HerramientasCI.CI3.value
+                            , ci.HerramientasCI.CI4.value
+                            , ci.HerramientasCI.CI5.value
+                            , ci.HerramientasCI.CI6.value
+                            , ci.HerramientasCI.CI7.value
+                            , ci.HerramientasCI.CI8.value
+                            , ci.HerramientasCI.CI9.value
+                            , ci.HerramientasCI.CI10.value
+                            , ci.HerramientasCI.CI11.value
+                            , ci.HerramientasCI.CI12.value
+                            ,"Totales"],
+                      columns=['Encontrados'])
+    return df
+
+def actualizarDataFrameContadores(fila, df):
+    df.at[fila, "Encontrados"] += 1
+
+def actualizarTotalesDataFrameContadores(df,df2):
+    totales = contarRepositoriosAlMenos1Encontrado(df)
+    df2.at["Totales", "Encontrados"] = totales
+
+def contarRepositoriosAlMenos1Encontrado(df):
+    cont = 0
+    for index, row in df.iterrows():
+        if (len(str(row[ci.HerramientasCI.CI1.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI2.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI3.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI4.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI5.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI6.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI7.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI8.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI9.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI10.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI11.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI12.value])) > 1):
+            cont += 1
+        elif (len(str(row[ci.HerramientasCI.CI13.value])) > 1):
+            cont += 1
+    return cont
 
 def generarEXCEL(df, pFichero):
     print("Generando fichero Excel...")

@@ -18,28 +18,40 @@ def ejecutaProceso():
             lFinal = ghs.getRepositoriosGithub()
 
             # Generamos un DataFrame donde irán los resultados.
-            df = d.generarDataFrame(lFinal, True)
+            githubDF = d.generarDataFrame(lFinal, True)
+
+            # Generamos un DataFrame donde irán los contadores.
+            githubDF2 = d.generarDataFrameContadores()
 
             # Aplicamos el proceso.
             listaEncontrados = []
-            listaEncontrados = ghs.busquedaGitHubApiRepos(lFinal, df)
+            listaEncontrados = ghs.busquedaGitHubApiRepos(lFinal, githubDF, githubDF2)
 
             # Generamos un fichero EXCEL con los resultados.
-            d.generarEXCEL(df, "resultados_github")
+            d.generarEXCEL(githubDF, "resultados_github")
+
+            # Generamos un fichero EXCEL con los contadores.
+            d.generarEXCEL(githubDF2, "contadores_github")
 
         if ejecutaProcesoGitlab:
             # Obtenemos la lista de repositorios Gitlab.
             lFinal = gls.getProyectosGitlab()
 
             # Generamos un DataFrame donde irán los resultados.
-            df2 = d.generarDataFrame(lFinal, False)
+            gitlabDF = d.generarDataFrame(lFinal, False)
+
+            # Generamos un DataFrame donde irán los contadores.
+            gitlabDF2 = d.generarDataFrameContadores()
 
             # Aplicamos el proceso.
             listaEncontrados = []
-            listaEncontrados = gls.busquedaGitLabApiRepos(lFinal, df2)
+            listaEncontrados = gls.busquedaGitLabApiRepos(lFinal, gitlabDF, gitlabDF2)
 
             # Generamos un fichero EXCEL con los resultados.
-            d.generarEXCEL(df2, "resultados_gitlab")
+            d.generarEXCEL(gitlabDF, "resultados_gitlab")
+
+            # Generamos un fichero EXCEL con los contadores.
+            d.generarEXCEL(gitlabDF2, "contadores_gitlab")
 
         print("Proceso finalizado.")
 

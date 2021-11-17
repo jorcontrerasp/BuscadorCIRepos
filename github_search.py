@@ -44,7 +44,7 @@ def getRepositoriosGithub():
     randomizar = True
     lFinal = []
     if randomizar:
-        while len(lFinal) < 100:
+        while len(lFinal) < 10:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)
@@ -57,22 +57,22 @@ def getRepositoriosGithub():
 
     return lFinal
 
-def busquedaGitHubApiRepos(listaRepositorios, df):
+def busquedaGitHubApiRepos(listaRepositorios, df, df2):
     listaEncontrados = []
     for repo in listaRepositorios:
-        encontrado1 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI1, [], df)
-        encontrado2 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI2, [], df)
-        encontrado3 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI3, [], df)
-        encontrado4 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI4, [], df)
-        encontrado5 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI5, [], df)
-        encontrado6 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI6, [], df)
-        encontrado7 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI7, [], df)
-        encontrado8 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI8, [], df)
-        encontrado9 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI9, [], df)
-        encontrado10 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI10, [], df)
-        encontrado11 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI11, [], df)
-        encontrado12 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI12, [], df)
-        encontrado13 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI13, [], df)
+        encontrado1 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI1, [], df, df2)
+        encontrado2 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI2, [], df, df2)
+        encontrado3 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI3, [], df, df2)
+        encontrado4 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI4, [], df, df2)
+        encontrado5 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI5, [], df, df2)
+        encontrado6 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI6, [], df, df2)
+        encontrado7 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI7, [], df, df2)
+        encontrado8 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI8, [], df, df2)
+        encontrado9 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI9, [], df, df2)
+        encontrado10 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI10, [], df, df2)
+        encontrado11 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI11, [], df, df2)
+        encontrado12 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI12, [], df, df2)
+        encontrado13 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI13, [], df, df2)
 
         # Si lo ha encontrado:
         # - lo añadimos a la listaEncontrados.
@@ -80,6 +80,8 @@ def busquedaGitHubApiRepos(listaRepositorios, df):
                      or encontrado8 or encontrado9 or encontrado10 or encontrado11 or encontrado12 or encontrado13
         if encontrado:
             listaEncontrados.append(repo)
+
+    d.actualizarTotalesDataFrameContadores(df, df2)
 
     return listaEncontrados
 
@@ -107,7 +109,7 @@ def buscarEnRaiz(repo, literal):
             break
     return encontrado
 
-def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df):
+def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df, df2):
     print("Buscando '" + herramientaCI.value + "' en '" + repo.full_name + "'")
     try:
         if len(literales)==0:
@@ -116,10 +118,11 @@ def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df):
         ruta = literales.pop(0)
         repo.get_contents(ruta)
         d.actualizarDataFrame(repo, ruta, herramientaCI, True, df)
+        d.actualizarDataFrameContadores(herramientaCI.value, df2)
         return True
     except:
         if len(literales)>0:
-            return buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df)
+            return buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df, df2)
         else:
             return False
 
