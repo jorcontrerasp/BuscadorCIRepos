@@ -41,10 +41,10 @@ def getRepositoriosGithub():
             filteredRepos.append(repo)
 
     # Seleccionamos N repositorios de manera aleatoria:
-    randomizar = True
+    randomizar = False
     lFinal = []
     if randomizar:
-        while len(lFinal) < 10:
+        while len(lFinal) < 100:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)

@@ -4,9 +4,9 @@ import auxiliares as aux
 import herramientasCI as ci
 import datos as d
 
-N_MAX_SEARCHES = 2500
+N_MAX_SEARCHES = 18550
 N_MIN_STARS = 50
-N_MAX_RESULT_PROYECTS = 10
+N_MAX_RESULT_PROYECTS = 400
 LANGUAGE = ''
 
 def getProyectosGitlab():
@@ -19,6 +19,7 @@ def getProyectosGitlab():
     idAfter = 0
     while i<=N_MAX_SEARCHES:
         try:
+
             projects = gl.projects.list(visibility='public',
                                         last_activity_after='2020-01-01T00:00:00Z',
                                         #all=True,
@@ -31,36 +32,40 @@ def getProyectosGitlab():
                                         sort='asc'
                                         )
 
-            print("Página " + str(i) + ": " + str(projects))
-            print("Nº Proyectos: " + str(len(projects)))
-            j = 0
-            for project in projects:
-                print("Tratando proyecto: " + str(j) + "/" + str(len(projects)))
+            if len(projects)==0:
+                print("No se ha encontrado ningún projecto en la búsqueda " + str(i))
+                break
+            else:
+                print("Búsqueda " + str(i) + ": " + str(projects))
+                print("Nº Proyectos: " + str(len(projects)))
+                j = 1
+                for project in projects:
+                    print("Tratando proyecto: " + str(j) + "/" + str(len(projects)))
 
-                if(j==len(projects)-1):
-                    idAfter = project.attributes['id']
+                    if(j==len(projects)):
+                        idAfter = project.attributes['id']
 
-                boVacio = esRepositorioVacio(project)
-                if not boVacio:
-                    stars = project.star_count
-                    if stars >= N_MIN_STARS:
-                        if len(LANGUAGE)>0:
-                            languages = project.languages()
-                            for l in languages:
-                                if LANGUAGE.lower() == str(l).lower():
-                                    lista.append(project)
-                                    break
-                        else:
-                            lista.append(project)
+                    boVacio = esRepositorioVacio(project)
+                    if not boVacio:
+                        stars = project.star_count
+                        if stars >= N_MIN_STARS:
+                            if len(LANGUAGE)>0:
+                                languages = project.languages()
+                                for l in languages:
+                                    if LANGUAGE.lower() == str(l).lower():
+                                        lista.append(project)
+                                        break
+                            else:
+                                lista.append(project)
 
-                tLista = len(lista)
-                print("L Resultado: " + str(tLista))
-                j = j + 1
+                    tLista = len(lista)
+                    print("L Resultado: " + str(tLista))
+                    j = j + 1
+                    if (tLista >= N_MAX_RESULT_PROYECTS):
+                        break
+                i = i + 1
                 if (tLista >= N_MAX_RESULT_PROYECTS):
                     break
-            i = i + 1
-            if (tLista >= N_MAX_RESULT_PROYECTS):
-                break
         except:
             print("Se ha producido un ERROR de búsqueda en la página " + str(i) + ".")
             i = i + 1
@@ -133,6 +138,9 @@ def buscaRutaGitlab(project, herramientaCI, df, df2):
     return encontrado
 
 def esRepositorioVacio(proyecto):
+    return proyecto.attributes['empty_repo']
+
+def esRepositorioVacio2(proyecto):
     try:
         items = proyecto.repository_tree()
         return False
