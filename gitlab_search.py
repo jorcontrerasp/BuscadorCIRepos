@@ -3,10 +3,11 @@ import gitlab
 import auxiliares as aux
 import herramientasCI as ci
 import datos as d
+import logging
 
 N_MAX_SEARCHES = 18550
 N_MIN_STARS = 50
-N_MAX_RESULT_PROYECTS = 100
+N_MAX_RESULT_PROYECTS = 10
 LANGUAGE = ''
 
 def getProyectosGitlab():
@@ -33,14 +34,14 @@ def getProyectosGitlab():
                                         )
 
             if len(projects)==0:
-                print("No se ha encontrado ningún projecto en la búsqueda " + str(i))
+                aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
                 break
             else:
-                print("Búsqueda " + str(i) + ": " + str(projects))
-                print("Nº Proyectos: " + str(len(projects)))
+                aux.printLog("Búsqueda " + str(i), logging.INFO)
+                aux.printLog("Nº Proyectos: " + str(len(projects)), logging.INFO)
                 j = 1
                 for project in projects:
-                    print("Tratando proyecto: " + str(j) + "/" + str(len(projects)))
+                    aux.printLog("Tratando proyecto: " + str(j) + "/" + str(len(projects)), logging.INFO)
 
                     if(j==len(projects)):
                         idAfter = project.attributes['id']
@@ -59,7 +60,7 @@ def getProyectosGitlab():
                                 lista.append(project)
 
                     tLista = len(lista)
-                    print("L Resultado: " + str(tLista))
+                    aux.printLog("L Resultado: " + str(tLista), logging.INFO)
                     j = j + 1
                     if (tLista >= N_MAX_RESULT_PROYECTS):
                         break
@@ -67,13 +68,17 @@ def getProyectosGitlab():
                 if (tLista >= N_MAX_RESULT_PROYECTS):
                     break
         except:
-            print("Se ha producido un ERROR de búsqueda en la página " + str(i) + ".")
+            aux.printLog(": Se ha producido un ERROR de búsqueda en la página " + str(i) + ".", logging.ERROR)
             i = i + 1
 
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
     fRepos = "gitlab_repos.pickle"
     aux.generarPickle(fRepos, lista)
     lista = aux.cargarRepositorios(fRepos)
+
+    # Imprimimos la lista de proyectos
+    aux.imprimirListaGitLabRepos(lista)
+    aux.printLog("Nº de proyectos: " + str(len(lista)), logging.INFO)
 
     return lista
 
@@ -107,7 +112,7 @@ def busquedaGitLabApiRepos(listaProyectos, df, df2):
 
 
 def buscaRutaGitlab(project, herramientaCI, df, df2):
-    print("Buscando '" + herramientaCI.value + "' en '" + project.attributes['path_with_namespace'] + "'")
+    aux.printLog("Buscando '" + herramientaCI.value + "' en '" + project.attributes['path_with_namespace'] + "'", logging.INFO)
     encontrado = False
     try:
         paths = ci.getFicherosBusquedaCI(herramientaCI.value)
@@ -133,7 +138,7 @@ def buscaRutaGitlab(project, herramientaCI, df, df2):
                 d.actualizarDataFrameContadores(herramientaCI.value, df2)
     except:
         d.actualizarDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", herramientaCI, False, df)
-        print("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.")
+        aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
     return encontrado
 

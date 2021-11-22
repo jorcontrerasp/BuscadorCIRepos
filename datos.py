@@ -3,8 +3,11 @@
 #Importamos las librerías necesarias.
 import pandas as pd
 import herramientasCI as ci
+import auxiliares as aux
+import logging
 
 def generarDataFrame(listaRepositorios, boEsGithub):
+    aux.printLog("Generando DataFrame...", logging.INFO)
     repo1 = listaRepositorios[0]
 
     if boEsGithub:
@@ -108,7 +111,7 @@ def actualizarDataFrame(repo, literal, herramientaCI, boEsGithub, df):
         df.at[identificador, herramientaCI.value] += "[" + literal + "]\n"
 
 def generarDataFrameContadores():
-    print("Generando DataFrame de contadores...")
+    aux.printLog("Generando DataFrame contadores...", logging.INFO)
     df = pd.DataFrame([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       index=[ci.HerramientasCI.CI1.value
                             , ci.HerramientasCI.CI2.value
@@ -165,9 +168,9 @@ def contarRepositoriosAlMenos1Encontrado(df):
     return cont
 
 def generarEXCEL(df, pFichero):
-    print("Generando fichero Excel...")
+    aux.printLog("Generando fichero Excel...", logging.INFO)
     df.to_excel(pFichero + ".xlsx")
 
 def generarCSV(df, pFichero):
-    print("Generando fichero Csv...")
+    aux.printLog("Generando fichero Csv...", logging.INFO)
     df.to_csv(pFichero + ".csv")

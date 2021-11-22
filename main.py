@@ -6,21 +6,22 @@ import github_search as ghs
 import gitlab_search as gls
 import auxiliares as aux
 import os
+import logging
 
 ejecutar = True
-ejecutaProcesoGithub = False
+ejecutaProcesoGithub = True
 ejecutaProcesoGitlab = True
-reutilizarRepos = True
+reutilizarRepos = False
 
 def ejecutaProceso():
     try:
-        print("Iniciando proceso...")
+        aux.printLog("Iniciando proceso...", logging.INFO)
         fRepos = ""
 
         if ejecutaProcesoGithub:
             fRepos = "github_repos.pickle"
             if reutilizarRepos:
-                print("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.")
+                aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
                 if os.path.exists(fRepos):
                     lFinal = aux.cargarRepositorios(fRepos)
                 else:
@@ -48,7 +49,7 @@ def ejecutaProceso():
         if ejecutaProcesoGitlab:
             fRepos = "gitlab_repos.pickle"
             if reutilizarRepos:
-                print("Utilizando el fichero " + fRepos + " para generar los repositorios GitLab.")
+                aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitLab.", logging.INFO)
                 if os.path.exists(fRepos):
                     lFinal = aux.cargarRepositorios(fRepos)
                 else:
@@ -73,10 +74,10 @@ def ejecutaProceso():
             # Generamos un fichero EXCEL con los contadores.
             d.generarEXCEL(gitlabDF2, "contadores_gitlab")
 
-        print("Proceso finalizado.")
+        aux.printLog("Proceso finalizado.", logging.INFO)
 
     except:
-        print("Se ha producido un ERROR inesperado.")
+        aux.printLog("Se ha producido un ERROR inesperado.", logging.ERROR)
         raise
         # FIN
 

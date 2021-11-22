@@ -4,7 +4,7 @@ import random
 import auxiliares as aux
 import herramientasCI as ci
 import datos as d
-import montaGithubQuery as mq
+import logging
 
 def getRepositoriosGithub():
     # Generamos un github_token para consultar la API de GitHub a través de la librería.
@@ -12,7 +12,7 @@ def getRepositoriosGithub():
     token = aux.leerFichero("github_token")
     g = Github(user, token)
 
-    q = aux.leerQuery("github_querys/query2")
+    q = aux.leerFichero("github_querys/query2")
     #query = mq.mGithubQuery.getQueryIni()
     generator = g.search_repositories(query=q)
 
@@ -44,7 +44,7 @@ def getRepositoriosGithub():
     randomizar = True
     lFinal = []
     if randomizar:
-        while len(lFinal) < 100:
+        while len(lFinal) < 10:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)
@@ -52,8 +52,8 @@ def getRepositoriosGithub():
         lFinal = filteredRepos
 
     # Imprimimos la lista de repositorios
-    aux.imprimirListaRepositorios(lFinal)
-    print("Nº de repositorios: " + str(len(lFinal)))
+    aux.imprimirListaGitHubRepos(lFinal)
+    aux.printLog("Nº de repositorios: " + str(len(lFinal)), logging.INFO)
 
     return lFinal
 
@@ -92,7 +92,6 @@ def buscarEnRepo(repo, literal):
         content_file = contents.pop(0)
         if literal in content_file.path.lower():
             encontrado = True
-            print(str(content_file.path))
             break
         else:
             if content_file.type == "dir":
@@ -105,12 +104,11 @@ def buscarEnRaiz(repo, literal):
     for content_file in contents:
         if literal in content_file.path.lower():
             encontrado = True
-            print(str(content_file.path))
             break
     return encontrado
 
 def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df, df2):
-    print("Buscando '" + herramientaCI.value + "' en '" + repo.full_name + "'")
+    aux.printLog("Buscando '" + herramientaCI.value + "' en '" + repo.full_name + "'", logging.INFO)
     try:
         if len(literales)==0:
             literales = ci.getFicherosBusquedaCI(herramientaCI.value)
