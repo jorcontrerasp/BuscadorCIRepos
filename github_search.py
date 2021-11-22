@@ -12,7 +12,7 @@ def getRepositoriosGithub():
     token = aux.leerFichero("github_token")
     g = Github(user, token)
 
-    q = aux.leerQuery("github_querys/query1")
+    q = aux.leerQuery("github_querys/query2")
     #query = mq.mGithubQuery.getQueryIni()
     generator = g.search_repositories(query=q)
 
@@ -41,7 +41,7 @@ def getRepositoriosGithub():
             filteredRepos.append(repo)
 
     # Seleccionamos N repositorios de manera aleatoria:
-    randomizar = False
+    randomizar = True
     lFinal = []
     if randomizar:
         while len(lFinal) < 100:

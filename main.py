@@ -4,18 +4,30 @@
 import datos as d
 import github_search as ghs
 import gitlab_search as gls
+import auxiliares as aux
+import os
 
 ejecutar = True
-ejecutaProcesoGithub = True
+ejecutaProcesoGithub = False
 ejecutaProcesoGitlab = True
+reutilizarRepos = True
 
 def ejecutaProceso():
     try:
         print("Iniciando proceso...")
+        fRepos = ""
 
         if ejecutaProcesoGithub:
-            # Obtenemos la lista de repositorios Github.
-            lFinal = ghs.getRepositoriosGithub()
+            fRepos = "github_repos.pickle"
+            if reutilizarRepos:
+                print("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.")
+                if os.path.exists(fRepos):
+                    lFinal = aux.cargarRepositorios(fRepos)
+                else:
+                    raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
+            else:
+                # Obtenemos la lista de repositorios Github.
+                lFinal = ghs.getRepositoriosGithub()
 
             # Generamos un DataFrame donde irán los resultados.
             githubDF = d.generarDataFrame(lFinal, True)
@@ -34,8 +46,16 @@ def ejecutaProceso():
             d.generarEXCEL(githubDF2, "contadores_github")
 
         if ejecutaProcesoGitlab:
-            # Obtenemos la lista de repositorios Gitlab.
-            lFinal = gls.getProyectosGitlab()
+            fRepos = "gitlab_repos.pickle"
+            if reutilizarRepos:
+                print("Utilizando el fichero " + fRepos + " para generar los repositorios GitLab.")
+                if os.path.exists(fRepos):
+                    lFinal = aux.cargarRepositorios(fRepos)
+                else:
+                    raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
+            else:
+                # Obtenemos la lista de repositorios Gitlab.
+                lFinal = gls.getProyectosGitlab()
 
             # Generamos un DataFrame donde irán los resultados.
             gitlabDF = d.generarDataFrame(lFinal, False)
