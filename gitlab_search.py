@@ -110,7 +110,6 @@ def busquedaGitLabApiRepos(listaProyectos, df, df2):
 
     return listaEncontrados
 
-
 def buscaRutaGitlab(project, herramientaCI, df, df2):
     aux.printLog("Buscando '" + herramientaCI.value + "' en '" + project.attributes['path_with_namespace'] + "'", logging.INFO)
     encontrado = False
@@ -119,19 +118,10 @@ def buscaRutaGitlab(project, herramientaCI, df, df2):
         for path in paths:
             items = project.repository_tree(all=True, path=path)
             if len(items) == 0:
-                sPath = path.split("/")
-                fichero = sPath.pop(len(sPath) - 1)
-                path = "/".join(sPath)
-                items = project.repository_tree(all=True, path=path)
-                if len(items) == 0:
-                    encontrado = False
-                else:
-                    for item in items:
-                        iPath = item['path']
-                        if iPath == (path + "/" + fichero):
-                            encontrado = True
-                            d.actualizarDataFrame(project, path + "/" + fichero, herramientaCI, False, df)
-                            d.actualizarDataFrameContadores(herramientaCI.value, df2)
+                encontrado = existeFichero(project,path)
+                if encontrado:
+                    d.actualizarDataFrame(project, path, herramientaCI, False, df)
+                    d.actualizarDataFrameContadores(herramientaCI.value, df2)
             else:
                 encontrado = True
                 d.actualizarDataFrame(project, path, herramientaCI, False, df)
@@ -139,8 +129,6 @@ def buscaRutaGitlab(project, herramientaCI, df, df2):
     except:
         d.actualizarDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", herramientaCI, False, df)
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
-
-    return encontrado
 
 def esRepositorioVacio(proyecto):
     return proyecto.attributes['empty_repo']
@@ -152,9 +140,9 @@ def esRepositorioVacio2(proyecto):
     except:
         return True
 
-def existeRutaFichero(proyecto, ruta):
+def existeFichero(proyecto, fPath):
     try:
-        f = proyecto.files.get(file_path=ruta, ref='master')
+        f = proyecto.files.get(file_path=fPath, ref='master')
         return True
     except:
         return False

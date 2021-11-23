@@ -9,7 +9,11 @@ gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
 project_id = 7764
 project = gl.projects.get(project_id)
-lProjects = [project]
+
+project_name_with_namespace = "gitlab-com/www-gitlab-com"
+project2 = gl.projects.get(project_name_with_namespace)
+
+lProjects = [project2]
 
 identificador = project.attributes['path_with_namespace']
 url = project.attributes['web_url']
