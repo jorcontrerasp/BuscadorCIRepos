@@ -11,7 +11,7 @@ import github_search as ghs
 
 # Generamos un github_token para consultar la API de GitHub a través de la librería.
 user = "jorcontrerasp"
-token = aux.readFile("github_token")
+token = aux.readFile("github_token.txt")
 g = Github(user, token)
 
 organizacion = "envoyproxy"

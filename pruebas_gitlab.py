@@ -4,7 +4,7 @@ import auxiliares as aux
 import gitlab_search as gls
 import datos as d
 
-token = aux.readFile("gitlab_token")
+token = aux.readFile("gitlab_token.txt")
 gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
 project_id = 7764
@@ -13,7 +13,7 @@ project = gl.projects.get(project_id)
 project_name_with_namespace = "gitlab-com/www-gitlab-com"
 project2 = gl.projects.get(project_name_with_namespace)
 
-lProjects = [project2]
+lProjects = [project]
 
 identificador = project.attributes['path_with_namespace']
 url = project.attributes['web_url']

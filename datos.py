@@ -5,6 +5,7 @@ import pandas as pd
 import herramientasCI as ci
 import auxiliares as aux
 import logging
+import os
 
 def makeDataFrame(lRepositories, boGitHub):
     aux.printLog("Generando DataFrame...", logging.INFO)
@@ -169,8 +170,14 @@ def countRepos1FoundUnless(df):
 
 def makeEXCEL(df, pFile):
     aux.printLog("Generando fichero Excel...", logging.INFO)
-    df.to_excel(pFile + ".xlsx")
+    folder = "results"
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    df.to_excel(folder + "/" + pFile + ".xlsx")
 
 def makeCSV(df, pFile):
     aux.printLog("Generando fichero Csv...", logging.INFO)
-    df.to_csv(pFile + ".csv")
+    folder = "results"
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    df.to_csv(folder + "/" + pFile + ".csv")
