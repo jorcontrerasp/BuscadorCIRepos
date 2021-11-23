@@ -139,31 +139,31 @@ def actualizarTotalesDataFrameContadores(df,df2):
 def contarRepositoriosAlMenos1Encontrado(df):
     cont = 0
     for index, row in df.iterrows():
-        if (len(str(row[ci.HerramientasCI.CI1.value])) > 1):
+        if (len(str(row[ci.HerramientasCI.CI1.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI1.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI2.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI2.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI2.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI3.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI3.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI3.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI4.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI4.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI4.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI5.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI5.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI5.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI6.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI6.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI6.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI7.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI7.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI7.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI8.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI8.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI8.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI9.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI9.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI9.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI10.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI10.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI10.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI11.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI11.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI11.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI12.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI12.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI12.value]:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI13.value])) > 1):
+        elif (len(str(row[ci.HerramientasCI.CI13.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI13.value]:
             cont += 1
     return cont
 
