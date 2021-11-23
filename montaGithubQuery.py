@@ -7,7 +7,7 @@ class MontaGithubQuery():
     archived = "false"
     qIs = "public"
 
-    def getQueryIni(self):
+    def getInitialQuery(self):
         queryIni = ""
 
         if len(self.created)>0:

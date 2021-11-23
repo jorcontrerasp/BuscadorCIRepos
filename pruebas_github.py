@@ -11,7 +11,7 @@ import github_search as ghs
 
 # Generamos un github_token para consultar la API de GitHub a través de la librería.
 user = "jorcontrerasp"
-token = aux.leerFichero("github_token")
+token = aux.readFile("github_token")
 g = Github(user, token)
 
 organizacion = "envoyproxy"
@@ -30,19 +30,19 @@ if continuar:
 
     filteredRepos = [repo]
 
-    df = d.generarDataFrame(filteredRepos, True)
-    df2 = d.generarDataFrameContadores()
+    df = d.makeDataFrame(filteredRepos, True)
+    df2 = d.makeCounterDataFrame()
 
-    files = ci.getFicherosBusquedaCI(ci.HerramientasCI.CI11.value)
+    files = ci.getCISearchFiles(ci.HerramientasCI.CI11.value)
     for file in files:
         print(str(file))
 
     aux.imprimirListaRepositorios(filteredRepos)
 
     listaEncontrados = []
-    listaEncontrados = ghs.busquedaGitHubApiRepos(filteredRepos, df, df2)
+    listaEncontrados = ghs.searchReposGitHubApi(filteredRepos, df, df2)
 
-    d.generarEXCEL(df, "fExcelPruebas")
-    d.generarEXCEL(df2, "fExcelPruebas2")
+    d.makeEXCEL(df, "fExcelPruebas")
+    d.makeEXCEL(df2, "fExcelPruebas2")
 
     print(str(len(listaEncontrados)))

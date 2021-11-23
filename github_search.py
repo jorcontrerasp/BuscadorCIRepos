@@ -6,13 +6,13 @@ import herramientasCI as ci
 import datos as d
 import logging
 
-def getRepositoriosGithub():
+def getGithubRepos():
     # Generamos un github_token para consultar la API de GitHub a través de la librería.
     user = "jorcontrerasp"
-    token = aux.leerFichero("github_token")
+    token = aux.readFile("github_token.txt")
     g = Github(user, token)
 
-    q = aux.leerFichero("github_querys/query2")
+    q = aux.readFile("github_querys/query2.txt")
     #query = mq.mGithubQuery.getQueryIni()
     generator = g.search_repositories(query=q)
 
@@ -21,17 +21,17 @@ def getRepositoriosGithub():
 
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
     fRepos = "github_repos.pickle"
-    aux.generarPickle(fRepos, repositories)
-    repositories = aux.cargarRepositorios(fRepos)
+    aux.makePickle(fRepos, repositories)
+    repositories = aux.loadRepositories(fRepos)
 
     # Filtramos por el número de COMMITS.
-    boFiltrarCommits = False
+    filterCommits = False
 
     MAX_COMMITS = 10000
     MIN_COMMITS = 1000
     filteredRepos = []
 
-    if boFiltrarCommits:
+    if filterCommits:
         for repo in repositories:
             commits = repo.get_commits().totalCount
             if commits >= MIN_COMMITS and commits <= MAX_COMMITS:
@@ -41,9 +41,9 @@ def getRepositoriosGithub():
             filteredRepos.append(repo)
 
     # Seleccionamos N repositorios de manera aleatoria:
-    randomizar = True
+    randomizeRepos = True
     lFinal = []
-    if randomizar:
+    if randomizeRepos:
         while len(lFinal) < 10:
             item = random.choice(filteredRepos)
             if item not in lFinal:
@@ -52,97 +52,97 @@ def getRepositoriosGithub():
         lFinal = filteredRepos
 
     # Imprimimos la lista de repositorios
-    aux.imprimirListaGitHubRepos(lFinal)
+    aux.printGitHubRepoList(lFinal)
     aux.printLog("Nº de repositorios: " + str(len(lFinal)), logging.INFO)
 
     return lFinal
 
-def busquedaGitHubApiRepos(listaRepositorios, df, df2):
-    listaEncontrados = []
-    for repo in listaRepositorios:
-        encontrado1 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI1, [], df, df2)
-        encontrado2 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI2, [], df, df2)
-        encontrado3 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI3, [], df, df2)
-        encontrado4 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI4, [], df, df2)
-        encontrado5 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI5, [], df, df2)
-        encontrado6 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI6, [], df, df2)
-        encontrado7 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI7, [], df, df2)
-        encontrado8 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI8, [], df, df2)
-        encontrado9 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI9, [], df, df2)
-        encontrado10 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI10, [], df, df2)
-        encontrado11 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI11, [], df, df2)
-        encontrado12 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI12, [], df, df2)
-        encontrado13 = buscarRutaLiteralDesdeRaiz(repo, ci.HerramientasCI.CI13, [], df, df2)
+def searchReposGitHubApi(lRepositories, df, df2):
+    lFound = []
+    for repo in lRepositories:
+        found1 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI1, [], df, df2)
+        found2 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI2, [], df, df2)
+        found3 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI3, [], df, df2)
+        found4 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI4, [], df, df2)
+        found5 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI5, [], df, df2)
+        found6 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI6, [], df, df2)
+        found7 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, [], df, df2)
+        found8 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI8, [], df, df2)
+        found9 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI9, [], df, df2)
+        found10 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI10, [], df, df2)
+        found11 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI11, [], df, df2)
+        found12 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI12, [], df, df2)
+        found13 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI13, [], df, df2)
 
         # Si lo ha encontrado:
-        # - lo añadimos a la listaEncontrados.
-        encontrado = encontrado1 or encontrado2 or encontrado3 or encontrado4 or encontrado5 or encontrado6 or encontrado7 \
-                     or encontrado8 or encontrado9 or encontrado10 or encontrado11 or encontrado12 or encontrado13
-        if encontrado:
-            listaEncontrados.append(repo)
+        # - lo añadimos a la lista de encontrados.
+        found = found1 or found2 or found3 or found4 or found5 or found6 or found7 \
+                     or found8 or found9 or found10 or found11 or found12 or found13
+        if found:
+            lFound.append(repo)
 
-    d.actualizarTotalesDataFrameContadores(df, df2)
+    d.updateTotalCounterDataFrame(df, df2)
 
-    return listaEncontrados
+    return lFound
 
-def buscarEnRepo(repo, literal):
-    encontrado = False
+def searchInRepo(repo, literal):
+    found = False
     contents = repo.get_contents("")
     while contents:
-        content_file = contents.pop(0)
-        if literal in content_file.path.lower():
-            encontrado = True
+        contentFile = contents.pop(0)
+        if literal in contentFile.path.lower():
+            found = True
             break
         else:
-            if content_file.type == "dir":
-                contents.extend(repo.get_contents(content_file.path))
-    return encontrado
+            if contentFile.type == "dir":
+                contents.extend(repo.get_contents(contentFile.path))
+    return found
 
-def buscarEnRaiz(repo, literal):
-    encontrado = False
+def searchInRoot(repo, literal):
+    found = False
     contents = repo.get_contents("")
-    for content_file in contents:
-        if literal in content_file.path.lower():
-            encontrado = True
+    for contentFile in contents:
+        if literal in contentFile.path.lower():
+            found = True
             break
-    return encontrado
+    return found
 
-def buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df, df2):
-    aux.printLog("Buscando '" + herramientaCI.value + "' en '" + repo.full_name + "'", logging.INFO)
+def searchLiteralPathFromRoot(repo, CITool, literals, df, df2):
+    aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
     try:
-        if len(literales)==0:
-            literales = ci.getFicherosBusquedaCI(herramientaCI.value)
+        if len(literals)==0:
+            literals = ci.getCISearchFiles(CITool.value)
 
-        ruta = literales.pop(0)
-        repo.get_contents(ruta)
-        d.actualizarDataFrame(repo, ruta, herramientaCI, True, df)
-        d.actualizarDataFrameContadores(herramientaCI.value, df2)
+        path = literals.pop(0)
+        repo.get_contents(path)
+        d.updateDataFrame(repo, path, CITool, True, df)
+        d.updateCounterDataFrame(CITool.value, df2)
         return True
     except:
-        if len(literales)>0:
-            return buscarRutaLiteralDesdeRaiz(repo, herramientaCI, literales, df, df2)
+        if len(literals)>0:
+            return searchLiteralPathFromRoot(repo, CITool, literals, df, df2)
         else:
             return False
 
-def buscarRutaLiteralDesdeRaiz2(repo, ruta):
+def searchLiteralPathFromRoot2(repo, path):
     try:
-        repo.get_contents(ruta)
+        repo.get_contents(path)
         return True
     except:
         return False
 
-def buscarRutaLiteralDesdeRaiz3(repo, contents, literal):
-    encontrado = False
+def searchLiteralPathFromRoot3(repo, contents, literal):
+    found = False
     pLiteral = literal.split("/")
     cLiteral = pLiteral.pop(0)
     for contentFile in contents:
-        ficheroIt = aux.obtenerFicheroIt(contentFile.path)
-        if cLiteral == ficheroIt.lower():
+        itFile = aux.getItFile(contentFile.path)
+        if cLiteral == itFile.lower():
             if len(pLiteral) > 0:
                 if contentFile.type == "dir":
                     contents = repo.get_contents(contentFile.path)
-                    encontrado = buscarRutaLiteralDesdeRaiz(repo, contents, '/'.join(pLiteral))
+                    found = searchLiteralPathFromRoot(repo, contents, '/'.join(pLiteral))
                     break
             else:
-                encontrado = True
-    return encontrado
+                found = True
+    return found

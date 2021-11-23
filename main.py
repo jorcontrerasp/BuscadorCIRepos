@@ -8,71 +8,71 @@ import auxiliares as aux
 import os
 import logging
 
-ejecutar = True
-ejecutaProcesoGithub = True
-ejecutaProcesoGitlab = True
-reutilizarRepos = False
+execute = True
+doGithubSearch = True
+doGitlabSearch = True
+usePickleFile = False
 
-def ejecutaProceso():
+def executeProcess():
     try:
         aux.printLog("Iniciando proceso...", logging.INFO)
         fRepos = ""
 
-        if ejecutaProcesoGithub:
+        if doGithubSearch:
             fRepos = "github_repos.pickle"
-            if reutilizarRepos:
+            if usePickleFile:
                 aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
                 if os.path.exists(fRepos):
-                    lFinal = aux.cargarRepositorios(fRepos)
+                    lFinal = aux.loadRepositories(fRepos)
                 else:
                     raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
             else:
                 # Obtenemos la lista de repositorios Github.
-                lFinal = ghs.getRepositoriosGithub()
+                lFinal = ghs.getGithubRepos()
 
             # Generamos un DataFrame donde irán los resultados.
-            githubDF = d.generarDataFrame(lFinal, True)
+            githubDF = d.makeDataFrame(lFinal, True)
 
             # Generamos un DataFrame donde irán los contadores.
-            githubDF2 = d.generarDataFrameContadores()
+            githubDF2 = d.makeCounterDataFrame()
 
             # Aplicamos el proceso.
-            listaEncontrados = []
-            listaEncontrados = ghs.busquedaGitHubApiRepos(lFinal, githubDF, githubDF2)
+            lFound = []
+            lFound = ghs.searchReposGitHubApi(lFinal, githubDF, githubDF2)
 
             # Generamos un fichero EXCEL con los resultados.
-            d.generarEXCEL(githubDF, "resultados_github")
+            d.makeEXCEL(githubDF, "resultados_github")
 
             # Generamos un fichero EXCEL con los contadores.
-            d.generarEXCEL(githubDF2, "contadores_github")
+            d.makeEXCEL(githubDF2, "contadores_github")
 
-        if ejecutaProcesoGitlab:
+        if doGitlabSearch:
             fRepos = "gitlab_repos.pickle"
-            if reutilizarRepos:
+            if usePickleFile:
                 aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitLab.", logging.INFO)
                 if os.path.exists(fRepos):
-                    lFinal = aux.cargarRepositorios(fRepos)
+                    lFinal = aux.loadRepositories(fRepos)
                 else:
                     raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
             else:
                 # Obtenemos la lista de repositorios Gitlab.
-                lFinal = gls.getProyectosGitlab()
+                lFinal = gls.getGitlabProyects()
 
             # Generamos un DataFrame donde irán los resultados.
-            gitlabDF = d.generarDataFrame(lFinal, False)
+            gitlabDF = d.makeDataFrame(lFinal, False)
 
             # Generamos un DataFrame donde irán los contadores.
-            gitlabDF2 = d.generarDataFrameContadores()
+            gitlabDF2 = d.makeCounterDataFrame()
 
             # Aplicamos el proceso.
             listaEncontrados = []
-            listaEncontrados = gls.busquedaGitLabApiRepos(lFinal, gitlabDF, gitlabDF2)
+            listaEncontrados = gls.searchProyectsGitLabApi(lFinal, gitlabDF, gitlabDF2)
 
             # Generamos un fichero EXCEL con los resultados.
-            d.generarEXCEL(gitlabDF, "resultados_gitlab")
+            d.makeEXCEL(gitlabDF, "resultados_gitlab")
 
             # Generamos un fichero EXCEL con los contadores.
-            d.generarEXCEL(gitlabDF2, "contadores_gitlab")
+            d.makeEXCEL(gitlabDF2, "contadores_gitlab")
 
         aux.printLog("Proceso finalizado.", logging.INFO)
 
@@ -81,5 +81,5 @@ def ejecutaProceso():
         raise
         # FIN
 
-if ejecutar:
-    ejecutaProceso()
+if execute:
+    executeProcess()

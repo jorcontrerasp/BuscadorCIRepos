@@ -5,39 +5,39 @@ import pickle
 import datetime
 import logging
 
-def generarPickle(nombreFichero, listaRepositorios):
+def makePickle(fileName, lRepositories):
     printLog("Generando fichero pickle...", logging.INFO)
-    with open(nombreFichero, 'wb') as f:
-        pickle.dump(listaRepositorios, f)
-    printLog("Fichero " + nombreFichero + " generado", logging.INFO)
+    with open(fileName, 'wb') as f:
+        pickle.dump(lRepositories, f)
+    printLog("Fichero " + fileName + " generado", logging.INFO)
 
-def cargarRepositorios(fichero):
+def loadRepositories(file):
     printLog("Cargando repositorios...", logging.INFO)
-    with open(fichero, 'rb') as f:
+    with open(file, 'rb') as f:
         repositories = pickle.load(f)
     return repositories
 
-def imprimirListaGitHubRepos(repositorios):
+def printGitHubRepoList(repositories):
     print("Lista de repositorios: ")
-    for project in repositorios:
-        project_name = project.full_name.split("/")[1]
+    for project in repositories:
+        projectName = project.full_name.split("/")[1]
         print(project.full_name)
 
-def imprimirListaGitLabRepos(proyectos):
+def printGitLabProyectList(projects):
     print("Lista de proyectos: ")
-    for project in proyectos:
+    for project in projects:
         print(project.attributes['path_with_namespace'])
 
-def obtenerFicheroIt(path):
+def getItFile(path):
     if "/" in path:
         pathArray = path.split("/")
-        fActual = pathArray[len(pathArray) - 1]
+        fIt = pathArray[len(pathArray) - 1]
     else:
-        fActual = path
-    return fActual
+        fIt = path
+    return fIt
 
-def leerFichero(fichero):
-    with open(fichero, 'rb') as f:
+def readFile(file):
+    with open(file, 'rb') as f:
         content = f.read()
         r = str(content.decode())
         f.close()

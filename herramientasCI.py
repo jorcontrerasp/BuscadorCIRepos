@@ -18,43 +18,43 @@ class HerramientasCI(Enum):
     CI12 = "Semaphore CI"
     CI13 = "AppVeyor"
 
-def getFicherosBusquedaCI(herramientaCI):
-    ficheros = []
-    if herramientaCI in HerramientasCI.CI1.value:
-        ficheros.append("Jenkinsfile")
-    elif herramientaCI in HerramientasCI.CI2.value:
-        ficheros.append(".travis-ci.yml")
-        ficheros.append(".travis.yml")
-    elif herramientaCI in HerramientasCI.CI3.value:
-        ficheros.append(".circleci/config.yml")
-        ficheros.append(".circle-ci")
-    elif herramientaCI in HerramientasCI.CI4.value:
-        ficheros.append(".github/workflows") #**.yml o **.yaml
-    elif herramientaCI in HerramientasCI.CI5.value:
-        ficheros.append(".azure-pipelines/pipelines.yml")
-        ficheros.append("azure-pipelines.yml")
-    elif herramientaCI in HerramientasCI.CI6.value:
-        ficheros.append("bamboo-specs/bamboo.yml")
-        ficheros.append("bamboo-specs/bamboo.yaml")
+def getCISearchFiles(CITool):
+    files = []
+    if CITool in HerramientasCI.CI1.value:
+        files.append("Jenkinsfile")
+    elif CITool in HerramientasCI.CI2.value:
+        files.append(".travis-ci.yml")
+        files.append(".travis.yml")
+    elif CITool in HerramientasCI.CI3.value:
+        files.append(".circleci/config.yml")
+        files.append(".circle-ci")
+    elif CITool in HerramientasCI.CI4.value:
+        files.append(".github/workflows") #**.yml o **.yaml
+    elif CITool in HerramientasCI.CI5.value:
+        files.append(".azure-pipelines/pipelines.yml")
+        files.append("azure-pipelines.yml")
+    elif CITool in HerramientasCI.CI6.value:
+        files.append("bamboo-specs/bamboo.yml")
+        files.append("bamboo-specs/bamboo.yaml")
     #elif herramientaCI in HerramientasCI.CI7.value:
         # NO ME QUEDA CLARO QUÉ AÑADIR EN ESTE CASO.
-    elif herramientaCI in HerramientasCI.CI8.value:
+    elif CITool in HerramientasCI.CI8.value:
         # ESTE IGUAL HAY QUE BUSCARLO EN EL REPO ENTERO, PUEDE ESTAR EN CUALQUIER RUTA.
-        ficheros.append(".gitlab-ci.yml")
-    elif herramientaCI in HerramientasCI.CI9.value:
-        ficheros.append("codeship-services.yml")
-        ficheros.append("codeship-steps.yml")
-        ficheros.append("codeship-steps.json")
-    elif herramientaCI in HerramientasCI.CI10.value:
-        ficheros.append(".teamcity/settings.kts")
-    elif herramientaCI in HerramientasCI.CI11.value:
-        ficheros.append(".bazelci/presubmit.yml")
-        ficheros.append(".bazelci/build_bazel_binaries.yml")
-        ficheros.append(".bazelrc")
-    elif herramientaCI in HerramientasCI.CI2.value:
-        ficheros.append(".semaphore/semaphore.yml")
-        ficheros.append(".semaphoreci")
-    elif herramientaCI in HerramientasCI.CI3.value:
-        ficheros.append("Appveyor.yml")
+        files.append(".gitlab-ci.yml")
+    elif CITool in HerramientasCI.CI9.value:
+        files.append("codeship-services.yml")
+        files.append("codeship-steps.yml")
+        files.append("codeship-steps.json")
+    elif CITool in HerramientasCI.CI10.value:
+        files.append(".teamcity/settings.kts")
+    elif CITool in HerramientasCI.CI11.value:
+        files.append(".bazelci/presubmit.yml")
+        files.append(".bazelci/build_bazel_binaries.yml")
+        files.append(".bazelrc")
+    elif CITool in HerramientasCI.CI2.value:
+        files.append(".semaphore/semaphore.yml")
+        files.append(".semaphoreci")
+    elif CITool in HerramientasCI.CI3.value:
+        files.append("Appveyor.yml")
 
-    return ficheros
+    return files

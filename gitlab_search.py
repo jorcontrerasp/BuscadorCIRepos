@@ -10,13 +10,13 @@ N_MIN_STARS = 50
 N_MAX_RESULT_PROYECTS = 10
 LANGUAGE = ''
 
-def getProyectosGitlab():
+def getGitlabProyects():
     # private github_token or personal github_token authentication
-    token = aux.leerFichero("gitlab_token")
+    token = aux.readFile("gitlab_token.txt")
     gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
     i = 1
-    lista = []
+    lResult = []
     idAfter = 0
     while i<=N_MAX_SEARCHES:
         try:
@@ -46,26 +46,26 @@ def getProyectosGitlab():
                     if(j==len(projects)):
                         idAfter = project.attributes['id']
 
-                    boVacio = esRepositorioVacio(project)
-                    if not boVacio:
+                    empty = isEmptyProject(project)
+                    if not empty:
                         stars = project.star_count
                         if stars >= N_MIN_STARS:
                             if len(LANGUAGE)>0:
                                 languages = project.languages()
                                 for l in languages:
                                     if LANGUAGE.lower() == str(l).lower():
-                                        lista.append(project)
+                                        lResult.append(project)
                                         break
                             else:
-                                lista.append(project)
+                                lResult.append(project)
 
-                    tLista = len(lista)
-                    aux.printLog("L Resultado: " + str(tLista), logging.INFO)
+                    lResultSize = len(lResult)
+                    aux.printLog("L Resultado: " + str(lResultSize), logging.INFO)
                     j = j + 1
-                    if (tLista >= N_MAX_RESULT_PROYECTS):
+                    if (lResultSize >= N_MAX_RESULT_PROYECTS):
                         break
                 i = i + 1
-                if (tLista >= N_MAX_RESULT_PROYECTS):
+                if (lResultSize >= N_MAX_RESULT_PROYECTS):
                     break
         except:
             aux.printLog(": Se ha producido un ERROR de búsqueda en la página " + str(i) + ".", logging.ERROR)
@@ -73,76 +73,76 @@ def getProyectosGitlab():
 
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
     fRepos = "gitlab_repos.pickle"
-    aux.generarPickle(fRepos, lista)
-    lista = aux.cargarRepositorios(fRepos)
+    aux.makePickle(fRepos, lResult)
+    lResult = aux.loadRepositories(fRepos)
 
     # Imprimimos la lista de proyectos
-    aux.imprimirListaGitLabRepos(lista)
-    aux.printLog("Nº de proyectos: " + str(len(lista)), logging.INFO)
+    aux.printGitLabProyectList(lResult)
+    aux.printLog("Nº de proyectos: " + str(len(lResult)), logging.INFO)
 
-    return lista
+    return lResult
 
-def busquedaGitLabApiRepos(listaProyectos, df, df2):
-    listaEncontrados = []
-    for proyecto in listaProyectos:
-        encontrado1 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI1, df, df2)
-        encontrado2 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI2, df, df2)
-        encontrado3 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI3, df, df2)
-        encontrado4 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI4, df, df2)
-        encontrado5 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI5, df, df2)
-        encontrado6 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI6, df, df2)
-        encontrado7 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI7, df, df2)
-        encontrado8 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI8, df, df2)
-        encontrado9 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI9, df, df2)
-        encontrado10 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI10, df, df2)
-        encontrado11 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI11, df, df2)
-        encontrado12 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI12, df, df2)
-        encontrado13 = buscaRutaGitlab(proyecto, ci.HerramientasCI.CI12, df, df2)
+def searchProyectsGitLabApi(lProjects, df, df2):
+    lFound = []
+    for project in lProjects:
+        found1 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2)
+        found2 = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2)
+        found3 = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2)
+        found4 = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2)
+        found5 = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2)
+        found6 = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2)
+        found7 = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2)
+        found8 = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2)
+        found9 = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2)
+        found10 = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2)
+        found11 = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2)
+        found12 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2)
+        found13 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2)
 
         # Si lo ha encontrado:
-        # - lo añadimos a la listaEncontrados.
-        encontrado = encontrado1 or encontrado2 or encontrado3 or encontrado4 or encontrado5 or encontrado6 or encontrado7 \
-                     or encontrado8 or encontrado9 or encontrado10 or encontrado11 or encontrado12 or encontrado13
-        if encontrado:
-            listaEncontrados.append(proyecto)
+        # - lo añadimos a la lista de encontrados.
+        found = found1 or found2 or found3 or found4 or found5 or found6 or found7 \
+                     or found8 or found9 or found10 or found11 or found12 or found13
+        if found:
+            lFound.append(project)
 
-    d.actualizarTotalesDataFrameContadores(df, df2)
+    d.updateTotalCounterDataFrame(df, df2)
 
-    return listaEncontrados
+    return lFound
 
-def buscaRutaGitlab(project, herramientaCI, df, df2):
-    aux.printLog("Buscando '" + herramientaCI.value + "' en '" + project.attributes['path_with_namespace'] + "'", logging.INFO)
-    encontrado = False
+def searchGitLabPath(project, CITool, df, df2):
+    aux.printLog("Buscando '" + CITool.value + "' en '" + project.attributes['path_with_namespace'] + "'", logging.INFO)
+    found = False
     try:
-        paths = ci.getFicherosBusquedaCI(herramientaCI.value)
+        paths = ci.getCISearchFiles(CITool.value)
         for path in paths:
             items = project.repository_tree(all=True, path=path)
             if len(items) == 0:
-                encontrado = existeFichero(project,path)
-                if encontrado:
-                    d.actualizarDataFrame(project, path, herramientaCI, False, df)
-                    d.actualizarDataFrameContadores(herramientaCI.value, df2)
+                found = existsFile(project,path)
+                if found:
+                    d.updateDataFrame(project, path, CITool, False, df)
+                    d.updateCounterDataFrame(CITool.value, df2)
             else:
-                encontrado = True
-                d.actualizarDataFrame(project, path, herramientaCI, False, df)
-                d.actualizarDataFrameContadores(herramientaCI.value, df2)
+                found = True
+                d.updateDataFrame(project, path, CITool, False, df)
+                d.updateCounterDataFrame(CITool.value, df2)
     except:
-        d.actualizarDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", herramientaCI, False, df)
+        d.updateDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", CITool, False, df)
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
-def esRepositorioVacio(proyecto):
-    return proyecto.attributes['empty_repo']
+def isEmptyProject(project):
+    return project.attributes['empty_repo']
 
-def esRepositorioVacio2(proyecto):
+def isEmptyProject2(project):
     try:
-        items = proyecto.repository_tree()
+        items = project.repository_tree()
         return False
     except:
         return True
 
-def existeFichero(proyecto, fPath):
+def existsFile(project, fPath):
     try:
-        f = proyecto.files.get(file_path=fPath, ref='master')
+        f = project.files.get(file_path=fPath, ref='master')
         return True
     except:
         return False
