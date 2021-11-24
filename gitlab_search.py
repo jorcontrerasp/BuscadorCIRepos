@@ -7,7 +7,7 @@ import logging
 
 N_MAX_SEARCHES = 18550
 N_MIN_STARS = 50
-N_MAX_RESULT_PROYECTS = 10
+N_MAX_RESULT_PROYECTS = 100
 LANGUAGE = ''
 
 def getGitlabProjects():
