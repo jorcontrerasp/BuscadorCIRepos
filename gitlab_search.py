@@ -10,9 +10,9 @@ N_MIN_STARS = 50
 N_MAX_RESULT_PROYECTS = 10
 LANGUAGE = ''
 
-def getGitlabProyects():
+def getGitlabProjects():
     # private github_token or personal github_token authentication
-    token = aux.readFile("gitlab_token.txt")
+    token = aux.readFile("tokens/gitlab_token.txt")
     gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
     i = 1
@@ -82,7 +82,7 @@ def getGitlabProyects():
 
     return lResult
 
-def searchProyectsGitLabApi(lProjects, df, df2):
+def searchProjectsGitLabApi(lProjects, df, df2):
     lFound = []
     for project in lProjects:
         found1 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2)
@@ -106,7 +106,7 @@ def searchProyectsGitLabApi(lProjects, df, df2):
         if found:
             lFound.append(project)
 
-    d.updateTotalCounterDataFrame(df, df2)
+    d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
 
     return lFound
 
@@ -121,7 +121,7 @@ def searchGitLabPath(project, CITool, df, df2):
                 found = existsFile(project,path)
                 if found:
                     d.updateDataFrame(project, path, CITool, False, df)
-                    d.updateCounterDataFrame(CITool.value, df2)
+                    d.updateCounterDataFrame(CITool.value, "Encontrados_GitLab", df2)
             else:
                 found = True
                 d.updateDataFrame(project, path, CITool, False, df)

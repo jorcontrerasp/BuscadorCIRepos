@@ -18,6 +18,9 @@ def executeProcess():
         aux.printLog("Iniciando proceso...", logging.INFO)
         fRepos = ""
 
+        # Generamos un DataFrame donde irán los contadores.
+        counterDF = d.makeCounterDataFrame()
+
         if doGithubSearch:
             fRepos = "github_repos.pickle"
             if usePickleFile:
@@ -33,18 +36,12 @@ def executeProcess():
             # Generamos un DataFrame donde irán los resultados.
             githubDF = d.makeDataFrame(lFinal, True)
 
-            # Generamos un DataFrame donde irán los contadores.
-            githubDF2 = d.makeCounterDataFrame()
-
             # Aplicamos el proceso.
             lFound = []
-            lFound = ghs.searchReposGitHubApi(lFinal, githubDF, githubDF2)
+            lFound = ghs.searchReposGitHubApi(lFinal, githubDF, counterDF)
 
             # Generamos un fichero EXCEL con los resultados.
             d.makeEXCEL(githubDF, "resultados_github")
-
-            # Generamos un fichero EXCEL con los contadores.
-            d.makeEXCEL(githubDF2, "contadores_github")
 
         if doGitlabSearch:
             fRepos = "gitlab_repos.pickle"
@@ -56,23 +53,20 @@ def executeProcess():
                     raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
             else:
                 # Obtenemos la lista de repositorios Gitlab.
-                lFinal = gls.getGitlabProyects()
+                lFinal = gls.getGitlabProjects()
 
             # Generamos un DataFrame donde irán los resultados.
             gitlabDF = d.makeDataFrame(lFinal, False)
 
-            # Generamos un DataFrame donde irán los contadores.
-            gitlabDF2 = d.makeCounterDataFrame()
-
             # Aplicamos el proceso.
-            listaEncontrados = []
-            listaEncontrados = gls.searchProyectsGitLabApi(lFinal, gitlabDF, gitlabDF2)
+            lFound = []
+            lFound = gls.searchProjectsGitLabApi(lFinal, gitlabDF, counterDF)
 
             # Generamos un fichero EXCEL con los resultados.
             d.makeEXCEL(gitlabDF, "resultados_gitlab")
 
-            # Generamos un fichero EXCEL con los contadores.
-            d.makeEXCEL(gitlabDF2, "contadores_gitlab")
+        # Generamos un fichero EXCEL con los contadores.
+        d.makeEXCEL(counterDF, "contadores")
 
         aux.printLog("Proceso finalizado.", logging.INFO)
 

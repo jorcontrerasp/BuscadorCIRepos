@@ -4,7 +4,7 @@ import auxiliares as aux
 import gitlab_search as gls
 import datos as d
 
-token = aux.readFile("gitlab_token.txt")
+token = aux.readFile("tokens/gitlab_token.txt")
 gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
 project_id = 7764
@@ -26,7 +26,7 @@ languages = project.languages()
 df = d.makeDataFrame(lProjects, False)
 df2 = d.makeCounterDataFrame()
 
-lEncontrados = gls.searchProyectsGitLabApi(lProjects, df, df2)
+lEncontrados = gls.searchProjectsGitLabApi(lProjects, df, df2)
 
 d.makeEXCEL(df, "fExcelPruebas")
 d.makeEXCEL(df2, "fExcelPruebas2")

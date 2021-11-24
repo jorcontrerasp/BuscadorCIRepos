@@ -113,7 +113,7 @@ def updateDataFrame(repo, literal, CITool, boGitHub, df):
 
 def makeCounterDataFrame():
     aux.printLog("Generando DataFrame contadores...", logging.INFO)
-    df = pd.DataFrame([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    df = pd.DataFrame([],
                       index=[ci.HerramientasCI.CI1.value
                             , ci.HerramientasCI.CI2.value
                             , ci.HerramientasCI.CI3.value
@@ -126,16 +126,49 @@ def makeCounterDataFrame():
                             , ci.HerramientasCI.CI10.value
                             , ci.HerramientasCI.CI11.value
                             , ci.HerramientasCI.CI12.value
+                            , ci.HerramientasCI.CI13.value
                             ,"Totales"],
-                      columns=['Encontrados'])
+                      columns=['Encontrados_GitHub', 'Encontrados_GitLab'])
+
+    df.at[ci.HerramientasCI.CI1.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI2.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI3.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI4.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI5.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI6.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI7.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI8.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI9.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI10.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI11.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI12.value, "Encontrados_GitHub"] = 0
+    df.at[ci.HerramientasCI.CI13.value, "Encontrados_GitHub"] = 0
+    df.at["Totales", "Encontrados_GitHub"] = 0
+
+
+    df.at[ci.HerramientasCI.CI1.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI2.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI3.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI4.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI5.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI6.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI7.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI8.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI9.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI10.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI11.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI12.value, "Encontrados_GitLab"] = 0
+    df.at[ci.HerramientasCI.CI13.value, "Encontrados_GitLab"] = 0
+    df.at["Totales", "Encontrados_GitLab"] = 0
+
     return df
 
-def updateCounterDataFrame(fila, df):
-    df.at[fila, "Encontrados"] += 1
+def updateCounterDataFrame(fila, column, df):
+    df.at[fila, column] += 1
 
-def updateTotalCounterDataFrame(df,df2):
+def updateTotalCounterDataFrame(column,df,df2):
     totales = countRepos1FoundUnless(df)
-    df2.at["Totales", "Encontrados"] = totales
+    df2.at["Totales", column] = totales
 
 def countRepos1FoundUnless(df):
     cont = 0

@@ -9,7 +9,7 @@ import logging
 def getGithubRepos():
     # Generamos un github_token para consultar la API de GitHub a través de la librería.
     user = "jorcontrerasp"
-    token = aux.readFile("github_token.txt")
+    token = aux.readFile("tokens/github_token.txt")
     g = Github(user, token)
 
     q = aux.readFile("github_querys/query2.txt")
@@ -81,7 +81,7 @@ def searchReposGitHubApi(lRepositories, df, df2):
         if found:
             lFound.append(repo)
 
-    d.updateTotalCounterDataFrame(df, df2)
+    d.updateTotalCounterDataFrame("Encontrados_GitHub", df, df2)
 
     return lFound
 
@@ -116,7 +116,7 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2):
         path = literals.pop(0)
         repo.get_contents(path)
         d.updateDataFrame(repo, path, CITool, True, df)
-        d.updateCounterDataFrame(CITool.value, df2)
+        d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
         return True
     except:
         if len(literals)>0:
