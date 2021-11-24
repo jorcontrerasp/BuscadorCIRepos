@@ -130,6 +130,8 @@ def searchGitLabPath(project, CITool, df, df2):
         d.updateDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", CITool, False, df)
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
+    return found
+
 def isEmptyProject(project):
     return project.attributes['empty_repo']
 
