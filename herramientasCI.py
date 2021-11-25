@@ -39,7 +39,6 @@ def getCISearchFiles(CITool):
     #elif herramientaCI in HerramientasCI.CI7.value:
         # NO ME QUEDA CLARO QUÉ AÑADIR EN ESTE CASO.
     elif CITool in HerramientasCI.CI8.value:
-        # ESTE IGUAL HAY QUE BUSCARLO EN EL REPO ENTERO, PUEDE ESTAR EN CUALQUIER RUTA.
         files.append(".gitlab-ci.yml")
     elif CITool in HerramientasCI.CI9.value:
         files.append("codeship-services.yml")
