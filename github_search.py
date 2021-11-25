@@ -44,7 +44,7 @@ def getGithubRepos():
     randomizeRepos = True
     lFinal = []
     if randomizeRepos:
-        while len(lFinal) < 100:
+        while len(lFinal) < 500:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)
