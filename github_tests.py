@@ -1,11 +1,11 @@
-#AQUÍ irán las pruebas que se realicen.
+#AQUÍ irán las pruebas que se realicen sobre GitHub.
 
 #Importamos las librerías necesarias.
 from github import Github
 from github.GithubException import UnknownObjectException
-import auxiliares as aux
-import datos as d
-import herramientasCI as ci
+import aux_functions as aux
+import dataF_functions as d
+import ci_tools as ci
 import github_search as ghs
 # import openpyxl --> esta hay que instalarla en el venv para que funcione el generarEXCEL.
 

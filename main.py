@@ -1,10 +1,10 @@
 #TFG Grado en Ingeniería de Computadores
 
 #Importamos las librerías necesarias.
-import datos as d
+import dataF_functions as d
 import github_search as ghs
 import gitlab_search as gls
-import auxiliares as aux
+import aux_functions as aux
 import os
 import logging
 

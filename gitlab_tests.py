@@ -1,8 +1,10 @@
+#AQUÍ irán las pruebas que se realicen sobre GitLab.
+
 #Importamos las librerías necesarias.
 import gitlab
-import auxiliares as aux
+import aux_functions as aux
 import gitlab_search as gls
-import datos as d
+import dataF_functions as d
 
 token = aux.readFile("tokens/gitlab_token.txt")
 gl = gitlab.Gitlab('http://gitlab.com', private_token=token)

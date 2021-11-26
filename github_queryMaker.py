@@ -1,3 +1,5 @@
+#AQUÍ se definirá la clase encargada de generar querys para la API de GitHub.
+
 class MontaGithubQuery():
     language = ""
     stars = ">=9000"

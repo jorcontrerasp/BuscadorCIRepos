@@ -1,9 +1,11 @@
+#AQUÍ se implementará la búsqueda en GitHub.
+
 #Importamos las librerías necesarias.
 from github import Github
 import random
-import auxiliares as aux
-import herramientasCI as ci
-import datos as d
+import aux_functions as aux
+import ci_tools as ci
+import dataF_functions as d
 import logging
 
 def getGithubRepos():

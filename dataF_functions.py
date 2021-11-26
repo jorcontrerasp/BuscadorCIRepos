@@ -2,8 +2,8 @@
 
 #Importamos las librerías necesarias.
 import pandas as pd
-import herramientasCI as ci
-import auxiliares as aux
+import ci_tools as ci
+import aux_functions as aux
 import logging
 import os
 

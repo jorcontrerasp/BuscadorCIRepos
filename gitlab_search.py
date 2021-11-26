@@ -1,8 +1,10 @@
+#AQUÍ se implementará la búsqueda en GitLab.
+
 #Importamos las librerías necesarias.
 import gitlab
-import auxiliares as aux
-import herramientasCI as ci
-import datos as d
+import aux_functions as aux
+import ci_tools as ci
+import dataF_functions as d
 import logging
 
 N_MAX_SEARCHES = 118550
