@@ -2,3 +2,4 @@ pygithub
 pandas
 openpyxl
 logging
+pyyaml

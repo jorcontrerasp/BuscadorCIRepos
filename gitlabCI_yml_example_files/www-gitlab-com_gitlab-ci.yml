@@ -1,0 +1,917 @@
+# De-duplication/DRY: A combination of YAML anchors and the `extends` keyword are used to remove duplication:
+#   * `extends` can be used for composing mappings of different keys, but not composing different
+#      values into the same array.
+#   * YAML anchors are to compose/override entries into the same array. For example,
+#     * Multiple `rules` entries, which uses `- <<: *anchor` to introduce a reusable mapping
+#       entry like `if:` as an array entry.
+#     * Composing a reusable string command as a step of a `script:` entry, which uses `- *anchor` to
+#       introduce a string as an array entry.
+#     * Composing a reusable array of commands, which uses `- *anchor` to introduce a sub-array
+#       as an array entry.  Note that this works because up to one level of nested arrays will
+#       still be successfully interpreted as sequential commands in a Gitlab CI `script` entry.
+#     * TIP: Use https://yaml-online-parser.appspot.com/ to experiment and test out your YAML
+#     * TIP: Use https://gitlab.com/gitlab-com/www-gitlab-com/-/ci/lint to validate your YAML
+#   * Also note that not everything is de-duplicated or DRYed up. For example, direct invocations
+#     of a script with no arguments, such as `scripts/deploy`, are simple enough that they are
+#     listed directly. Extracting them to a YAML anchor would actually add more total characters
+#     and unnecessarily increase complexity for no real benefit.
+#
+# * Forked repos and deploys: Forked repos do not have permission to deploy, nor run review apps.
+#   Since we now use combined build-and-deploy jobs to deploy from the original repo, we need to exclude
+#   forks from attempting to run these jobs.  This is done via the `if-merge-request-forked-repo` rule,
+#   which runs the `...-build-only` versions of the jobs, while the `...-build-and-deploy` versions
+#   use the `if-master-original-repo` and `if-merge-request-original-repo` rules.
+#
+# * Rules for test jobs: Jobs in the test stage will always be run for original repo master branch,
+#   and all MRs on the original repo and forks (see 'Note A' below). Previously, tests had been
+#   excluded from running on the original repo master branch, to avoid increasing pipeline run
+#   times, and since they were mostly unnecessary due to merge trains. However, since currently
+#   there are no excessively-long-running test jobs (see 'Note B' below), we run them always, which
+#   allows the rules definitions to be simplified and DRYed up.
+#     (Note A): If you want a job to always run (master of original repo, and any MRs whether on the main
+#               repo or a fork), you must still specify the `if-master-original-repo-or-merge-request` rule,
+#               in order to avoid duplicate pipeline runs for the same commit on branches and MRs.
+#               (see https://docs.gitlab.com/ee/ci/troubleshooting.html#job-may-allow-multiple-pipelines-to-run-for-a-single-action)
+#               In other words, the master branch is the only branch which triggers pipelines without a
+#               merge request; all other pipelines are only triggered via merge requests on the original
+#               repo or a fork.
+#     (Note B): All excessively-long-running test jobs are currently commented out or set to
+#               be run manually. There is also one exception for the `check-handbook-edit-links`
+#               job, which is long-running/blocking, but only runs for certain changes, and only
+#               for merge requests on the original repo.
+#
+# Job key consistent order (keys which exist only in `default:` are not listed):
+#   extends
+#   image
+#   services
+#   interruptible
+#   timeout
+#   tags
+#   stage
+#   trigger
+#   rules
+#   needs
+#   variables
+#   environment
+#   cache
+#   artifacts
+#   parallel
+#   before_script
+#   script
+#   after_script
+
+###################################
+#
+# GENERAL/DEFAULT CONFIG:
+#
+###################################
+
+# Stages define groups of jobs. These are defined globally for the pipeline.
+# The order defined below defines the execution order for the jobs.
+# Jobs in the same stage will be run in parallel, and jobs in the other stages 
+# happen sequentially - after the previous stage. 
+stages:
+  - prepare
+  - content-generation
+  - build-and-deploy
+  - test
+  - cleanup
+
+# The default keyword sets its child keywords as global defaults for all jobs.
+# These defaults can be overridden by job-specific configuration.
+default:
+  # Note that the rspec job below uses a different image that also
+  # includes chromedriver. If we update the Ruby version for this image,
+  # we should also update it for the rspec job.
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:www-gitlab-com-3.0
+  tags:
+    - gitlab-org
+  interruptible: true # All jobs are interruptible by default
+  retry:
+    max: 2 # This is confusing but this means "3 runs at max".
+    when:
+      - unknown_failure
+      - api_failure
+      - runner_system_failure
+      - job_execution_timeout
+      - stuck_or_timeout_failure
+
+# These variables are global and apply to all jobs. Specific job variables will override them.
+variables:
+  ### PERFORMANCE ###
+  # GIT_* variables to speed up repo cloning/fetching
+  GIT_DEPTH: "10"
+  GIT_STRATEGY: "fetch"
+  GIT_SUBMODULE_STRATEGY: "none"
+  # Disabling LFS speeds up jobs, because runners don't have to perform the LFS steps during repo clone/fetch
+  GIT_LFS_SKIP_SMUDGE: "1"
+  # NO_CONTRACTS speeds up middleman builds
+  NO_CONTRACTS: "true"
+
+  ### RELIABILITY ###
+  # Reduce flaky builds via https://docs.gitlab.com/ee/ci/yaml/#job-stages-attempts variables
+  GET_SOURCES_ATTEMPTS: "3"
+  ARTIFACT_DOWNLOAD_ATTEMPTS: "3"
+  RESTORE_CACHE_ATTEMPTS: "3"
+  EXECUTOR_JOB_SECTION_ATTEMPTS: "3"
+  # Performs an error check after each Bash script command is executed, and exits if the previously executed command returned a non-zero exit code
+  # https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/2671
+  FF_ENABLE_BASH_EXIT_CODE_CHECK: "true" 
+
+### RULES REUSED VIA YAML ANCHORS:
+# YAML anchors reference: https://docs.gitlab.com/ee/ci/yaml/README.html#anchors
+
+# master branch in the original repo, NOT a master branch MR for a forked repo.
+# NOTE: We must make sure to exclude forked repo MRs by checking `CI_MERGE_REQUEST_SOURCE_PROJECT_ID is null,
+# because the pipeline might be in an MR against a fork's 'master' branch, and in this case this rule
+# would incorrectly trigger when the "Pipeline for Merged Results" is run for the MR.
+.if-master-original-repo: &if-master-original-repo
+  if: '$CI_COMMIT_REF_NAME == "master" && $CI_PROJECT_ID == "7764" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == null'
+
+# merge request, ONLY for a branch in the original repo
+.if-merge-request-original-repo: &if-merge-request-original-repo
+  if: '$CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == "7764"'
+
+# merge request, ONLY for a branch in a forked repo
+.if-merge-request-forked-repo: &if-merge-request-forked-repo
+  if: '$CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID != "7764"'
+
+# "always" - master branch in the original repo, OR any merge request
+.if-master-original-repo-or-merge-request: &if-master-original-repo-or-merge-request
+  if: '($CI_COMMIT_REF_NAME == "master" && $CI_PROJECT_ID == "7764") || $CI_MERGE_REQUEST_IID'
+
+# if triggered by the scheduled job to cleanup old deleted files, only on master branch in the original repo
+.if-schedule-deploy-cleanup-old-deleted-files-master-original-repo: &if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  if: '$CI_PIPELINE_SOURCE == "schedule" && $RUN_SCHEDULED_DEPLOY_CLEANUP_OLD_DELETED_FILES == "true" && $CI_COMMIT_REF_NAME == "master" && $CI_PROJECT_ID == "7764"'
+
+### COMMON JOBS REUSED VIA `extends`:
+# Extends reference: https://docs.gitlab.com/ee/ci/yaml/README.html#extends
+
+.ruby-cache:
+  cache:
+    key: "web_ruby-3.0-buster"
+    policy: pull
+    paths:
+      - vendor
+
+.bundle-install:
+  extends: .ruby-cache
+  before_script:
+    - bundle config set path vendor
+    - bundle install --quiet --jobs 4
+
+# Artifacts upload: To avoid adding extra run time to jobs, this should only be
+# used by jobs which require artifacts.  Currently, this is only
+# `deploy-cleanup-old-deleted-files` and `check-handbook-edit-links`
+.upload-artifacts:
+  artifacts:
+    expire_in: 7 days
+    paths:
+      - public/
+
+###################################
+#
+# PREPARE STAGE
+#
+###################################
+
+# Only push the cache from this job, to save time on all other jobs.
+ruby-push-cache:
+  extends: .bundle-install
+  stage: prepare
+  rules:
+    - <<: *if-master-original-repo
+  cache:
+    policy: pull-push
+  script:
+    - echo "Pushing updated ruby cache..."
+
+# Prevents pipeline from being interrupted by subsequent commits.
+# Pipelines on the master branch of the original repo are never interruptible.
+# MR pipelines (on original repo and forks) may be made non-interruptible by manually running the job.
+dont-interrupt-me:
+  image: alpine:edge
+  interruptible: false
+  stage: prepare
+  rules:
+    - <<: *if-master-original-repo
+      allow_failure: true
+    - <<: *if-merge-request-original-repo
+      when: manual
+      allow_failure: true
+    - <<: *if-merge-request-forked-repo
+      when: manual
+      allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "# This job makes sure this pipeline won't be interrupted on master. It can also be triggered manually to prevent a pipeline from being interrupted. See https://docs.gitlab.com/ee/ci/yaml/#interruptible."
+
+# This is a manual job for debugging any unexpected behavior encountered while refactoring the CI config
+expose-ci-rules-variables:
+  image: alpine:edge
+  stage: prepare
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+      when: manual
+      allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "CI_COMMIT_REF_NAME = ${CI_COMMIT_REF_NAME}"
+    - echo "CI_PROJECT_ID = ${CI_PROJECT_ID}"
+    - echo "CI_MERGE_REQUEST_IID = ${CI_MERGE_REQUEST_IID}"
+    - echo "CI_MERGE_REQUEST_TITLE = ${CI_MERGE_REQUEST_TITLE}"
+    - echo "CI_MERGE_REQUEST_SOURCE_PROJECT_ID = ${CI_MERGE_REQUEST_SOURCE_PROJECT_ID}"
+    - echo "CI_COMMIT_REF_SLUG = ${CI_COMMIT_REF_SLUG}"
+    - echo "CI_PIPELINE_SOURCE = ${CI_PIPELINE_SOURCE}"
+    - echo "RUN_SCHEDULED_DEPLOY_CLEANUP_OLD_DELETED_FILES = ${RUN_SCHEDULED_DEPLOY_CLEANUP_OLD_DELETED_FILES}"
+
+###################################
+#
+# CONTENT-GENERATION STAGE
+#
+###################################
+
+# SCHEDULED OR TRIGGERED CONTENT-GENERATION JOBS:
+
+generate-handbook-changelog:
+  extends:
+    - .bundle-install
+    - .production-environment
+  timeout: 3h
+  stage: content-generation
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CHANGELOG_MD == "true"'
+  needs: []
+  script:
+    - bundle exec bin/generate_handbook_changelog
+    # Ensure we build and deploy only the generated `sites/handbook/source/handbook/CHANGELOG.html.md
+    - cd sites/handbook && bundle exec middleman build --bail --clean --glob='handbook/CHANGELOG.html' && cd -
+    - scripts/deploy
+
+generate-handbook-changelog-rss:
+  extends:
+    - .bundle-install
+    - .production-environment
+  timeout: 3h
+  stage: content-generation
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CHANGELOG_RSS == "true"'
+  needs: []
+  script:
+    - bundle exec bin/generate_handbook_changelog_rss
+    - scripts/deploy
+
+release-post-build:
+  extends: .bundle-install
+  timeout: 3h
+  stage: content-generation
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $RELEASE_POST_BUILD == "true"'
+  needs: []
+  script:
+    - bundle exec bin/release-post-build
+
+generate-release-post-items:
+  extends: .bundle-install
+  timeout: 1h
+  stage: content-generation
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $RELEASE_POST_ITEM == "true"'
+  needs: []
+  script:
+    - bundle exec bin/release-post-item --no-local
+
+# Update https://gitlab.com/gitlab-org/gitlab/-/releases
+# and https://gitlab.com/gitlab-org/gitlab-foss/-/releases
+# when release posts are published
+update-gitlab-project-releases-page:
+  extends: .bundle-install
+  stage: content-generation
+  rules:
+    - <<: *if-master-original-repo
+      changes:
+        - sites/uncategorized/source/releases/posts/*-released.html.md
+      allow_failure: true
+  script:
+    - bundle exec rake release:ee:update_project_releases_page
+    - bundle exec rake release:foss:update_project_releases_page
+
+###################################
+#
+# BUILD-AND-DEPLOY STAGE
+#
+###################################
+
+# SHARED BUILD AND DEPLOY LOGIC USED VIA `extends` AND YAML ANCHORS:
+
+.build-base:
+  extends: .bundle-install
+  stage: build-and-deploy
+  needs: []
+
+.review-environment:
+  variables:
+    DEPLOY_TYPE: review
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_COMMIT_REF_SLUG.about.gitlab-review.app
+    on_stop: review-stop
+    auto_stop_in: 30 days
+
+.production-environment:
+  variables:
+    DEPLOY_TYPE: production
+  environment:
+    name: production
+    url: https://about.gitlab.com
+
+# IMAGES BUILD AND DEPLOY JOBS:
+
+.images-build-script: &images-build-script
+  - mkdir -p public/
+  - rsync -vlaP --exclude='/team/' --exclude='.gitkeep' source/images/ public/images
+
+images-build-only:
+  extends: 
+    - .build-base
+    - .upload-artifacts
+  rules:
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  script:
+    - *images-build-script
+
+images-build-and-review-deploy:
+  extends:
+    - .build-base
+    - .review-environment
+  rules:
+    - <<: *if-merge-request-original-repo
+  script:
+    - *images-build-script
+    - scripts/deploy
+
+images-build-and-prod-deploy:
+  extends:
+    - .build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - *images-build-script
+    - scripts/deploy
+
+# WEBPACK BUILD AND DEPLOY JOBS
+
+.packaged-assets-webpack-build-script: &packaged-assets-webpack-build-script
+  - mkdir -p public/
+  - yarn install
+  - yarn run build-webpack
+  - ls tmp 
+  - mv tmp/dist/stylesheets public/
+  - mv tmp/dist/javascripts public/
+  - ls public
+  - ls public/stylesheets
+  - ls public/javascripts
+  
+packaged-assets-webpack-build-only:
+  extends: 
+    - .build-base
+    - .upload-artifacts
+  rules:
+    - <<: *if-merge-request-forked-repo
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  script:
+    - *packaged-assets-webpack-build-script
+
+packaged-assets-webpack-build-and-review-deploy:
+  extends:
+    - .build-base
+    - .review-environment
+  rules:
+    - <<: *if-merge-request-original-repo
+  script:
+    - *packaged-assets-webpack-build-script
+    - scripts/deploy
+
+packaged-assets-webpack-build-and-prod-deploy:
+  extends:
+    - .build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - *packaged-assets-webpack-build-script
+    - scripts/deploy
+
+# ASSETS BUILD AND DEPLOY JOBS:
+
+.assets-build-base:
+  extends: .build-base
+  variables:
+    DESTINATION_PATH_REGEXES: '^ico/'
+    MIDDLEMAN_CONFIG_FILE_NAME: 'config_assets.rb'
+
+.assets-build-script: &assets-build-script
+  - bundle exec middleman build --bail
+
+assets-build-only:
+  extends: 
+    - .assets-build-base
+    - .upload-artifacts
+  rules:
+    - <<: *if-merge-request-forked-repo
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  script:
+    - *assets-build-script
+
+assets-build-and-review-deploy:
+  extends:
+    - .assets-build-base
+    - .review-environment
+  rules:
+    - <<: *if-merge-request-original-repo
+  script:
+    - *assets-build-script
+    - scripts/review-replace-urls
+    - scripts/deploy
+
+assets-build-and-prod-deploy:
+  extends:
+    - .assets-build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - *assets-build-script
+    - scripts/deploy
+
+# HANDBOOK BUILD AND DEPLOY JOBS (PARALLEL VIA PartialBuildHandbook EXTENSION):
+
+.handbook-build-base:
+  extends: .build-base
+  parallel: 2
+
+.handbook-build-script: &handbook-build-script
+  - cd sites/handbook && bundle exec middleman build --bail && cd -
+
+handbook-build-only:
+  extends: 
+    - .handbook-build-base
+    - .upload-artifacts
+  rules:
+    - <<: *if-merge-request-forked-repo
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  script:
+    - *handbook-build-script
+
+handbook-build-and-review-deploy:
+  extends:
+    - .handbook-build-base
+    - .review-environment
+    # NOTE: this `.upload-artifacts` is only needed by `check-handbook-edit-links`
+    - .upload-artifacts
+  rules:
+   - <<: *if-merge-request-original-repo
+  script:
+    - *handbook-build-script
+    - scripts/review-replace-urls
+    - scripts/deploy
+
+handbook-build-and-prod-deploy:
+  extends:
+    - .handbook-build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - *handbook-build-script
+    - scripts/deploy
+
+# UNCATEGORIZED BUILD AND DEPLOY JOBS (PARALLEL VIA PartialBuildUncategorized EXTENSION):
+
+.uncategorized-build-base:
+  extends: .build-base
+  parallel: 5
+
+.uncategorized-build-script: &uncategorized-build-script
+  - if [[ "$CI_NODE_INDEX" == "4" ]]; then bin/crop-team-pictures; fi
+  - cd sites/uncategorized
+  - find source/images/team -type f ! -name '*-crop.jpg' -delete
+  - bundle exec middleman build --bail
+  - cd -
+
+uncategorized-build-only:
+  extends: 
+    - .uncategorized-build-base
+    - .upload-artifacts
+  rules:
+    - <<: *if-merge-request-forked-repo
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  script:
+    - *uncategorized-build-script
+
+uncategorized-build-and-review-deploy:
+  extends:
+    - .uncategorized-build-base
+    - .review-environment
+  rules:
+    - <<: *if-merge-request-original-repo
+  script:
+    - *uncategorized-build-script
+    - scripts/pull_buyer_experience_artifacts.rb
+    - scripts/review-replace-urls
+    - scripts/deploy
+
+uncategorized-build-and-prod-deploy:
+  extends:
+    - .uncategorized-build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - *uncategorized-build-script
+    - scripts/pull_buyer_experience_artifacts.rb
+    - scripts/deploy
+
+# UNCATEGORIZED PROXY RESOURCE BUILD AND DEPLOY JOBS:
+
+# Generators should be cached every 24 hours. We need a dedicated cache key to make
+# sure the cache doesn't get blown away by other non-proxy-resource build jobs.
+.uncategorized-proxy-resource-build-base:
+  extends: .build-base
+  # occasionally this job's script can run 11+ minutes if there are a
+  # lot of cache misses, putting the total job runtime over the current
+  # 15 minute default timeout. So, it is increased to 30m to be safe.
+  timeout: 30m
+  variables:
+    INCLUDE_GENERATORS: 'true'
+    CI_BUILD_PROXY_RESOURCE: 'true'
+  cache:
+    key: "build_proxy_resource_ruby-3.0-buster"
+    policy: pull-push
+    paths:
+      - tmp/cache
+      - vendor
+
+.uncategorized-proxy-resource-build-script: &uncategorized-proxy-resource-build-script
+  - cd sites/uncategorized && bundle exec middleman build --bail && cd -
+
+uncategorized-proxy-resource-build-only:
+  extends: 
+    - .uncategorized-proxy-resource-build-base
+    - .upload-artifacts
+  rules:
+    - <<: *if-merge-request-forked-repo
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  script:
+    - *uncategorized-proxy-resource-build-script
+
+uncategorized-proxy-resource-build-and-review-deploy:
+  extends:
+    - .uncategorized-proxy-resource-build-base
+    - .review-environment
+  rules:
+    - <<: *if-merge-request-original-repo
+  script:
+    - *uncategorized-proxy-resource-build-script
+    - scripts/deploy
+
+uncategorized-proxy-resource-build-and-prod-deploy:
+  extends:
+    - .uncategorized-proxy-resource-build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - *uncategorized-proxy-resource-build-script
+    - scripts/deploy
+
+buyer-experience-pull-and-review-deploy:
+  extends:
+    - .build-base
+    - .review-environment
+  rules:
+    - <<: *if-merge-request-original-repo
+  script:
+    - scripts/pull_buyer_experience_artifacts.rb
+    - scripts/review-replace-urls
+    - scripts/deploy
+
+buyer-experience-pull-and-prod-deploy:
+  extends:
+    - .build-base
+    - .production-environment
+  rules:
+    - <<: *if-master-original-repo
+  script:
+    - scripts/pull_buyer_experience_artifacts.rb
+    - scripts/deploy
+
+# APPLY REDIRECTS JOB:
+.apply-redirects-script: &apply-redirects-script
+  - bundle exec bin/apply-exact-match-redirects
+  - bundle exec bin/apply-regex-redirects
+
+apply-redirects-review:
+  extends: .bundle-install
+  stage: build-and-deploy
+  rules:
+    - <<: *if-merge-request-original-repo
+      when: manual
+      allow_failure: true
+  script:
+    - export FASTLY_SRV_ID=$FASTLY_SRV_ID_REVIEW
+    - export FASTLY_SRV_VER=$FASTLY_SRV_VER_REVIEW
+    - export FASTLY_DICT_ID=$FASTLY_DICT_ID_REVIEW
+    - export FASTLY_EXACT_ERR_SNIPPET_ID=$FASTLY_EXACT_ERR_SNIPPET_ID_REVIEW
+    - export FASTLY_EXACT_RECV_SNIPPET_ID=$FASTLY_EXACT_RECV_SNIPPET_ID_REVIEW
+    - export FASTLY_LITERAL_ERR_SNIPPET_ID=$FASTLY_LITERAL_ERR_SNIPPET_ID_REVIEW
+    - export FASTLY_LITERAL_RECV_SNIPPET_ID=$FASTLY_LITERAL_RECV_SNIPPET_ID_REVIEW
+    - export FASTLY_REGEX_ERR_SNIPPET_ID=$FASTLY_REGEX_ERR_SNIPPET_ID_REVIEW
+    - export FASTLY_REGEX_RECV_SNIPPET_ID=$FASTLY_REGEX_RECV_SNIPPET_ID_REVIEW
+    - export FASTLY_API_KEY=$FASTLY_API_KEY_REVIEW
+    - *apply-redirects-script
+
+apply-redirects-prod:
+  extends: .bundle-install
+  stage: build-and-deploy
+  rules:
+    - <<: *if-master-original-repo
+      changes:
+        - data/redirects.yml
+  environment:
+    name: production
+  script:
+    - export FASTLY_SRV_ID=$FASTLY_SRV_ID_PROD
+    - export FASTLY_SRV_VER=$FASTLY_SRV_VER_PROD
+    - export FASTLY_DICT_ID=$FASTLY_DICT_ID_PROD
+    - export FASTLY_EXACT_ERR_SNIPPET_ID=$FASTLY_EXACT_ERR_SNIPPET_ID_PROD
+    - export FASTLY_EXACT_RECV_SNIPPET_ID=$FASTLY_EXACT_RECV_SNIPPET_ID_PROD
+    - export FASTLY_LITERAL_ERR_SNIPPET_ID=$FASTLY_LITERAL_ERR_SNIPPET_ID_PROD
+    - export FASTLY_LITERAL_RECV_SNIPPET_ID=$FASTLY_LITERAL_RECV_SNIPPET_ID_PROD
+    - export FASTLY_REGEX_ERR_SNIPPET_ID=$FASTLY_REGEX_ERR_SNIPPET_ID_PROD
+    - export FASTLY_REGEX_RECV_SNIPPET_ID=$FASTLY_REGEX_RECV_SNIPPET_ID_PROD
+    - export FASTLY_API_KEY=$FASTLY_API_KEY_PROD
+    - *apply-redirects-script
+
+###################################
+#
+# TEST STAGE
+#
+###################################
+
+# LINTER JOBS:
+
+root-files-checker:
+  image: debian:stable-slim
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+  needs: []
+  script:
+    - (diff -u FILES <(find . -maxdepth 1 -mindepth 1 | sort) && /bin/echo "No files/directories are added or removed")
+      || ( /bin/echo "It looks like you've added files to the root directory. If this was intentional, please update FILES to allow this file. If this was not intentional, please remove the file from Git and try again."; exit 1 )
+
+# The CSP is sometimes disabled for testing and we must not forget
+# to renable it before merging. If you believe this check fails for
+# a legitimate change, please ping @gitlab-com/gl-security/appsec
+content-security-policy-checker:
+  image: debian:stable-slim
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+      changes:
+        - "source/includes/layout/head.html.haml"
+  needs: []
+  script:
+    - |
+      grep '^%meta{"http-equiv": "Content-Security-Policy", content: "default-src .* script-src .*"}' source/includes/layout/head.html.haml || (echo "The Content Security Policy appears to be disabled, please re-enable it before merging." ; exit 1)
+
+lint 0 2:
+  extends: .bundle-install
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+  needs: []
+  script:
+    - bundle exec rake lint
+
+lint 1 2:
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+  needs: []
+  script:
+    - yarn install
+    - yarn run eslint
+
+lint release-post-items:
+  extends: .bundle-install
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+      changes:
+        - "data/release_posts/unreleased/*"
+        - "data/categories.yml"
+        - "data/stages.yml"
+        - "source/images/unreleased/*"
+  needs: []
+  script:
+    - bundle exec bin/validate-release-post-item
+
+rubocop:
+  extends: .bundle-install
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+      changes:
+        - "*.rb"
+        - "**/*.rb"
+        - ".rubocop.yml"
+        - "Dangerfile"
+        - "*.rake"
+        - "**/*.rake"
+        - "bin/**/*"
+        - "scripts/**/*"
+  needs: []
+  script:
+    - bundle exec rubocop
+
+include:
+  - template: Code-Quality.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+
+code_quality:
+  tags: [gitlab-org-docker]
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+      when: manual
+  needs: []
+  artifacts:
+    paths:
+      - coffeelint.json
+      - gl-code-quality-report.json
+
+# Override Dependency Scanning Jobs until https://gitlab.com/gitlab-org/gitlab/-/issues/217668 is closed
+gemnasium-dependency_scanning:
+  rules:
+    - if: $DEPENDENCY_SCANNING_DISABLED
+      when: never
+    - if: $DS_EXCLUDED_ANALYZERS =~ /gemnasium([^-]|$)/
+      when: never
+    - <<: *if-master-original-repo-or-merge-request
+      exists:
+        - '{Gemfile.lock,*/Gemfile.lock,*/*/Gemfile.lock}'
+        - '{composer.lock,*/composer.lock,*/*/composer.lock}'
+        - '{gems.locked,*/gems.locked,*/*/gems.locked}'
+        - '{go.sum,*/go.sum,*/*/go.sum}'
+        - '{npm-shrinkwrap.json,*/npm-shrinkwrap.json,*/*/npm-shrinkwrap.json}'
+        - '{package-lock.json,*/package-lock.json,*/*/package-lock.json}'
+        - '{yarn.lock,*/yarn.lock,*/*/yarn.lock}'
+        - '{packages.lock.json,*/packages.lock.json,*/*/packages.lock.json}'
+        - '{conan.lock,*/conan.lock,*/*/conan.lock}'
+
+bundler-audit-dependency_scanning:
+  rules:
+    - if: $DEPENDENCY_SCANNING_DISABLED
+      when: never
+    - if: $DS_EXCLUDED_ANALYZERS =~ /bundler-audit/
+      when: never
+    - <<: *if-master-original-repo-or-merge-request
+      exists:
+        - '{Gemfile.lock,*/Gemfile.lock,*/*/Gemfile.lock}'
+
+retire-js-dependency_scanning:
+  rules:
+    - if: $DEPENDENCY_SCANNING_DISABLED
+      when: never
+    - if: $DS_EXCLUDED_ANALYZERS =~ /retire.js/
+      when: never
+    - <<: *if-master-original-repo-or-merge-request
+      exists:
+        - '{package.json,*/package.json,*/*/package.json}'
+
+# == END Dependency Scanning jobs
+
+# Override Secret Detection job until https://gitlab.com/gitlab-org/gitlab/-/issues/217668 is closed
+
+secret_detection:
+  # Override script to avoid scanning all the files on `master`.
+  # We still need to keep a scan on the default branch to store the results for the Vulnerability Reports.
+  script:
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        export SECRET_DETECTION_COMMITS=$CI_COMMIT_SHA
+      else
+        git fetch origin $CI_DEFAULT_BRANCH $CI_COMMIT_REF_NAME
+        git log --left-right --cherry-pick --pretty=format:"%H" refs/remotes/origin/${CI_DEFAULT_BRANCH}...refs/remotes/origin/${CI_COMMIT_REF_NAME} >${CI_COMMIT_SHA}_commit_list.txt
+        export SECRET_DETECTION_COMMITS_FILE=${CI_COMMIT_SHA}_commit_list.txt
+      fi
+    - /analyzer run
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+  needs: []
+  dependencies: [] # Don't download artifacts, especially `./public/`
+
+check-handbook-edit-links:
+  extends: .bundle-install
+# NOTE: Because of the time it would takes to download all artifacts, and because the non-handbook portions of the site may change in the future,
+#       we are only checking links in the handbook instead of all build jobs, even though there are edit links on non-handbook pages
+#       which are still shared for now.  So, this only provides coverage for major breakages or regressions in the edit
+#       links logic for pages in the handbook, not the rest of the site.
+#
+#       Note that the source for the `lib/lint/check_handbook_edit_links.rb` could still be used for checking the rest of the site
+#       (if the proper skip regexes were added), but this job is only running it against the files generated by the handbook build job.
+  stage: test
+  rules:
+    - <<: *if-merge-request-original-repo
+      changes:
+        # To avoid this job from running too often and blocking builds (since its dependency on the handbook job is currently one of the longest-running jobs),
+        # the list of changes to trigger it are restricted to files currently involved in rendering the edit links.
+        - data/monorepo.yml
+        - helpers/custom_helpers.rb
+        - '**/edit_page.html.haml'
+        - '**/footer.html.haml'
+        - '**/handbook-page-toc.haml'
+        - '**/check_handbook_edit_links.rb'
+  needs:
+    - handbook-build-and-review-deploy
+  script:
+    - scripts/check-handbook-edit-links.rb
+
+# TEST SUITE JOBS:
+
+rspec-unit:
+  extends: .bundle-install
+  stage: test
+  rules:
+    - <<: *if-master-original-repo-or-merge-request
+      changes:
+        - "spec/**/*"
+        - "**/*.{js,json,rb,yml}"
+        - ".rspec"
+  needs: []
+  script:
+    - bundle exec rspec --tag ~@feature
+
+###################################
+#
+# CLEANUP STAGE
+#
+###################################
+
+# REVIEW STOP JOB:
+
+review-stop:
+  extends: .review-environment
+  stage: cleanup
+  rules:
+    - <<: *if-merge-request-original-repo
+      when: manual
+      allow_failure: true
+  variables:
+    DEPLOY_DELETE_APP: 'true'
+  environment:
+    action: stop
+  script:
+    - scripts/deploy
+
+# PROD DEPLOY JOBS:
+
+# This uses artifacts and is part of a scheduled pipeline, so it needs to depend on the "build-only" versions of jobs
+deploy-cleanup-old-deleted-files:
+  extends:
+    - .production-environment
+  stage: cleanup
+  rules:
+    - <<: *if-schedule-deploy-cleanup-old-deleted-files-master-original-repo
+  needs:
+    - uncategorized-build-only
+    - uncategorized-proxy-resource-build-only
+    - handbook-build-only
+    - images-build-only
+    - packaged-assets-webpack-build-only
+    - assets-build-only
+  variables:
+    DEPLOY_CLEANUP_OLD_DELETED_FILES: 'true'
+  script:
+    - scripts/pull_buyer_experience_artifacts.rb
+    - scripts/deploy
+
+danger-review:
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:danger
+  rules:
+    - if: '$DANGER_GITLAB_API_TOKEN && $CI_MERGE_REQUEST_IID'
+  stage: test
+  needs: []
+  script:
+    - danger --fail-on-errors=true --verbose
+  
+dependency_scanning:
+  needs: []
+  variables:
+    DS_EXCLUDED_ANALYZERS: "gemnasium-maven, gemnasium-python" 
