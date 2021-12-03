@@ -1,4 +1,4 @@
-# BuscadorCIRepos
+# CIReposFinder
 Search for GitHub and GitLab repositories. The aim is to find GitHub and GitLab repositories which use CI/CD tools.
 
 ## Set Up 📋
