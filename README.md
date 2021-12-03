@@ -16,7 +16,7 @@ $ pip install -r requirements.txt
 
 ## Construido con 🛠️
 
-* [PyCharm Community](https://www.jetbrains.com/es-es/pycharm/?ref=hackernoon.com)
+* [Visual Studio Code](https://code.visualstudio.com/)
 
 ## Autores ✒️
 
