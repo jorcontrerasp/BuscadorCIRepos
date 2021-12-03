@@ -1,5 +1,5 @@
 # BuscadorCIRepos
-Buscador de repositorios CI en GitHub y GitLab
+Search for GitHub and GitLab repositories. The aim is to find GitHub and GitLab repositories which use CI/CD tools.
 
 ## Set Up 📋
 
@@ -14,14 +14,14 @@ Install Python libraries
 $ pip install -r requirements.txt
 ```
 
-## Construido con 🛠️
+## Build with 🛠️
 
 * [Visual Studio Code](https://code.visualstudio.com/)
 
-## Autores ✒️
+## Authors ✒️
 
 * **Jorge Contreras Padilla** - [jorcontrerasp](https://github.com/jorcontrerasp)
 
-## Licencia 📄
+## License 📄
 
-Este proyecto está bajo la Licencia (Apache-2.0 License) - mirar el archivo [LICENSE](https://github.com/jorcontrerasp/BuscadorCIRepos/blob/main/LICENSE) para más detalles.
+This project is under the license (Apache-2.0 License) - look at the file [LICENSE](https://github.com/jorcontrerasp/BuscadorCIRepos/blob/main/LICENSE) for details.
