@@ -68,6 +68,36 @@ def parseGitHubActionsYAML(yamlFile):
     ciObj.setStages(when)
     ciObj.setSJobs(jobs)
     return ciObj
+
+def parseTravisYAML(yamlFile):
+    #dataLoaded = getDataYAML(yamlFile)
+    dataLoaded = yaml.safe_load(open(yamlFile))
+    jobs = []
+    when = []
+    for topLevel in dataLoaded:
+        topLevelContent = dataLoaded[topLevel]
+        if 'jobs' == topLevel:
+            includeContent = getValueArrayParam(topLevelContent, 'include')
+            for j in includeContent:
+                job = CIJob()
+                job.setStage(when)
+                jobSteps = []
+
+                install = getValueArrayParam(j, 'install')
+                if len(install)>0:
+                    for task in install:
+                        jobSteps.append(task)
+                
+                script = getValueArrayParam(j, 'script')
+                if len(script)>0:
+                    for task in script:
+                        jobSteps.append(task)
+                        job.setTasks(jobSteps)
+                        jobs.append(job)
+    ciObj = CIObj()
+    ciObj.setStages(when)
+    ciObj.setSJobs(jobs)
+    return ciObj
     
 def getDataYAML(yamlContent):
     # Write YAML file
@@ -122,11 +152,15 @@ class CIObj:
         self.jobs = jobs
 
 
+print("Iniciando proceso.")
 
 f = "gitlabCI_yml_example_files/apple_turicreate_gitlab-ci.yml"
 obj = parseGitLabYAML(f)
 
 f = "githubActions_yml_example_files/hacker-laws_build-on-pull-request.yaml"
 obj = parseGitHubActionsYAML(f)
+
+f = "travisCI_yml_example_files/facebook_prophet_travis-ci.yml"
+obj = parseTravisYAML(f)
 
 print("Parseo finalizado.")
