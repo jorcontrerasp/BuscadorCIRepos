@@ -37,7 +37,7 @@ if continuar:
     for file in files:
         print(str(file))
 
-    aux.imprimirListaRepositorios(filteredRepos)
+    aux.printGitHubRepoList(filteredRepos)
 
     listaEncontrados = []
     listaEncontrados = ghs.searchReposGitHubApi(filteredRepos, df, df2)

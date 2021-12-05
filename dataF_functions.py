@@ -100,6 +100,90 @@ def makeDataFrame(lRepositories, boGitHub):
 
     return df
 
+def makeEmptyDataFrame():
+    aux.printLog("Generando DataFrame vacío...", logging.INFO)
+    id = "EmptyRecord"
+    df = pd.DataFrame([],
+                      index=[id],
+                      columns=["URL", "Lenguaje"
+                                ,ci.HerramientasCI.CI1.value
+                                , ci.HerramientasCI.CI2.value
+                                , ci.HerramientasCI.CI3.value
+                                , ci.HerramientasCI.CI4.value
+                                , ci.HerramientasCI.CI5.value
+                                , ci.HerramientasCI.CI6.value
+                                , ci.HerramientasCI.CI7.value
+                                , ci.HerramientasCI.CI8.value
+                                , ci.HerramientasCI.CI9.value
+                                , ci.HerramientasCI.CI10.value
+                                , ci.HerramientasCI.CI11.value
+                                , ci.HerramientasCI.CI12.value
+                                , ci.HerramientasCI.CI13.value
+                               ])
+    df.at[id, "URL"] = " "
+    df.at[id, "Lenguaje"] = " "
+    df.at[id, ci.HerramientasCI.CI1.value] = " "
+    df.at[id, ci.HerramientasCI.CI2.value] = " "
+    df.at[id, ci.HerramientasCI.CI3.value] = " "
+    df.at[id, ci.HerramientasCI.CI4.value] = " "
+    df.at[id, ci.HerramientasCI.CI5.value] = " "
+    df.at[id, ci.HerramientasCI.CI6.value] = " "
+    df.at[id, ci.HerramientasCI.CI7.value] = " "
+    df.at[id, ci.HerramientasCI.CI8.value] = " "
+    df.at[id, ci.HerramientasCI.CI9.value] = " "
+    df.at[id, ci.HerramientasCI.CI10.value] = " "
+    df.at[id, ci.HerramientasCI.CI11.value] = " "
+    df.at[id, ci.HerramientasCI.CI12.value] = " "
+    df.at[id, ci.HerramientasCI.CI13.value] = " "
+
+    return df
+
+def addDFRecord(repo, df, boGitHub):
+    if boGitHub:
+        id = repo.full_name
+        url = repo.html_url
+        language = repo.language
+    else:
+        id = repo.attributes['path_with_namespace']
+        url = repo.attributes['web_url']
+        language = ','.join(repo.languages())
+        
+    df2 = pd.DataFrame([],
+                          index=[id],
+                          columns=["URL", "Lenguaje"
+                                    , ci.HerramientasCI.CI1.value
+                                    , ci.HerramientasCI.CI2.value
+                                    , ci.HerramientasCI.CI3.value
+                                    , ci.HerramientasCI.CI4.value
+                                    , ci.HerramientasCI.CI5.value
+                                    , ci.HerramientasCI.CI6.value
+                                    , ci.HerramientasCI.CI7.value
+                                    , ci.HerramientasCI.CI8.value
+                                    , ci.HerramientasCI.CI9.value
+                                    , ci.HerramientasCI.CI10.value
+                                    , ci.HerramientasCI.CI11.value
+                                    , ci.HerramientasCI.CI12.value
+                                    , ci.HerramientasCI.CI13.value
+                                   ])
+    df2.at[id, "URL"] = url
+    df2.at[id, "Lenguaje"] = language
+    df2.at[id, ci.HerramientasCI.CI1.value] = " "
+    df2.at[id, ci.HerramientasCI.CI2.value] = " "
+    df2.at[id, ci.HerramientasCI.CI3.value] = " "
+    df2.at[id, ci.HerramientasCI.CI4.value] = " "
+    df2.at[id, ci.HerramientasCI.CI5.value] = " "
+    df2.at[id, ci.HerramientasCI.CI6.value] = " "
+    df2.at[id, ci.HerramientasCI.CI7.value] = " "
+    df2.at[id, ci.HerramientasCI.CI8.value] = " "
+    df2.at[id, ci.HerramientasCI.CI9.value] = " "
+    df2.at[id, ci.HerramientasCI.CI10.value] = " "
+    df2.at[id, ci.HerramientasCI.CI11.value] = " "
+    df2.at[id, ci.HerramientasCI.CI12.value] = " "
+    df2.at[id, ci.HerramientasCI.CI13.value] = " "
+    df = df.append(df2)
+
+    return df
+
 def updateDataFrame(repo, literal, CITool, boGitHub, df):
     if boGitHub:
         id = repo.full_name
@@ -200,6 +284,13 @@ def countRepos1FoundUnless(df):
         elif (len(str(row[ci.HerramientasCI.CI13.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI13.value]:
             cont += 1
     return cont
+
+def existsDFRecord(id, df):
+        try:
+            df.at[id, ci.HerramientasCI.CI1.value]
+            return True
+        except:
+            return False
 
 def makeEXCEL(df, pFile):
     aux.printLog("Generando fichero Excel...", logging.INFO)

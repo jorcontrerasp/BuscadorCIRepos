@@ -34,14 +34,12 @@ def executeProcess():
                 lFinal = ghs.getGithubRepos()
 
             # Generamos un DataFrame donde irán los resultados.
-            githubDF = d.makeDataFrame(lFinal, True)
+            #githubDF = d.makeDataFrame(lFinal, True)
+            githubDF = d.makeEmptyDataFrame()
 
             # Aplicamos el proceso.
             lFound = []
             lFound = ghs.searchReposGitHubApi(lFinal, githubDF, counterDF)
-
-            # Generamos un fichero EXCEL con los resultados.
-            d.makeEXCEL(githubDF, "resultados_github")
 
         if doGitlabSearch:
             fRepos = "gitlab_repos.pickle"
@@ -56,15 +54,13 @@ def executeProcess():
                 lFinal = gls.getGitlabProjects()
 
             # Generamos un DataFrame donde irán los resultados.
-            gitlabDF = d.makeDataFrame(lFinal, False)
+            #gitlabDF = d.makeDataFrame(lFinal, False)
+            gitlabDF = d.makeEmptyDataFrame()
 
             # Aplicamos el proceso.
             lFound = []
             lFound = gls.searchProjectsGitLabApi(lFinal, gitlabDF, counterDF)
-
-            # Generamos un fichero EXCEL con los resultados.
-            d.makeEXCEL(gitlabDF, "resultados_gitlab")
-
+            
         # Generamos un fichero EXCEL con los contadores.
         d.makeEXCEL(counterDF, "contadores")
 

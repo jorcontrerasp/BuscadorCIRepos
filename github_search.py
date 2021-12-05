@@ -19,6 +19,7 @@ def getGithubRepos():
     generator = g.search_repositories(query=q)
 
     # Convertimos el generador en una lista de repositorios.
+    aux.printLog("Generando lista de repositorios GitHub...", logging.INFO)
     repositories = list(generator)
 
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
@@ -46,7 +47,7 @@ def getGithubRepos():
     randomizeRepos = True
     lFinal = []
     if randomizeRepos:
-        while len(lFinal) < 500:
+        while len(lFinal) < 100:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)
@@ -62,6 +63,10 @@ def getGithubRepos():
 def searchReposGitHubApi(lRepositories, df, df2):
     lFound = []
     for repo in lRepositories:
+
+        if not d.existsDFRecord(repo.full_name, df):
+            df = d.addDFRecord(repo, df, True)
+
         found1 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI1, [], df, df2)
         found2 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI2, [], df, df2)
         found3 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI3, [], df, df2)
@@ -84,6 +89,9 @@ def searchReposGitHubApi(lRepositories, df, df2):
             lFound.append(repo)
 
     d.updateTotalCounterDataFrame("Encontrados_GitHub", df, df2)
+
+    # Generamos un fichero EXCEL con los resultados.
+    d.makeEXCEL(df, "resultados_github")
 
     return lFound
 
@@ -117,7 +125,13 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2):
 
         path = literals.pop(0)
         repo.get_contents(path)
-        d.updateDataFrame(repo, path, CITool, True, df)
+
+        if d.existsDFRecord(repo.full_name, df):
+            d.updateDataFrame(repo, path, CITool, True, df)
+        else:
+            df = d.addDFRecord(repo, df, True)
+            d.updateDataFrame(repo, path, CITool, True, df)
+
         d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
         return True
     except:
