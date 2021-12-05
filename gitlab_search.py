@@ -11,6 +11,7 @@ N_MAX_SEARCHES = 118550
 N_MIN_STARS = 50
 N_MAX_RESULT_PROYECTS = 100
 LANGUAGE = ''
+onlyPositives = True
 
 def getGitlabProjects():
     # private github_token or personal github_token authentication
@@ -87,23 +88,22 @@ def getGitlabProjects():
 def searchProjectsGitLabApi(lProjects, df, df2):
     lFound = []
     for project in lProjects:
-
-        if not d.existsDFRecord(project.attributes['path_with_namespace'], df):
+        if not onlyPositives and not d.existsDFRecord(project.attributes['path_with_namespace'], df):
             df = d.addDFRecord(project, df, False)
 
-        found1 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2)
-        found2 = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2)
-        found3 = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2)
-        found4 = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2)
-        found5 = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2)
-        found6 = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2)
-        found7 = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2)
-        found8 = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2)
-        found9 = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2)
-        found10 = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2)
-        found11 = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2)
-        found12 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2)
-        found13 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2)
+        found1,df = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2)
+        found2,df = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2)
+        found3,df = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2)
+        found4,df = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2)
+        found5,df = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2)
+        found6,df = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2)
+        found7,df = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2)
+        found8,df = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2)
+        found9,df = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2)
+        found10,df = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2)
+        found11,df = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2)
+        found12,df = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2)
+        found13,df = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -112,7 +112,7 @@ def searchProjectsGitLabApi(lProjects, df, df2):
         if found:
             lFound.append(project)
 
-    d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
+    df2 = d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
 
     # Generamos un fichero EXCEL con los resultados.
     d.makeEXCEL(df, "resultados_gitlab")
@@ -130,30 +130,25 @@ def searchGitLabPath(project, CITool, df, df2):
                 found = existsFile(project,path)
                 if found:
                     if d.existsDFRecord(project.attributes['path_with_namespace'], df):
-                        d.updateDataFrame(project, path, CITool, False, df)
+                        df = d.updateDataFrame(project, path, CITool, False, df)
                     else:
                         df = d.addDFRecord(project, df, False)
-                        d.updateDataFrame(project, path, CITool, False, df)
+                        df = d.updateDataFrame(project, path, CITool, False, df)
 
-                    d.updateCounterDataFrame(CITool.value, "Encontrados_GitLab", df2)
+                    df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitLab", df2)
             else:
                 found = True
                 if d.existsDFRecord(project.attributes['path_with_namespace'], df):
-                    d.updateDataFrame(project, path, CITool, False, df)
+                    df = d.updateDataFrame(project, path, CITool, False, df)
                 else:
                     df = d.addDFRecord(project, df, False)
-                    d.updateDataFrame(project, path, CITool, False, df)
+                    df = d.updateDataFrame(project, path, CITool, False, df)
 
-                d.updateCounterDataFrame(CITool.value, df2)
+                df2 = d.updateCounterDataFrame(CITool.value, df2)
     except:
-        if d.existsDFRecord(project.attributes['path_with_namespace'], df):
-            d.updateDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", CITool, False, df)
-        else:
-            df = d.addDFRecord(project, df, False)
-            d.updateDataFrame(project, "EXCEPT: ERROR al buscar la ruta en el proyecto", CITool, False, df)
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
-    return found
+    return found,df
 
 def isEmptyProject(project):
     return project.attributes['empty_repo']

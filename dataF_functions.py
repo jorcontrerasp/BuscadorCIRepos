@@ -194,6 +194,8 @@ def updateDataFrame(repo, literal, CITool, boGitHub, df):
         df.at[id, CITool.value] = "[" + literal + "]\n"
     else:
         df.at[id, CITool.value] += "[" + literal + "]\n"
+    
+    return df
 
 def makeCounterDataFrame():
     aux.printLog("Generando DataFrame contadores...", logging.INFO)
@@ -249,10 +251,12 @@ def makeCounterDataFrame():
 
 def updateCounterDataFrame(fila, column, df):
     df.at[fila, column] += 1
+    return df
 
 def updateTotalCounterDataFrame(column,df,df2):
     totales = countRepos1FoundUnless(df)
     df2.at["Totales", column] = totales
+    return df2
 
 def countRepos1FoundUnless(df):
     cont = 0
