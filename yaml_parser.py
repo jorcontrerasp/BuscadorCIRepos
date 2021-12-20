@@ -2,19 +2,39 @@ import io
 import yaml
 import aux_functions as aux
 
-data = yaml.safe_load(open('yml_example_files/defaults.yaml'))
-url = data['url']
+class CIJob:
+    stage = ""
+    tasks = [] 
 
+    # GETTER & SETTER
+    def getStage(self):
+        return self.stage
 
-data2 = yaml.safe_load(open('gitlabCI_yml_example_files/.gitlab-ci.yml'))
-stages = data2['stages']
-job1 = data2['test-code-job2']
-job1_script = job1['script']
-#for s in job1_script:
-#    print(s)
+    def setStage(self, stage):
+        self.stage = stage
 
-data3 = yaml.safe_load(open('gitlabCI_yml_example_files/apple_turicreate_gitlab-ci.yml'))
-#print(data3)
+    def getTasks(self):
+        return self.tasks
+
+    def setTasks(self, tasks):
+        self.tasks = tasks
+
+class CIObj:
+    stages = []
+    jobs = []
+
+    # GETTER & SETTER
+    def getStages(self):
+        return self.stages
+
+    def setStages(self, stages):
+        self.stages = stages
+
+    def getJobs(self):
+        return self.jobs
+
+    def setSJobs(self, jobs):
+        self.jobs = jobs
 
 def parseGitLabYAML(yamlFile):
     #dataLoaded = getDataYAML(yamlFile)
@@ -117,50 +137,26 @@ def getValueArrayParam(level,param):
         value = ""
     return value
 
-class CIJob:
-    stage = ""
-    tasks = [] 
+def parseConfigParam(l1, l2):
+    dataLoaded = yaml.safe_load(open("config.yml"))
+    l1Content = getValueArrayParam(dataLoaded, l1)
+    l2Content = getValueArrayParam(l1Content, l2)
+    return l2Content
 
-    # GETTER & SETTER
-    def getStage(self):
-        return self.stage
+doTest = False
+if doTest:
+    print("Iniciando proceso.")
 
-    def setStage(self, stage):
-        self.stage = stage
+    f = "yml_example_files/apple_turicreate_gitlab-ci.yml"
+    obj = parseGitLabYAML(f)
 
-    def getTasks(self):
-        return self.tasks
+    f = "yml_example_files/hacker-laws_build-on-pull-request.yaml"
+    obj = parseGitHubActionsYAML(f)
 
-    def setTasks(self, tasks):
-        self.tasks = tasks
+    f = "yml_example_files/facebook_prophet_travis-ci.yml"
+    obj = parseTravisYAML(f)
 
-class CIObj:
-    stages = []
-    jobs = []
+    config = parseConfigParam("process", "execute")
+    print(config)
 
-    # GETTER & SETTER
-    def getStages(self):
-        return self.stages
-
-    def setStages(self, stages):
-        self.stages = stages
-
-    def getJobs(self):
-        return self.jobs
-
-    def setSJobs(self, jobs):
-        self.jobs = jobs
-
-
-print("Iniciando proceso.")
-
-f = "gitlabCI_yml_example_files/apple_turicreate_gitlab-ci.yml"
-obj = parseGitLabYAML(f)
-
-f = "githubActions_yml_example_files/hacker-laws_build-on-pull-request.yaml"
-obj = parseGitHubActionsYAML(f)
-
-f = "travisCI_yml_example_files/facebook_prophet_travis-ci.yml"
-obj = parseTravisYAML(f)
-
-print("Parseo finalizado.")
+    print("Parseo finalizado.")

@@ -7,6 +7,17 @@ import aux_functions as aux
 import ci_tools as ci
 import dataF_functions as d
 import logging
+import yaml_parser as ymlp
+
+# Configuración de la búsqueda GitHub.
+config = "github"
+queryFile = ymlp.parseConfigParam(config, "queryFile")
+filterCommits = ymlp.parseConfigParam(config, "filterCommits")
+MAX_COMMITS = ymlp.parseConfigParam(config, "MAX_COMMITS")
+MIN_COMMITS = ymlp.parseConfigParam(config, "MIN_COMMITS")
+randomizeRepos = ymlp.parseConfigParam(config, "randomizeRepos")
+N_RANDOM = ymlp.parseConfigParam(config, "N_RANDOM")
+onlyPositives = ymlp.parseConfigParam(config, "onlyPositives")
 
 def getGithubRepos():
     # Generamos un github_token para consultar la API de GitHub a través de la librería.
@@ -14,8 +25,9 @@ def getGithubRepos():
     token = aux.readFile("tokens/github_token.txt")
     g = Github(user, token)
 
-    q = aux.readFile("github_querys/query2.txt")
+    q = aux.readFile(queryFile)
     #query = mq.mGithubQuery.getQueryIni()
+    aux.printLog("Ejecutando query: " + queryFile, logging.INFO)
     generator = g.search_repositories(query=q)
 
     # Convertimos el generador en una lista de repositorios.
@@ -28,10 +40,6 @@ def getGithubRepos():
     repositories = aux.loadRepositories(fRepos)
 
     # Filtramos por el número de COMMITS.
-    filterCommits = False
-
-    MAX_COMMITS = 10000
-    MIN_COMMITS = 1000
     filteredRepos = []
 
     if filterCommits:
@@ -44,10 +52,9 @@ def getGithubRepos():
             filteredRepos.append(repo)
 
     # Seleccionamos N repositorios de manera aleatoria:
-    randomizeRepos = True
     lFinal = []
     if randomizeRepos:
-        while len(lFinal) < 100:
+        while len(lFinal) < N_RANDOM:
             item = random.choice(filteredRepos)
             if item not in lFinal:
                 lFinal.append(item)
@@ -62,25 +69,25 @@ def getGithubRepos():
 
 def searchReposGitHubApi(lRepositories, df, df2):
     lFound = []
-    onlyPositives = True
     for repo in lRepositories:
 
         if not onlyPositives and not d.existsDFRecord(repo.full_name, df):
             df = d.addDFRecord(repo, df, True)
 
-        found1,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI1, [], df, df2)
-        found2,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI2, [], df, df2)
-        found3,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI3, [], df, df2)
-        found4,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI4, [], df, df2)
-        found5,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI5, [], df, df2)
-        found6,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI6, [], df, df2)
-        found7,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, [], df, df2)
-        found8,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI8, [], df, df2)
-        found9,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI9, [], df, df2)
-        found10,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI10, [], df, df2)
-        found11,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI11, [], df, df2)
-        found12,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI12, [], df, df2)
-        found13,df = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI13, [], df, df2)
+
+        found1,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI1, df, df2)
+        found2,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2)
+        found3,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI3, df, df2)
+        found4,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI4, df, df2)
+        found5,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI5, df, df2)
+        found6,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI6, df, df2)
+        found7,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI7, df, df2)
+        found8,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI8, df, df2)
+        found9,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI9, df, df2)
+        found10,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI10, df, df2)
+        found11,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI11, df, df2)
+        found12,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI12, df, df2)
+        found13,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI13, df, df2)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -128,38 +135,41 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2):
         repo.get_contents(path)
 
         if d.existsDFRecord(repo.full_name, df):
-            df = d.updateDataFrame(repo, path, CITool, True, df)
+            df = d.updateDataFrame(repo, "***", CITool, True, df)
+            if not onlyPositives:
+                df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
         else:
             df = d.addDFRecord(repo, df, True)
-            df = d.updateDataFrame(repo, path, CITool, True, df)
+            df = d.updateDataFrame(repo, "***", CITool, True, df)
+            df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
 
-        df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
         return True,df
     except:
         if len(literals)>0:
-            return searchLiteralPathFromRoot(repo, CITool, literals, df, df2),df
+            found,df = searchLiteralPathFromRoot(repo, CITool, literals, df, df2)
+            return found,df
         else:
             return False,df
 
-def searchLiteralPathFromRoot2(repo, path):
-    try:
-        repo.get_contents(path)
-        return True
-    except:
-        return False
+def searchLiteralPathFromRoot2(repo, CITool, df, df2):
+    aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
+    literals = ci.getCISearchFiles(CITool.value)
 
-def searchLiteralPathFromRoot3(repo, contents, literal):
-    found = False
-    pLiteral = literal.split("/")
-    cLiteral = pLiteral.pop(0)
-    for contentFile in contents:
-        itFile = aux.getItFile(contentFile.path)
-        if cLiteral == itFile.lower():
-            if len(pLiteral) > 0:
-                if contentFile.type == "dir":
-                    contents = repo.get_contents(contentFile.path)
-                    found = searchLiteralPathFromRoot(repo, contents, '/'.join(pLiteral))
-                    break
-            else:
-                found = True
-    return found
+    for path in literals:
+        encontrado = False
+        try:
+            c = repo.get_contents(path)
+            encontrado = True
+        except:
+            encontrado = False
+        
+        if encontrado:
+            if not d.existsDFRecord(repo.full_name, df):
+                df = d.addDFRecord(repo, df, True)
+            
+            df = d.updateDataFrame(repo, "***", CITool, True, df)
+            df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
+
+            return True,df
+    
+    return False,df

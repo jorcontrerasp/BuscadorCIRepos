@@ -28,7 +28,7 @@ languages = project.languages()
 df = d.makeDataFrame(lProjects, False)
 df2 = d.makeCounterDataFrame()
 
-lEncontrados = gls.searchProjectsGitLabApi(lProjects, df, df2)
+lEncontrados = gls.searchInProjectsGitLabApi(lProjects, df, df2)
 
 d.makeEXCEL(df, "fExcelPruebas")
 d.makeEXCEL(df2, "fExcelPruebas2")

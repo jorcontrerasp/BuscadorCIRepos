@@ -14,8 +14,8 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-organizacion = "envoyproxy"
-repo = "envoy"
+organizacion = "kevinsawicki"
+repo = "http-request"
 
 continuar = True
 
@@ -33,14 +33,16 @@ if continuar:
     df = d.makeDataFrame(filteredRepos, True)
     df2 = d.makeCounterDataFrame()
 
-    files = ci.getCISearchFiles(ci.HerramientasCI.CI11.value)
+    files = ci.getCISearchFiles(ci.HerramientasCI.CI2.value)
     for file in files:
         print(str(file))
 
     aux.printGitHubRepoList(filteredRepos)
 
     listaEncontrados = []
-    listaEncontrados = ghs.searchReposGitHubApi(filteredRepos, df, df2)
+    #listaEncontrados = ghs.searchReposGitHubApi(filteredRepos, df, df2)
+
+    ghs.searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2)
 
     d.makeEXCEL(df, "fExcelPruebas")
     d.makeEXCEL(df2, "fExcelPruebas2")

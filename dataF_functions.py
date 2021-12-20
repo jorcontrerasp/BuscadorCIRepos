@@ -189,13 +189,18 @@ def updateDataFrame(repo, literal, CITool, boGitHub, df):
         id = repo.full_name
     else:
         id = repo.attributes['path_with_namespace']
-    value = str(df.at[id, CITool.value])
-    if value == " " or value == "nan":
-        df.at[id, CITool.value] = "[" + literal + "]\n"
-    else:
-        df.at[id, CITool.value] += "[" + literal + "]\n"
+
+    df.at[id, CITool.value] = literal
     
     return df
+
+def getDF(df):
+    return df
+
+def printDF(df):
+    print("----------------------------------------------------------------------------------------------------")
+    print(df)
+    print("----------------------------------------------------------------------------------------------------")
 
 def makeCounterDataFrame():
     aux.printLog("Generando DataFrame contadores...", logging.INFO)
@@ -216,36 +221,37 @@ def makeCounterDataFrame():
                             ,"Totales"],
                       columns=['Encontrados_GitHub', 'Encontrados_GitLab'])
 
-    df.at[ci.HerramientasCI.CI1.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI2.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI3.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI4.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI5.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI6.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI7.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI8.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI9.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI10.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI11.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI12.value, "Encontrados_GitHub"] = 0
-    df.at[ci.HerramientasCI.CI13.value, "Encontrados_GitHub"] = 0
-    df.at["Totales", "Encontrados_GitHub"] = 0
+    columna = "Encontrados_GitHub"
+    df.at[ci.HerramientasCI.CI1.value, columna] = 0
+    df.at[ci.HerramientasCI.CI2.value, columna] = 0
+    df.at[ci.HerramientasCI.CI3.value, columna] = 0
+    df.at[ci.HerramientasCI.CI4.value, columna] = 0
+    df.at[ci.HerramientasCI.CI5.value, columna] = 0
+    df.at[ci.HerramientasCI.CI6.value, columna] = 0
+    df.at[ci.HerramientasCI.CI7.value, columna] = 0
+    df.at[ci.HerramientasCI.CI8.value, columna] = 0
+    df.at[ci.HerramientasCI.CI9.value, columna] = 0
+    df.at[ci.HerramientasCI.CI10.value, columna] = 0
+    df.at[ci.HerramientasCI.CI11.value, columna] = 0
+    df.at[ci.HerramientasCI.CI12.value, columna] = 0
+    df.at[ci.HerramientasCI.CI13.value, columna] = 0
+    df.at["Totales", columna] = 0
 
-
-    df.at[ci.HerramientasCI.CI1.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI2.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI3.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI4.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI5.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI6.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI7.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI8.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI9.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI10.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI11.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI12.value, "Encontrados_GitLab"] = 0
-    df.at[ci.HerramientasCI.CI13.value, "Encontrados_GitLab"] = 0
-    df.at["Totales", "Encontrados_GitLab"] = 0
+    columna = "Encontrados_GitLab"
+    df.at[ci.HerramientasCI.CI1.value, columna] = 0
+    df.at[ci.HerramientasCI.CI2.value, columna] = 0
+    df.at[ci.HerramientasCI.CI3.value, columna] = 0
+    df.at[ci.HerramientasCI.CI4.value, columna] = 0
+    df.at[ci.HerramientasCI.CI5.value, columna] = 0
+    df.at[ci.HerramientasCI.CI6.value, columna] = 0
+    df.at[ci.HerramientasCI.CI7.value, columna] = 0
+    df.at[ci.HerramientasCI.CI8.value, columna] = 0
+    df.at[ci.HerramientasCI.CI9.value, columna] = 0
+    df.at[ci.HerramientasCI.CI10.value, columna] = 0
+    df.at[ci.HerramientasCI.CI11.value, columna] = 0
+    df.at[ci.HerramientasCI.CI12.value, columna] = 0
+    df.at[ci.HerramientasCI.CI13.value, columna] = 0
+    df.at["Totales", columna] = 0
 
     return df
 
@@ -260,33 +266,35 @@ def updateTotalCounterDataFrame(column,df,df2):
 
 def countRepos1FoundUnless(df):
     cont = 0
+    pValue = "***"
     for index, row in df.iterrows():
-        if (len(str(row[ci.HerramientasCI.CI1.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI1.value]:
+        if row[ci.HerramientasCI.CI1.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI2.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI2.value]:
+        elif row[ci.HerramientasCI.CI2.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI3.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI3.value]:
+        elif row[ci.HerramientasCI.CI3.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI4.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI4.value]:
+        elif row[ci.HerramientasCI.CI4.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI5.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI5.value]:
+        elif row[ci.HerramientasCI.CI5.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI6.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI6.value]:
+        elif row[ci.HerramientasCI.CI6.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI7.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI7.value]:
+        elif row[ci.HerramientasCI.CI7.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI8.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI8.value]:
+        elif row[ci.HerramientasCI.CI8.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI9.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI9.value]:
+        elif row[ci.HerramientasCI.CI9.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI10.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI10.value]:
+        elif row[ci.HerramientasCI.CI10.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI11.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI11.value]:
+        elif row[ci.HerramientasCI.CI11.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI12.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI12.value]:
+        elif row[ci.HerramientasCI.CI12.value] == pValue:
             cont += 1
-        elif (len(str(row[ci.HerramientasCI.CI13.value])) > 1) and "EXCEPT" not in row[ci.HerramientasCI.CI13.value]:
+        elif row[ci.HerramientasCI.CI13.value] == pValue:
             cont += 1
+
     return cont
 
 def existsDFRecord(id, df):
@@ -295,6 +303,78 @@ def existsDFRecord(id, df):
             return True
         except:
             return False
+
+def makeEmptyLanguageDataFrame():
+    aux.printLog("Generando DataFrame por lenguajes vacío...", logging.INFO)
+    id = "EmptyRecord"
+    df = pd.DataFrame([],
+                      index=[id],
+                      columns=[ci.HerramientasCI.CI1.value
+                                , ci.HerramientasCI.CI2.value
+                                , ci.HerramientasCI.CI3.value
+                                , ci.HerramientasCI.CI4.value
+                                , ci.HerramientasCI.CI5.value
+                                , ci.HerramientasCI.CI6.value
+                                , ci.HerramientasCI.CI7.value
+                                , ci.HerramientasCI.CI8.value
+                                , ci.HerramientasCI.CI9.value
+                                , ci.HerramientasCI.CI10.value
+                                , ci.HerramientasCI.CI11.value
+                                , ci.HerramientasCI.CI12.value
+                                , ci.HerramientasCI.CI13.value
+                                ])
+
+    df.at[id, ci.HerramientasCI.CI1.value] = 0
+    df.at[id, ci.HerramientasCI.CI2.value] = 0
+    df.at[id, ci.HerramientasCI.CI3.value] = 0
+    df.at[id, ci.HerramientasCI.CI4.value] = 0
+    df.at[id, ci.HerramientasCI.CI5.value] = 0
+    df.at[id, ci.HerramientasCI.CI6.value] = 0
+    df.at[id, ci.HerramientasCI.CI7.value] = 0
+    df.at[id, ci.HerramientasCI.CI8.value] = 0
+    df.at[id, ci.HerramientasCI.CI9.value] = 0
+    df.at[id, ci.HerramientasCI.CI10.value] = 0
+    df.at[id, ci.HerramientasCI.CI11.value] = 0
+    df.at[id, ci.HerramientasCI.CI12.value] = 0
+    df.at[id, ci.HerramientasCI.CI13.value] = 0
+
+    return df
+
+def addLanguageDFRecord(language, df):
+        
+    df2 = pd.DataFrame([],
+                          index=[language],
+                          columns=[ci.HerramientasCI.CI1.value
+                                    , ci.HerramientasCI.CI2.value
+                                    , ci.HerramientasCI.CI3.value
+                                    , ci.HerramientasCI.CI4.value
+                                    , ci.HerramientasCI.CI5.value
+                                    , ci.HerramientasCI.CI6.value
+                                    , ci.HerramientasCI.CI7.value
+                                    , ci.HerramientasCI.CI8.value
+                                    , ci.HerramientasCI.CI9.value
+                                    , ci.HerramientasCI.CI10.value
+                                    , ci.HerramientasCI.CI11.value
+                                    , ci.HerramientasCI.CI12.value
+                                    , ci.HerramientasCI.CI13.value
+                                    ])
+
+    df2.at[id, ci.HerramientasCI.CI1.value] = 0
+    df2.at[id, ci.HerramientasCI.CI2.value] = 0
+    df2.at[id, ci.HerramientasCI.CI3.value] = 0
+    df2.at[id, ci.HerramientasCI.CI4.value] = 0
+    df2.at[id, ci.HerramientasCI.CI5.value] = 0
+    df2.at[id, ci.HerramientasCI.CI6.value] = 0
+    df2.at[id, ci.HerramientasCI.CI7.value] = 0
+    df2.at[id, ci.HerramientasCI.CI8.value] = 0
+    df2.at[id, ci.HerramientasCI.CI9.value] = 0
+    df2.at[id, ci.HerramientasCI.CI10.value] = 0
+    df2.at[id, ci.HerramientasCI.CI11.value] = 0
+    df2.at[id, ci.HerramientasCI.CI12.value] = 0
+    df2.at[id, ci.HerramientasCI.CI13.value] = 0
+    df = df.append(df2)
+
+    return df
 
 def makeEXCEL(df, pFile):
     aux.printLog("Generando fichero Excel...", logging.INFO)
