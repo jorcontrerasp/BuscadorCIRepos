@@ -37,36 +37,40 @@ def executeProcess():
 
             fRepos = "github_repos.pickle"
             fResults = "results/resultados_github.xlsx"
-
-            if usePickleFile:
-                aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
-                if os.path.exists(fRepos):
-                    
-                    lFinal = aux.loadRepositories(fRepos)
-                else:
-                    raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
-            else:
-                # Obtenemos la lista de repositorios Github.
-                lFinal = ghs.getGithubRepos()
+            fLanguages = "results/lenguajes_github.xlsx"
 
             # Generamos un DataFrame donde irán los resultados.
             # githubDF = d.makeDataFrame(lFinal, True)
             if useResultsExcelFile:
                 if os.path.exists(fResults):
                     githubDF = pd.read_excel(fResults, index_col=0)
+                    githubLanguagesDF = pd.read_excel(fLanguages, index_col=0)
                 else:
                     githubDF = d.makeEmptyDataFrame()
+                    githubLanguagesDF = d.makeEmptyLanguageDataFrame()
             else:
                 githubDF = d.makeEmptyDataFrame()
+                githubLanguagesDF = d.makeEmptyLanguageDataFrame()
+                
+            if usePickleFile:
+                aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
+                if os.path.exists(fRepos):
+                    
+                    lFound = aux.loadRepositories(fRepos)
+                else:
+                    raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
+            else:
+                # Obtenemos la lista de repositorios Github.
+                lFound = ghs.getGithubRepos()
 
             # Aplicamos el proceso.
-            lFound = []
-            lFound = ghs.searchReposGitHubApi(lFinal, githubDF, counterDF)
+            lResult = []
+            lResult = ghs.searchReposGitHubApi(lFound, githubDF, counterDF, githubLanguagesDF)
 
         if doGitlabSearch:
-
             fRepos = "gitlab_repos.pickle"
             fResults = "results/resultados_gitlab.xlsx"
+            fLanguages = "results/languages_gitlab.xlsx"
 
             lFound = []
             lResult = []
@@ -76,23 +80,26 @@ def executeProcess():
             if useResultsExcelFile:
                 if os.path.exists(fResults):
                     gitlabDF = pd.read_excel(fResults, index_col=0)
+                    gitlabLanguageDF = pd.read_excel(fLanguages, index_col=0)
                 else:
                     gitlabDF = d.makeEmptyDataFrame()
+                    gitlabLanguageDF = d.makeEmptyLanguageDataFrame()
             else:
                 gitlabDF = d.makeEmptyDataFrame()
+                gitlabLanguageDF = d.makeEmptyLanguageDataFrame()
             
             if usePickleFile:
                 aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitLab.", logging.INFO)
                 if os.path.exists(fRepos):
-                    lFinal = aux.loadRepositories(fRepos)
+                    lFound = aux.loadRepositories(fRepos)
 
                     # Aplicamos el proceso.
-                    lFound = gls.searchInProjectsGitLabApi(lFinal, gitlabDF, counterDF)
+                    lResult = gls.searchInProjectsGitLabApi(lFound, gitlabDF, counterDF, gitlabLanguageDF)
 
                 else:
                     raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
             else:
-                lFound,lResult = gls.doSearchGitLabApi(gitlabDF, counterDF)
+                lFound,lResult = gls.doSearchGitLabApi(gitlabDF, counterDF, gitlabLanguageDF)
             
         # Generamos un fichero EXCEL con los contadores.
         d.makeEXCEL(counterDF, "contadores")

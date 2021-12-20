@@ -255,7 +255,7 @@ def makeCounterDataFrame():
 
     return df
 
-def updateCounterDataFrame(fila, column, df):
+def add1CounterDFRecord(fila, column, df):
     df.at[fila, column] += 1
     return df
 
@@ -359,19 +359,19 @@ def addLanguageDFRecord(language, df):
                                     , ci.HerramientasCI.CI13.value
                                     ])
 
-    df2.at[id, ci.HerramientasCI.CI1.value] = 0
-    df2.at[id, ci.HerramientasCI.CI2.value] = 0
-    df2.at[id, ci.HerramientasCI.CI3.value] = 0
-    df2.at[id, ci.HerramientasCI.CI4.value] = 0
-    df2.at[id, ci.HerramientasCI.CI5.value] = 0
-    df2.at[id, ci.HerramientasCI.CI6.value] = 0
-    df2.at[id, ci.HerramientasCI.CI7.value] = 0
-    df2.at[id, ci.HerramientasCI.CI8.value] = 0
-    df2.at[id, ci.HerramientasCI.CI9.value] = 0
-    df2.at[id, ci.HerramientasCI.CI10.value] = 0
-    df2.at[id, ci.HerramientasCI.CI11.value] = 0
-    df2.at[id, ci.HerramientasCI.CI12.value] = 0
-    df2.at[id, ci.HerramientasCI.CI13.value] = 0
+    df2.at[language, ci.HerramientasCI.CI1.value] = 0
+    df2.at[language, ci.HerramientasCI.CI2.value] = 0
+    df2.at[language, ci.HerramientasCI.CI3.value] = 0
+    df2.at[language, ci.HerramientasCI.CI4.value] = 0
+    df2.at[language, ci.HerramientasCI.CI5.value] = 0
+    df2.at[language, ci.HerramientasCI.CI6.value] = 0
+    df2.at[language, ci.HerramientasCI.CI7.value] = 0
+    df2.at[language, ci.HerramientasCI.CI8.value] = 0
+    df2.at[language, ci.HerramientasCI.CI9.value] = 0
+    df2.at[language, ci.HerramientasCI.CI10.value] = 0
+    df2.at[language, ci.HerramientasCI.CI11.value] = 0
+    df2.at[language, ci.HerramientasCI.CI12.value] = 0
+    df2.at[language, ci.HerramientasCI.CI13.value] = 0
     df = df.append(df2)
 
     return df

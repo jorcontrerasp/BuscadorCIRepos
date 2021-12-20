@@ -67,7 +67,7 @@ def getGithubRepos():
 
     return lFinal
 
-def searchReposGitHubApi(lRepositories, df, df2):
+def searchReposGitHubApi(lRepositories, df, df2, df3):
     lFound = []
     for repo in lRepositories:
 
@@ -75,19 +75,19 @@ def searchReposGitHubApi(lRepositories, df, df2):
             df = d.addDFRecord(repo, df, True)
 
 
-        found1,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI1, df, df2)
-        found2,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2)
-        found3,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI3, df, df2)
-        found4,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI4, df, df2)
-        found5,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI5, df, df2)
-        found6,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI6, df, df2)
-        found7,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI7, df, df2)
-        found8,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI8, df, df2)
-        found9,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI9, df, df2)
-        found10,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI10, df, df2)
-        found11,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI11, df, df2)
-        found12,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI12, df, df2)
-        found13,df = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI13, df, df2)
+        found1,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI1, df, df2, df3)
+        found2,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2, df3)
+        found3,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI3, df, df2, df3)
+        found4,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI4, df, df2, df3)
+        found5,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI5, df, df2, df3)
+        found6,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI6, df, df2, df3)
+        found7,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI7, df, df2, df3)
+        found8,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI8, df, df2, df3)
+        found9,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI9, df, df2, df3)
+        found10,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI10, df, df2, df3)
+        found11,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI11, df, df2, df3)
+        found12,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI12, df, df2, df3)
+        found13,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI13, df, df2, df3)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -98,8 +98,9 @@ def searchReposGitHubApi(lRepositories, df, df2):
 
     df2 =d.updateTotalCounterDataFrame("Encontrados_GitHub", df, df2)
 
-    # Generamos un fichero EXCEL con los resultados.
+    # Generamos ficheros EXCEL con los resultados.
     d.makeEXCEL(df, "resultados_github")
+    d.makeEXCEL(df3, "lenguajes_github")
 
     return lFound
 
@@ -125,7 +126,7 @@ def searchInRoot(repo, literal):
             break
     return found
 
-def searchLiteralPathFromRoot(repo, CITool, literals, df, df2):
+def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
     aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
     try:
         if len(literals)==0:
@@ -134,24 +135,29 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2):
         path = literals.pop(0)
         repo.get_contents(path)
 
-        if d.existsDFRecord(repo.full_name, df):
-            df = d.updateDataFrame(repo, "***", CITool, True, df)
-            if not onlyPositives:
-                df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
-        else:
-            df = d.addDFRecord(repo, df, True)
-            df = d.updateDataFrame(repo, "***", CITool, True, df)
-            df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
+        if not d.existsDFRecord(repo.full_name, df):
+                df = d.addDFRecord(repo, df, True)
+            
+        df = d.updateDataFrame(repo, "***", CITool, True, df)
+        df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
-        return True,df
+        language = "EMPTY"
+        if len(repo.language) > 0:
+            language = repo.language
+        if not d.existsDFRecord(language, df3):
+            df3 = d.addLanguageDFRecord(language, df3)
+        
+        df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+
+        return True,df,df3
     except:
         if len(literals)>0:
-            found,df = searchLiteralPathFromRoot(repo, CITool, literals, df, df2)
-            return found,df
+            found,df,df3 = searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3)
+            return found,df,df3
         else:
-            return False,df
+            return False,df,df3
 
-def searchLiteralPathFromRoot2(repo, CITool, df, df2):
+def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
     aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
     literals = ci.getCISearchFiles(CITool.value)
 
@@ -168,8 +174,16 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2):
                 df = d.addDFRecord(repo, df, True)
             
             df = d.updateDataFrame(repo, "***", CITool, True, df)
-            df2 = d.updateCounterDataFrame(CITool.value, "Encontrados_GitHub", df2)
+            df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
-            return True,df
+            language = "EMPTY"
+            if len(repo.language) > 0:
+                language = repo.language
+            if not d.existsDFRecord(language, df3):
+                df3 = d.addLanguageDFRecord(language, df3)
+            
+            df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+
+            return True,df,df3
     
-    return False,df
+    return False,df,df3
