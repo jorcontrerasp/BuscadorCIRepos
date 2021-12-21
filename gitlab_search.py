@@ -120,7 +120,7 @@ def doSearch1By1GitLabApi(df, df2, df3):
 
     # Generamos un fichero EXCEL con los resultados.
     d.makeEXCEL(df, "resultados_gitlab")
-    d.makeEXCEL(df3, "lenguajes_github")
+    d.makeEXCEL(df3, "lenguajes_gitlab")
     
     return lFound,lResult
 

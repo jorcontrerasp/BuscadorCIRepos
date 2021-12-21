@@ -177,8 +177,8 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
             language = "EMPTY"
-            if len(repo.language) > 0:
-                language = repo.language
+            if len(str(repo.language)) > 0:
+                language = str(repo.language)
             if not d.existsDFRecord(language, df3):
                 df3 = d.addLanguageDFRecord(language, df3)
             
