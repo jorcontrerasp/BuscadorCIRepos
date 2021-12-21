@@ -136,12 +136,12 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
         repo.get_contents(path)
 
         if not d.existsDFRecord(repo.full_name, df):
-                df = d.addDFRecord(repo, df, True)
+            df = d.addDFRecord(repo, df, True)
             
         df = d.updateDataFrame(repo, "***", CITool, True, df)
         df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
-        language = "EMPTY"
+        language = "None"
         if len(repo.language) > 0:
             language = repo.language
         if not d.existsDFRecord(language, df3):
@@ -176,7 +176,7 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             df = d.updateDataFrame(repo, "***", CITool, True, df)
             df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
-            language = "EMPTY"
+            language = "None"
             if len(str(repo.language)) > 0:
                 language = str(repo.language)
             if not d.existsDFRecord(language, df3):

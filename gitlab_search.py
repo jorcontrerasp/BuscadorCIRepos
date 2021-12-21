@@ -252,7 +252,7 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3):
 
     # Generamos ficheros EXCEL con los resultados.
     d.makeEXCEL(df, "resultados_gitlab")
-    d.makeEXCEL(df3, "lenguajes_github")
+    d.makeEXCEL(df3, "lenguajes_gitlab")
 
     return lFound
 
@@ -272,7 +272,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                     df = d.updateDataFrame(project, "***", CITool, False, df)
                     df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
 
-                    language = "EMPTY"
+                    language = "None"
                     languages = project.languages()
                     if len(languages)>0:
                         for l in languages:
@@ -292,7 +292,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                 df = d.updateDataFrame(project, "***", CITool, False, df)
                 df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
 
-                language = "EMPTY"
+                language = "None"
                 languages = project.languages()
                 if len(languages)>0:
                     for l in languages:
