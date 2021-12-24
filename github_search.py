@@ -184,6 +184,12 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             
             df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
+            ciObj = ymlp.getParseObj(repo, path, CITool, True)
+            if not type(ciObj) == None:
+                print("ciObj NOT NULL")
+            else:
+                print("ciObj NULL")
+
             return True,df,df3
     
     return False,df,df3

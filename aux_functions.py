@@ -4,6 +4,8 @@
 import pickle
 import datetime
 import logging
+import base64
+from github import GithubException
 
 def makePickle(fileName, lRepositories):
     printLog("Generando fichero pickle...", logging.INFO)
@@ -62,3 +64,35 @@ def printLog(msg, level):
 def getTimestamp():
     timestamp = str(datetime.datetime.now())[0:19]
     return timestamp
+
+def getBlobContent(project, branch, path_name):
+    # Obtener referencia del "branch"
+    ref = project.get_git_ref(f'heads/{branch}')
+    # Obtener el árbol
+    tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
+    # Buscar ruta en el árbol
+    sha = [x.sha for x in tree if x.path == path_name]
+    if not sha:
+        # SHA no encontrado
+        return None
+    # SHA encontrado
+    return project.get_git_blob(sha[0])
+
+def getFileContent(project, filePath, boGitHub):
+    if boGitHub:
+        try:
+            res = project.get_contents(filePath)
+            return str(res.decoded_content)
+        except GithubException:
+            blob = getBlobContent(project, "master", filePath)
+            b64 = base64.b64decode(blob.content)
+            content = b64.decode("utf8")
+            return str(content)
+    else:
+        try:
+            res = project.files.get(file_path=filePath, ref='master')
+            str_res = str(res)
+            return str_res
+        except:
+            return ""
+        

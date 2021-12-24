@@ -1,6 +1,11 @@
 import io
 import yaml
 import aux_functions as aux
+import os
+import ci_tools as ci
+import logging
+import shutil
+from shutil import rmtree
 
 class CIJob:
     stage = ""
@@ -36,53 +41,88 @@ class CIObj:
     def setSJobs(self, jobs):
         self.jobs = jobs
 
+def getParseObj(repo, path, CITool, boGitHub):
+    ciObj = CIObj()
+    try:
+        # Generamos el directorio 'tmp'
+        if not os.path.exists(tmpFolder):
+            os.mkdir(tmpFolder)
+
+        doYMLParse = CITool.value == ci.HerramientasCI.CI2.value or CITool.value == ci.HerramientasCI.CI4.value or CITool.value == ci.HerramientasCI.CI8.value
+        
+        if doYMLParse:
+            makeYMLTmpFile(repo, path, boGitHub)
+            if os.path.exists(tmpFile):
+                if CITool.value == ci.HerramientasCI.CI2.value:
+                    ciObj = parseTravisYAML(tmpFile)
+                    os.remove(tmpFile)
+                elif CITool.value == ci.HerramientasCI.CI4.value:
+                    ciObj = parseGitHubActionsYAML(tmpFile)
+                    os.remove(tmpFile)
+                elif CITool.value == ci.HerramientasCI.CI8.value:
+                    ciObj = parseGitLabYAML(tmpFile)
+                    os.remove(tmpFile)
+    except:
+        aux.printLog("No se ha podido parsear el fichero YML: '" + path + "'", logging.INFO)
+
+    rmtree("./" + tmpFolder)
+
+    return ciObj
+
 def parseGitLabYAML(yamlFile):
-    #dataLoaded = getDataYAML(yamlFile)
-    dataLoaded = yaml.safe_load(open(yamlFile))
+    try:
+        dataLoaded = yaml.safe_load(open(yamlFile))
+    except:
+        return None
     stages = dataLoaded['stages']
     jobs = []
-    for topLevel in dataLoaded:
+    strdl = str(dataLoaded)
+    if not strdl == "None":
+        for topLevel in dataLoaded:
+            topLevelContent = dataLoaded[topLevel]
+            stage = getValueArrayParam(topLevelContent, 'stage')
+            script = getValueArrayParam(topLevelContent, 'script')
 
-        topLevelContent = dataLoaded[topLevel]
-        stage = getValueArrayParam(topLevelContent, 'stage')
-        script = getValueArrayParam(topLevelContent, 'script')
-
-        if len(script)>0:
-            job = CIJob()
-            job.setStage(stage)
-            jobTasks = []
-            for task in script:
-                jobTasks.append(task)
-            job.setTasks(jobTasks)
-            jobs.append(job)
+            if len(script)>0:
+                job = CIJob()
+                job.setStage(stage)
+                jobTasks = []
+                for task in script:
+                    jobTasks.append(task)
+                job.setTasks(jobTasks)
+                jobs.append(job)
     ciObj = CIObj()
     ciObj.setStages(stages)
     ciObj.setSJobs(jobs)
     return ciObj
     
 def parseGitHubActionsYAML(yamlFile):
-    #dataLoaded = getDataYAML(yamlFile)
     # La etiqueta 'on' la detecta como True ¿?
-    dataLoaded = yaml.safe_load(open(yamlFile))
+    try:
+        dataLoaded = yaml.safe_load(open(yamlFile))
+    except:
+        return None
     jobs = []
     when = []
-    for topLevel in dataLoaded:
-        topLevelContent = dataLoaded[topLevel]
-        if topLevel == True: # on
-            for w in topLevelContent:
-                when.append(w)
-        if 'jobs' == topLevel and len(topLevelContent)>0:
-            for j in topLevelContent:
-                job = CIJob()
-                job.setStage(when)
-                jobSteps = []
-                jobContent = topLevelContent[j]
-                steps = getValueArrayParam(jobContent, 'steps')
-                if len(steps)>0:
-                    for step in steps:
-                        jobSteps.append(step)
-                job.setTasks(jobSteps)
-                jobs.append(job)
+    strdl = str(dataLoaded)
+    if not strdl == "None":
+        for topLevel in dataLoaded:
+            topLevelContent = dataLoaded[topLevel]
+            if topLevel == True: # on
+                for w in topLevelContent:
+                    when.append(w)
+            if 'jobs' == topLevel and len(topLevelContent)>0:
+                for j in topLevelContent:
+                    job = CIJob()
+                    job.setStage(when)
+                    jobSteps = []
+                    jobContent = topLevelContent[j]
+                    steps = getValueArrayParam(jobContent, 'steps')
+                    if len(steps)>0:
+                        for step in steps:
+                            jobSteps.append(step)
+                    job.setTasks(jobSteps)
+                    jobs.append(job)
                     
     ciObj = CIObj()
     ciObj.setStages(when)
@@ -90,30 +130,34 @@ def parseGitHubActionsYAML(yamlFile):
     return ciObj
 
 def parseTravisYAML(yamlFile):
-    #dataLoaded = getDataYAML(yamlFile)
-    dataLoaded = yaml.safe_load(open(yamlFile))
+    try:
+        dataLoaded = yaml.safe_load(open(yamlFile))
+    except:
+        return None
     jobs = []
     when = []
-    for topLevel in dataLoaded:
-        topLevelContent = dataLoaded[topLevel]
-        if 'jobs' == topLevel:
-            includeContent = getValueArrayParam(topLevelContent, 'include')
-            for j in includeContent:
-                job = CIJob()
-                job.setStage(when)
-                jobSteps = []
+    strdl = str(dataLoaded)
+    if not strdl == "None":
+        for topLevel in dataLoaded:
+            topLevelContent = dataLoaded[topLevel]
+            if 'jobs' == topLevel:
+                includeContent = getValueArrayParam(topLevelContent, 'include')
+                for j in includeContent:
+                    job = CIJob()
+                    job.setStage(when)
+                    jobSteps = []
 
-                install = getValueArrayParam(j, 'install')
-                if len(install)>0:
-                    for task in install:
-                        jobSteps.append(task)
-                
-                script = getValueArrayParam(j, 'script')
-                if len(script)>0:
-                    for task in script:
-                        jobSteps.append(task)
-                        job.setTasks(jobSteps)
-                        jobs.append(job)
+                    install = getValueArrayParam(j, 'install')
+                    if len(install)>0:
+                        for task in install:
+                            jobSteps.append(task)
+                    
+                    script = getValueArrayParam(j, 'script')
+                    if len(script)>0:
+                        for task in script:
+                            jobSteps.append(task)
+                            job.setTasks(jobSteps)
+                            jobs.append(job)
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setSJobs(jobs)
@@ -142,6 +186,29 @@ def parseConfigParam(l1, l2):
     l1Content = getValueArrayParam(dataLoaded, l1)
     l2Content = getValueArrayParam(l1Content, l2)
     return l2Content
+
+def getStrToFile(content):
+    content = content.replace("b'","")
+    content = content.replace("'","")
+    parts = content.split("\\n")
+
+    return parts
+
+def makeYMLTmpFile(repo, path, boGitHub):
+    decoded = aux.getFileContent(repo, path, boGitHub)
+
+    parts = getStrToFile(decoded)
+    
+    try:
+        with open(tmpFile, 'a') as f:
+            for part in parts:
+                f.write(part + "\n")
+    finally:
+        f.close()
+
+config = "process"
+tmpFolder = parseConfigParam(config, "tmpFolder")
+tmpFile = parseConfigParam(config, "tmpFile")
 
 doTest = False
 if doTest:

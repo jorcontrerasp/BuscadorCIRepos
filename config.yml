@@ -1,9 +1,11 @@
 process:
   execute: True
-  doGithubSearch: True
-  doGitlabSearch: False
+  doGithubSearch: False
+  doGitlabSearch: True
   usePickleFile: False
   useResultsExcelFile: False
+  tmpFolder: tmp
+  tmpFile: /ftmp
 github:
   queryFile: github_querys/query2.txt
   filterCommits: False
