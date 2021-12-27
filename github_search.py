@@ -7,7 +7,7 @@ import aux_functions as aux
 import ci_tools as ci
 import dataF_functions as d
 import logging
-import yaml_parser as ymlp
+import ci_yml_parser as ymlp
 
 # Configuración de la búsqueda GitHub.
 config = "github"
@@ -138,7 +138,7 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
         if not d.existsDFRecord(repo.full_name, df):
             df = d.addDFRecord(repo, df, True)
             
-        df = d.updateDataFrame(repo, "***", CITool, True, df)
+        df = d.updateDataFrameCiColumn(repo, "***", CITool, True, df)
         df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
         language = "None"
@@ -148,6 +148,10 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
             df3 = d.addLanguageDFRecord(language, df3)
         
         df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+
+        ciObj = ymlp.getParseObj(repo, path, CITool, True)
+        if not type(ciObj) == None:
+            d.updateDataFrameCiObj(repo, ciObj, True, df)
 
         return True,df,df3
     except:
@@ -173,7 +177,7 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             if not d.existsDFRecord(repo.full_name, df):
                 df = d.addDFRecord(repo, df, True)
             
-            df = d.updateDataFrame(repo, "***", CITool, True, df)
+            df = d.updateDataFrameCiColumn(repo, "***", CITool, True, df)
             df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
 
             language = "None"
@@ -186,9 +190,7 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
 
             ciObj = ymlp.getParseObj(repo, path, CITool, True)
             if not type(ciObj) == None:
-                print("ciObj NOT NULL")
-            else:
-                print("ciObj NULL")
+                d.updateDataFrameCiObj(repo, ciObj, True, df)
 
             return True,df,df3
     

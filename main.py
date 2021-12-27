@@ -8,7 +8,7 @@ import aux_functions as aux
 import pandas as pd
 import os
 import logging
-import yaml_parser as ymlp
+import ci_yml_parser as ymlp
 
 # Configuración del proceso de búsqueda.
 config = "process"

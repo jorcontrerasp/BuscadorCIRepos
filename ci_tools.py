@@ -18,6 +18,25 @@ class HerramientasCI(Enum):
     CI12 = "Semaphore CI"
     CI13 = "AppVeyor"
 
+def getCIToolsValueList():
+    lCITools = []
+    lCITools.append(HerramientasCI.CI1.value)
+    lCITools.append(HerramientasCI.CI2.value)
+    lCITools.append(HerramientasCI.CI3.value)
+    lCITools.append(HerramientasCI.CI4.value)
+    lCITools.append(HerramientasCI.CI5.value)
+    lCITools.append(HerramientasCI.CI6.value)
+    lCITools.append(HerramientasCI.CI7.value)
+    lCITools.append(HerramientasCI.CI8.value)
+    lCITools.append(HerramientasCI.CI9.value)
+    lCITools.append(HerramientasCI.CI10.value)
+    lCITools.append(HerramientasCI.CI11.value)
+    lCITools.append(HerramientasCI.CI12.value)
+    lCITools.append(HerramientasCI.CI13.value)
+    
+    return lCITools
+
+
 def getCISearchFiles(CITool):
     files = []
     if CITool in HerramientasCI.CI1.value:

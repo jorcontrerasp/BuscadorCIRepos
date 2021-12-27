@@ -6,7 +6,7 @@ import aux_functions as aux
 import ci_tools as ci
 import dataF_functions as d
 import logging
-import yaml_parser as ymlp
+import ci_yml_parser as ymlp
 
 # Configuración de la búsqueda GitLab.
 config = "gitlab"
@@ -269,7 +269,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                     if not d.existsDFRecord(project.attributes['path_with_namespace'], df):
                         df = d.addDFRecord(project, df, False)
                     
-                    df = d.updateDataFrame(project, "***", CITool, False, df)
+                    df = d.updateDataFrameCiColumn(project, "***", CITool, False, df)
                     df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
 
                     language = "None"
@@ -295,7 +295,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                 if not d.existsDFRecord(project.attributes['path_with_namespace'], df):
                         df = d.addDFRecord(project, df, False)
                 
-                df = d.updateDataFrame(project, "***", CITool, False, df)
+                df = d.updateDataFrameCiColumn(project, "***", CITool, False, df)
                 df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
 
                 language = "None"
