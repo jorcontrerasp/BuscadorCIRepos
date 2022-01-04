@@ -6,6 +6,8 @@ import datetime
 import logging
 import base64
 from github import GithubException
+import ci_yml_parser as ymlp
+import gitlab_search as gls
 
 def makePickle(fileName, lRepositories):
     printLog("Generando fichero pickle...", logging.INFO)
@@ -82,7 +84,19 @@ def getFileContent(project, filePath, boGitHub):
     if boGitHub:
         try:
             res = project.get_contents(filePath)
-            return str(res.decoded_content)
+            if isinstance(res, list):
+                fileList = []
+                for r in res:
+                    res2 = project.get_contents(r.path)
+                    if not isinstance(res2, list):
+                        extension = r.path.split(".")[len(r.path.split("."))-1]
+                        fileObj = ymlp.FileObj()
+                        fileObj.setExtension(extension)
+                        fileObj.setContent(str(res2.decoded_content))
+                        fileList.append(fileObj)
+                return fileList
+            else:
+                return str(res.decoded_content)
         except GithubException:
             blob = getBlobContent(project, "master", filePath)
             b64 = base64.b64decode(blob.content)
@@ -91,8 +105,26 @@ def getFileContent(project, filePath, boGitHub):
     else:
         try:
             res = project.files.get(file_path=filePath, ref='master')
-            str_res = str(res)
-            return str_res
+            b = base64.b64decode(res.content)
+            str_res = b.decode("utf-8")
+            return str(str_res)
         except:
-            return ""
+            try:
+                res = project.repository_tree(filePath)
+                fileList = []
+                for r in res:
+                    rPath = r['path']
+                    rName = r['name']
+                    if gls.isFile(project,rPath):
+                        extension = rPath.split(".")[len(rPath.split("."))-1]
+                        fileObj = ymlp.FileObj()
+                        fileObj.setExtension(extension)
+                        resFile = project.files.get(file_path=rPath, ref='master')
+                        b = base64.b64decode(resFile.content)
+                        str_res = b.decode("utf-8")
+                        fileObj.setContent(str(str_res))
+                        fileList.append(fileObj)
+                return fileList
+            except:
+                return ""
         

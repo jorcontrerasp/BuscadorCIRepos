@@ -1,10 +1,10 @@
 process:
   execute: True
-  doGithubSearch: True
-  doGitlabSearch: False
+  doGithubSearch: False
+  doGitlabSearch: True
   usePickleFile: False
   useResultsExcelFile: False
-  tmpFolder: tmp
+  tmpDirectory: tmp
   tmpFile: /ftmp
 github:
   queryFile: github_querys/query2.txt

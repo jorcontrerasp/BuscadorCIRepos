@@ -264,7 +264,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
         for path in paths:
             items = project.repository_tree(all=True, path=path)
             if len(items) == 0:
-                found = existsFile(project,path)
+                found = isFile(project,path)
                 if found:
                     if not d.existsDFRecord(project.attributes['path_with_namespace'], df):
                         df = d.addDFRecord(project, df, False)
@@ -286,9 +286,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
 
                     ciObj = ymlp.getParseObj(repo, path, CITool, False)
                     if not type(ciObj) == None:
-                        print("ciObj NOT NULL")
-                    else:
-                        print("ciObj NULL")
+                        d.updateDataFrameCiObj(repo, ciObj, False, df)
                         
             else:
                 found = True
@@ -312,9 +310,7 @@ def searchGitLabPath(project, CITool, df, df2, df3):
 
                 ciObj = ymlp.getParseObj(repo, path, CITool, False)
                 if not type(ciObj) == None:
-                    print("ciObj NOT NULL")
-                else:
-                    print("ciObj NULL")
+                    d.updateDataFrameCiObj(repo, ciObj, False, df)
     except:
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
@@ -330,7 +326,7 @@ def isEmptyProject2(project):
     except:
         return True
 
-def existsFile(project, fPath):
+def isFile(project, fPath):
     try:
         f = project.files.get(file_path=fPath, ref='master')
         return True

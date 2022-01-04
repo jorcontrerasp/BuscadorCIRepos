@@ -6,6 +6,24 @@ import ci_tools as ci
 import logging
 import shutil
 from shutil import rmtree
+import ci_yml_parser as ymlp
+
+class FileObj:
+    extension = ""
+    content = ""
+
+    # GETTER & SETTER
+    def getExtension(self):
+        return self.extension
+
+    def setExtension(self, extension):
+        self.extension = extension
+
+    def getContent(self):
+        return self.content
+
+    def setContent(self, content):
+        self.content = content
 
 class CIJob:
     stage = ""
@@ -45,8 +63,8 @@ def getParseObj(repo, path, CITool, boGitHub):
     ciObj = CIObj()
     try:
         # Generamos el directorio 'tmp'
-        if not os.path.exists(tmpFolder):
-            os.mkdir(tmpFolder)
+        if not os.path.exists(tmpDirectory):
+            os.mkdir(tmpDirectory)
 
         doYMLParse = CITool.value == ci.HerramientasCI.CI2.value or CITool.value == ci.HerramientasCI.CI4.value or CITool.value == ci.HerramientasCI.CI8.value
         
@@ -62,10 +80,25 @@ def getParseObj(repo, path, CITool, boGitHub):
                 elif CITool.value == ci.HerramientasCI.CI8.value:
                     ciObj = parseGitLabYAML(tmpFile)
                     os.remove(tmpFile)
+            else:
+                if os.path.exists(tmpDirectory):
+                    ymlFiles = os.listdir(tmpDirectory)
+                    for ymlF in ymlFiles:
+                        ymlF = tmpDirectory + "/" + ymlF
+                        if CITool.value == ci.HerramientasCI.CI2.value:
+                            ciObj = parseTravisYAML(ymlF)
+                            os.remove(ymlF)
+                        elif CITool.value == ci.HerramientasCI.CI4.value:
+                            ciObj = parseGitHubActionsYAML(ymlF)
+                            os.remove(ymlF)
+                        elif CITool.value == ci.HerramientasCI.CI8.value:
+                            ciObj = parseGitLabYAML(ymlF)
+                            os.remove(ymlF)
+
     except:
         aux.printLog("No se ha podido parsear el fichero YML: '" + path + "'", logging.INFO)
 
-    rmtree("./" + tmpFolder)
+    rmtree("./" + tmpDirectory)
 
     return ciObj
 
@@ -188,27 +221,44 @@ def parseConfigParam(l1, l2):
     return l2Content
 
 def getStrToFile(content):
+    content = content.replace("b''","")
     content = content.replace("b'","")
     content = content.replace("'","")
     parts = content.split("\\n")
+    parts = content.split("\n")
 
     return parts
 
 def makeYMLTmpFile(repo, path, boGitHub):
     decoded = aux.getFileContent(repo, path, boGitHub)
 
-    parts = getStrToFile(decoded)
+    if isinstance(decoded, list):
+        i = 0
+        for d in decoded:
+            if "yml" in d.getExtension():
+                parts = getStrToFile(d.getContent())
+        
+                try:
+                    fileName = str(tmpFile + "_" + str(i))
+                    with open(fileName, 'a') as f:
+                        for part in parts:
+                            f.write(part + "\n")
+                finally:
+                    i = i+1
+                    f.close()
+    else:
+        parts = getStrToFile(decoded)
     
-    try:
-        with open(tmpFile, 'a') as f:
-            for part in parts:
-                f.write(part + "\n")
-    finally:
-        f.close()
+        try:
+            with open(tmpFile, 'a') as f:
+                for part in parts:
+                    f.write(part + "\n")
+        finally:
+            f.close()
 
 config = "process"
-tmpFolder = parseConfigParam(config, "tmpFolder")
-tmpFile = parseConfigParam(config, "tmpFile")
+tmpDirectory = parseConfigParam(config, "tmpDirectory")
+tmpFile = tmpDirectory + parseConfigParam(config, "tmpFile")
 
 doTest = False
 if doTest:

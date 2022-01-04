@@ -6,6 +6,7 @@ import ci_tools as ci
 import aux_functions as aux
 import logging
 import os
+import ci_yml_parser as ymlp
 
 def getResultDFColumns():
     _columns = []
@@ -139,10 +140,12 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df):
     else:
         id = repo.attributes['path_with_namespace']
 
-    df.at[id, "STAGES"] = str(ciObj.getStages())
-    df.at[id, "NUM_JOBS"] = str(len(ciObj.getJobs()))
-    df.at[id, "TOTAL_TASKS"] = 0
-    df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
+    ciObjType = type(ciObj)
+    if isinstance(ciObj, ymlp.CIObj):
+        df.at[id, "STAGES"] = str(ciObj.getStages())
+        df.at[id, "NUM_JOBS"] = str(len(ciObj.getJobs()))
+        df.at[id, "TOTAL_TASKS"] = 0
+        df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
     
     return df
 
