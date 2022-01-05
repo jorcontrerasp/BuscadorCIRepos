@@ -149,10 +149,16 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
         
         df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
-        ciObj = ymlp.getParseObj(repo, path, CITool, True)
-        str_ciobj = str(ciObj)
-        if str_ciobj != 'None':
-            d.updateDataFrameCiObj(repo, ciObj, True, df)
+        ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
+        if isinstance(ciObjRes, list):
+            for ciObj in ciObjRes:
+                str_ciobj = str(ciObjRes)
+                if str_ciobj != 'None':
+                    d.updateDataFrameCiObj(repo, ciObjRes, True, df)
+        else:
+            str_ciobj = str(ciObjRes)
+            if str_ciobj != 'None':
+                d.updateDataFrameCiObj(repo, ciObjRes, True, df)
 
         return True,df,df3
     except:
@@ -189,10 +195,16 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             
             df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
-            ciObj = ymlp.getParseObj(repo, path, CITool, True)
-            str_ciobj = str(ciObj)
-            if str_ciobj != 'None':
-                d.updateDataFrameCiObj(repo, ciObj, True, df)
+            ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
+            if isinstance(ciObjRes, list):
+                for ciObj in ciObjRes:
+                    str_ciobj = str(ciObjRes)
+                    if str_ciobj != 'None':
+                        d.updateDataFrameCiObj(repo, ciObjRes, True, df)
+            else:
+                str_ciobj = str(ciObjRes)
+                if str_ciobj != 'None':
+                    d.updateDataFrameCiObj(repo, ciObjRes, True, df)
 
             return True,df,df3
     

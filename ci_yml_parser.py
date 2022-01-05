@@ -60,7 +60,8 @@ class CIObj:
         self.jobs = jobs
 
 def getParseObj(repo, path, CITool, boGitHub):
-    ciObj = CIObj()
+    ciObj = None
+    ciObjList = []
     try:
         # Generamos el directorio 'tmp'
         if not os.path.exists(tmpDirectory):
@@ -71,6 +72,7 @@ def getParseObj(repo, path, CITool, boGitHub):
         if doYMLParse:
             makeYMLTmpFile(repo, path, boGitHub)
             if os.path.exists(tmpFile):
+                ciObj = CIObj()
                 if CITool.value == ci.HerramientasCI.CI2.value:
                     ciObj = parseTravisYAML(tmpFile)
                     os.remove(tmpFile)
@@ -85,6 +87,7 @@ def getParseObj(repo, path, CITool, boGitHub):
                     ymlFiles = os.listdir(tmpDirectory)
                     for ymlF in ymlFiles:
                         ymlF = tmpDirectory + "/" + ymlF
+                        ciObj = CIObj()
                         if CITool.value == ci.HerramientasCI.CI2.value:
                             ciObj = parseTravisYAML(ymlF)
                             os.remove(ymlF)
@@ -94,13 +97,17 @@ def getParseObj(repo, path, CITool, boGitHub):
                         elif CITool.value == ci.HerramientasCI.CI8.value:
                             ciObj = parseGitLabYAML(ymlF)
                             os.remove(ymlF)
+                        ciObjList.append(ciObj)
 
     except:
         aux.printLog("No se ha podido parsear el fichero YML: '" + path + "'", logging.INFO)
 
     rmtree("./" + tmpDirectory)
 
-    return ciObj
+    if len(ciObjList)>1:
+        return ciObjList
+    else:
+        return ciObj
 
 def parseGitLabYAML(yamlFile):
     try:

@@ -142,10 +142,10 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df):
 
     ciObjType = type(ciObj)
     if isinstance(ciObj, ymlp.CIObj):
-        df.at[id, "STAGES"] = str(ciObj.getStages())
-        df.at[id, "NUM_JOBS"] = str(len(ciObj.getJobs()))
-        df.at[id, "TOTAL_TASKS"] = 0
-        df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
+        df.at[id, "STAGES"] += "\n" + str(ciObj.getStages())
+        df.at[id, "NUM_JOBS"] += "\n" + str(len(ciObj.getJobs()))
+        #df.at[id, "TOTAL_TASKS"] += 0
+        #df.at[id, "TASK_AVERAGE_PER_JOB"] += 0
     
     return df
 
