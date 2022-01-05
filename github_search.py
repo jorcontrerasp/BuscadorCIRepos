@@ -150,7 +150,8 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
         df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
         ciObj = ymlp.getParseObj(repo, path, CITool, True)
-        if not type(ciObj) == None:
+        str_ciobj = str(ciObj)
+        if str_ciobj != 'None':
             d.updateDataFrameCiObj(repo, ciObj, True, df)
 
         return True,df,df3
@@ -189,7 +190,8 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
             ciObj = ymlp.getParseObj(repo, path, CITool, True)
-            if not type(ciObj) == None:
+            str_ciobj = str(ciObj)
+            if str_ciobj != 'None':
                 d.updateDataFrameCiObj(repo, ciObj, True, df)
 
             return True,df,df3

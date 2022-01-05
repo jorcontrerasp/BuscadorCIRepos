@@ -285,8 +285,9 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                     df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
                     ciObj = ymlp.getParseObj(repo, path, CITool, False)
-                    if not type(ciObj) == None:
-                        d.updateDataFrameCiObj(repo, ciObj, False, df)
+                    str_ciobj = str(ciObj)
+                    if str_ciobj != 'None':
+                        d.updateDataFrameCiObj(repo, ciObj, True, df)
                         
             else:
                 found = True
@@ -309,8 +310,9 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                 df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
                 ciObj = ymlp.getParseObj(repo, path, CITool, False)
-                if not type(ciObj) == None:
-                    d.updateDataFrameCiObj(repo, ciObj, False, df)
+                str_ciobj = str(ciObj)
+                if str_ciobj != 'None':
+                    d.updateDataFrameCiObj(repo, ciObj, True, df)
     except:
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 

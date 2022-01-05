@@ -127,4 +127,13 @@ def getFileContent(project, filePath, boGitHub):
                 return fileList
             except:
                 return ""
+
+def getStrToFile(content):
+    content = content.replace("b''","")
+    content = content.replace("b'","")
+    content = content.replace("'","")
+    parts = content.split("\n")
+    parts = content.split("\\n")
+
+    return parts
         

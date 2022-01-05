@@ -220,15 +220,6 @@ def parseConfigParam(l1, l2):
     l2Content = getValueArrayParam(l1Content, l2)
     return l2Content
 
-def getStrToFile(content):
-    content = content.replace("b''","")
-    content = content.replace("b'","")
-    content = content.replace("'","")
-    parts = content.split("\\n")
-    parts = content.split("\n")
-
-    return parts
-
 def makeYMLTmpFile(repo, path, boGitHub):
     decoded = aux.getFileContent(repo, path, boGitHub)
 
@@ -236,7 +227,7 @@ def makeYMLTmpFile(repo, path, boGitHub):
         i = 0
         for d in decoded:
             if "yml" in d.getExtension():
-                parts = getStrToFile(d.getContent())
+                parts = aux.getStrToFile(d.getContent())
         
                 try:
                     fileName = str(tmpFile + "_" + str(i))
@@ -247,7 +238,7 @@ def makeYMLTmpFile(repo, path, boGitHub):
                     i = i+1
                     f.close()
     else:
-        parts = getStrToFile(decoded)
+        parts = aux.getStrToFile(decoded)
     
         try:
             with open(tmpFile, 'a') as f:
