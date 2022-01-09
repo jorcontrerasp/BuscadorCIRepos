@@ -14,37 +14,39 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-organizacion = "kevinsawicki"
-repo = "http-request"
+ciTool = ci.HerramientasCI.CI2
+organization = "PanJiaChen"
+repo = "vue-element-admin"
 
-continuar = True
+continueTest = True
 
 try:
-    repo = g.get_repo(organizacion + "/" + repo)
+    repo = g.get_repo(organization + "/" + repo)
 except UnknownObjectException as e:
-    print("El repositorio " + organizacion + "/" + repo + " no existe en GitHub: " + str(e))
-    continuar = False
+    print("El repositorio " + organization + "/" + repo + " no existe en GitHub: " + str(e))
+    continueTest = False
 
-if continuar:
+if continueTest:
     print("Continuar con el proceso.")
 
     filteredRepos = [repo]
 
     df = d.makeDataFrame(filteredRepos, True)
     df2 = d.makeCounterDataFrame()
+    df3 = d.makeEmptyLanguageDataFrame()
 
-    files = ci.getCISearchFiles(ci.HerramientasCI.CI2.value)
+    files = ci.getCISearchFiles(ciTool.value)
     for file in files:
         print(str(file))
 
     aux.printGitHubRepoList(filteredRepos)
 
-    listaEncontrados = []
-    #listaEncontrados = ghs.searchReposGitHubApi(filteredRepos, df, df2)
+    foundList = []
+    #foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3)
 
-    ghs.searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2)
+    found,df,df3 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3)
 
     d.makeEXCEL(df, "fExcelPruebas")
     d.makeEXCEL(df2, "fExcelPruebas2")
 
-    print(str(len(listaEncontrados)))
+    print(str(len(foundList)))

@@ -104,7 +104,7 @@ def getParseObj(repo, path, CITool, boGitHub):
 
     rmtree("./" + tmpDirectory)
 
-    if len(ciObjList)>1:
+    if len(ciObjList)>0:
         return ciObjList
     else:
         return ciObj
@@ -149,8 +149,9 @@ def parseGitHubActionsYAML(yamlFile):
         for topLevel in dataLoaded:
             topLevelContent = dataLoaded[topLevel]
             if topLevel == True: # on
-                for w in topLevelContent:
-                    when.append(w)
+                when.append(topLevelContent)
+                #for w in topLevelContent:
+                    #when.append(w)
             if 'jobs' == topLevel and len(topLevelContent)>0:
                 for j in topLevelContent:
                     job = CIJob()
@@ -178,6 +179,7 @@ def parseTravisYAML(yamlFile):
     when = []
     strdl = str(dataLoaded)
     if not strdl == "None":
+        when.append("?")
         for topLevel in dataLoaded:
             topLevelContent = dataLoaded[topLevel]
             if 'jobs' == topLevel:
@@ -198,6 +200,14 @@ def parseTravisYAML(yamlFile):
                             jobSteps.append(task)
                             job.setTasks(jobSteps)
                             jobs.append(job)
+            elif 'script' == topLevel:
+                job = CIJob()
+                jobSteps = []
+                job.setStage("?")
+                jobSteps.append(topLevelContent)
+                job.setTasks(jobSteps)
+                jobs.append(job)
+            
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)

@@ -287,13 +287,13 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                     ciObjRes = ymlp.getParseObj(repo, path, CITool, False)
                     if isinstance(ciObjRes, list):
                         for ciObj in ciObjRes:
-                            str_ciobj = str(ciObjRes)
+                            str_ciobj = str(ciObj)
                             if str_ciobj != 'None':
-                                d.updateDataFrameCiObj(repo, ciObjRes, False, df)
+                                df = d.updateDataFrameCiObj(repo, ciObj, False, df)
                     else:
                         str_ciobj = str(ciObjRes)
                         if str_ciobj != 'None':
-                            d.updateDataFrameCiObj(repo, ciObjRes, False, df)
+                            df = d.updateDataFrameCiObj(repo, ciObjRes, False, df)
                         
             else:
                 found = True
@@ -318,13 +318,13 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                 ciObjRes = ymlp.getParseObj(repo, path, CITool, False)
                 if isinstance(ciObjRes, list):
                     for ciObj in ciObjRes:
-                        str_ciobj = str(ciObjRes)
+                        str_ciobj = str(ciObj)
                         if str_ciobj != 'None':
-                            d.updateDataFrameCiObj(repo, ciObjRes, False, df)
+                            df = d.updateDataFrameCiObj(repo, ciObj, False, df)
                 else:
                     str_ciobj = str(ciObjRes)
                     if str_ciobj != 'None':
-                        d.updateDataFrameCiObj(repo, ciObjRes, False, df)
+                        df = d.updateDataFrameCiObj(repo, ciObjRes, False, df)
     except:
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 

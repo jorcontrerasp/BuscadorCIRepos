@@ -154,11 +154,11 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
             for ciObj in ciObjRes:
                 str_ciobj = str(ciObjRes)
                 if str_ciobj != 'None':
-                    d.updateDataFrameCiObj(repo, ciObjRes, True, df)
+                    df = d.updateDataFrameCiObj(repo, ciObj, True, df)
         else:
             str_ciobj = str(ciObjRes)
             if str_ciobj != 'None':
-                d.updateDataFrameCiObj(repo, ciObjRes, True, df)
+                df = d.updateDataFrameCiObj(repo, ciObjRes, True, df)
 
         return True,df,df3
     except:
@@ -198,13 +198,13 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
             ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
             if isinstance(ciObjRes, list):
                 for ciObj in ciObjRes:
-                    str_ciobj = str(ciObjRes)
+                    str_ciobj = str(ciObj)
                     if str_ciobj != 'None':
-                        d.updateDataFrameCiObj(repo, ciObjRes, True, df)
+                        df = d.updateDataFrameCiObj(repo, ciObj, True, df)
             else:
                 str_ciobj = str(ciObjRes)
                 if str_ciobj != 'None':
-                    d.updateDataFrameCiObj(repo, ciObjRes, True, df)
+                    df = d.updateDataFrameCiObj(repo, ciObjRes, True, df)
 
             return True,df,df3
     

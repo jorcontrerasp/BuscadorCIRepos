@@ -92,7 +92,9 @@ def getFileContent(project, filePath, boGitHub):
                         extension = r.path.split(".")[len(r.path.split("."))-1]
                         fileObj = ymlp.FileObj()
                         fileObj.setExtension(extension)
-                        fileObj.setContent(str(res2.decoded_content))
+                        b = base64.b64decode(res2.content)
+                        str_res = b.decode("utf-8")
+                        fileObj.setContent(str(str_res))
                         fileList.append(fileObj)
                 return fileList
             else:
@@ -132,8 +134,8 @@ def getStrToFile(content):
     content = content.replace("b''","")
     content = content.replace("b'","")
     content = content.replace("'","")
+    content = content.replace("\\n","\n")
     parts = content.split("\n")
-    parts = content.split("\\n")
 
     return parts
         
