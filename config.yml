@@ -1,8 +1,8 @@
 process:
   execute: True
-  doGithubSearch: True
-  doGitlabSearch: False
-  usePickleFile: True
+  doGithubSearch: False
+  doGitlabSearch: True
+  usePickleFile: False
   useResultsExcelFile: False
   tmpDirectory: tmp
   tmpFile: /ftmp
@@ -13,7 +13,7 @@ github:
   MIN_COMMITS: 1000
   randomizeRepos: False
   N_RANDOM: 10
-  onlyPositives: False
+  onlyPositives: True
 gitlab:
   #Si buscamos solo positivos, search1By1 será True sí o sí (se controla por programa), da igual lo que venga en el fichero de configuración.
   search1By1: True
@@ -23,4 +23,4 @@ gitlab:
   onlyPositives: False
   #Si solo buscamos positivos, N_MAX_PROJECTS será el nº máximo de positivos a encontrar.
   #Si buscamos tanto positivos como negativos, N_MAX_PROJECTS será el número máximo de projectos que tratará (sean o no positivos en CI).
-  N_MAX_PROJECTS: 100
+  N_MAX_PROJECTS: 20

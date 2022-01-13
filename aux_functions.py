@@ -8,6 +8,7 @@ import base64
 from github import GithubException
 import ci_yml_parser as ymlp
 import gitlab_search as gls
+import github_search as ghs
 
 def makePickle(fileName, lRepositories):
     printLog("Generando fichero pickle...", logging.INFO)
@@ -83,11 +84,13 @@ def getBlobContent(project, branch, path_name):
 def getFileContent(project, filePath, boGitHub):
     if boGitHub:
         try:
-            res = project.get_contents(filePath)
+            #res = project.get_contents(filePath)
+            res = ghs.getContents(project, filePath)
             if isinstance(res, list):
                 fileList = []
                 for r in res:
-                    res2 = project.get_contents(r.path)
+                    #res2 = project.get_contents(r.path)
+                    res2 = ghs.getContents(project, r.path)
                     if not isinstance(res2, list):
                         extension = r.path.split(".")[len(r.path.split("."))-1]
                         fileObj = ymlp.FileObj()

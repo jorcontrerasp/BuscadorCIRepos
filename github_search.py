@@ -8,6 +8,9 @@ import ci_tools as ci
 import dataF_functions as d
 import logging
 import ci_yml_parser as ymlp
+import calendar
+import time
+import datetime
 
 # Configuración de la búsqueda GitHub.
 config = "github"
@@ -19,11 +22,16 @@ randomizeRepos = ymlp.parseConfigParam(config, "randomizeRepos")
 N_RANDOM = ymlp.parseConfigParam(config, "N_RANDOM")
 onlyPositives = ymlp.parseConfigParam(config, "onlyPositives")
 
-def getGithubRepos():
-    # Generamos un github_token para consultar la API de GitHub a través de la librería.
+def authenticate():
+    # Nos autenticamos y generamos un github_token para consultar la API de GitHub a través de la librería.
     user = "jorcontrerasp"
     token = aux.readFile("tokens/github_token.txt")
     g = Github(user, token)
+
+    return g
+
+def getGithubRepos():
+    g = authenticate()
 
     q = aux.readFile(queryFile)
     #query = mq.mGithubQuery.getQueryIni()
@@ -67,13 +75,32 @@ def getGithubRepos():
 
     return lFinal
 
+def getContents(repo, path):
+    contents = None
+    g = authenticate()
+    rl = g.get_rate_limit()
+    rl_core = rl.core
+    core_remaining = rl_core.remaining
+    rl_search = rl.search
+    search_remaining = rl_search.remaining
+    # core | Limit: 5000, Remaining: 5000, Reset: 2020-01-08 14:09:16.
+    # search | Limit: 30, Remaining: 29, Reset: 2020-01-08 13:10:16.
+    if core_remaining <= 0:
+        reset_timestamp = calendar.timegm(rl_core.reset.timetuple())
+        sleep_time = reset_timestamp - calendar.timegm(time.gmtime()) + 5
+        print("API rate limit exceded: " + str(sleep_time) + " sleep_time. Waiting...")
+        time.sleep(sleep_time)
+        g = authenticate()
+        
+    contents = repo.get_contents(path)
+    return contents
+
 def searchReposGitHubApi(lRepositories, df, df2, df3):
     lFound = []
     for repo in lRepositories:
 
         if not onlyPositives and not d.existsDFRecord(repo.full_name, df):
             df = d.addDFRecord(repo, df, True)
-
 
         found1,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI1, df, df2, df3)
         found2,df,df3 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2, df3)
@@ -106,7 +133,8 @@ def searchReposGitHubApi(lRepositories, df, df2, df3):
 
 def searchInRepo(repo, literal):
     found = False
-    contents = repo.get_contents("")
+    #contents = repo.get_contents("")
+    contents = getContents(repo, "")
     while contents:
         contentFile = contents.pop(0)
         if literal in contentFile.path.lower():
@@ -119,7 +147,8 @@ def searchInRepo(repo, literal):
 
 def searchInRoot(repo, literal):
     found = False
-    contents = repo.get_contents("")
+    #contents = repo.get_contents("")
+    contents = getContents(repo, "")
     for contentFile in contents:
         if literal in contentFile.path.lower():
             found = True
@@ -133,7 +162,8 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3):
             literals = ci.getCISearchFiles(CITool.value)
 
         path = literals.pop(0)
-        repo.get_contents(path)
+        #repo.get_contents(path)
+        getContents(repo, path)
 
         if not d.existsDFRecord(repo.full_name, df):
             df = d.addDFRecord(repo, df, True)
@@ -175,7 +205,8 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3):
     for path in literals:
         encontrado = False
         try:
-            c = repo.get_contents(path)
+            #c = repo.get_contents(path)
+            c = getContents(repo, path)
             encontrado = True
         except:
             encontrado = False
