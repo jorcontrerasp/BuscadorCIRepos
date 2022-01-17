@@ -1,6 +1,6 @@
 process:
   execute: True
-  doGithubSearch: False
+  doGithubSearch: True
   doGitlabSearch: True
   usePickleFile: False
   useResultsExcelFile: False
@@ -11,8 +11,8 @@ github:
   filterCommits: False
   MAX_COMMITS: 10000
   MIN_COMMITS: 1000
-  randomizeRepos: False
-  N_RANDOM: 10
+  randomizeRepos: True
+  N_RANDOM: 50
   onlyPositives: True
 gitlab:
   #Si buscamos solo positivos, search1By1 será True sí o sí (se controla por programa), da igual lo que venga en el fichero de configuración.
@@ -20,7 +20,7 @@ gitlab:
   LANGUAGE: ALL
   N_MAX_SEARCHES: 118550
   N_MIN_STARS: 50
-  onlyPositives: False
+  onlyPositives: True
   #Si solo buscamos positivos, N_MAX_PROJECTS será el nº máximo de positivos a encontrar.
   #Si buscamos tanto positivos como negativos, N_MAX_PROJECTS será el número máximo de projectos que tratará (sean o no positivos en CI).
-  N_MAX_PROJECTS: 20
+  N_MAX_PROJECTS: 50

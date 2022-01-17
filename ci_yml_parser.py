@@ -114,10 +114,20 @@ def parseGitLabYAML(yamlFile):
         dataLoaded = yaml.safe_load(open(yamlFile))
     except:
         return None
-    stages = dataLoaded['stages']
+
     jobs = []
+    stages = []
     strdl = str(dataLoaded)
     if not strdl == "None":
+        stagesContent = getValueArrayParam(dataLoaded, 'stages')
+        if len(stagesContent)==0:
+            stages.append("?")
+        elif isinstance(stagesContent, list):
+            for w in stagesContent:
+                stages.append(w)
+        else:
+            stages.append(stagesContent)
+        
         for topLevel in dataLoaded:
             topLevelContent = dataLoaded[topLevel]
             stage = getValueArrayParam(topLevelContent, 'stage')
@@ -149,9 +159,11 @@ def parseGitHubActionsYAML(yamlFile):
         for topLevel in dataLoaded:
             topLevelContent = dataLoaded[topLevel]
             if topLevel == True: # on
-                when.append(topLevelContent)
-                #for w in topLevelContent:
-                    #when.append(w)
+                if isinstance(topLevelContent, list):
+                    for w in topLevelContent:
+                        when.append(w)
+                else:
+                    when.append(topLevelContent)
             if 'jobs' == topLevel and len(topLevelContent)>0:
                 for j in topLevelContent:
                     job = CIJob()
