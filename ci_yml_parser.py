@@ -163,7 +163,9 @@ def parseGitHubActionsYAML(yamlFile):
                     for w in topLevelContent:
                         when.append(w)
                 else:
-                    when.append(topLevelContent)
+                    for w in topLevelContent:
+                        when.append(w)
+                        break
             if 'jobs' == topLevel and len(topLevelContent)>0:
                 for j in topLevelContent:
                     job = CIJob()

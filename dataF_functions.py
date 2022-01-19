@@ -44,6 +44,10 @@ def makeDataFrame(lRepositories, boGitHub):
     initDF(df, id, _columns, " ")
     df.at[id, "URL"] = url1
     df.at[id, "Lenguaje"] = language1
+    df.at[id, "STAGES"] = 0
+    df.at[id, "NUM_JOBS"] = 0
+    df.at[id, "TOTAL_TASKS"] = 0
+    df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
 
     for repo in lRepositories[1:len(lRepositories)]:
         if boGitHub:
@@ -59,6 +63,10 @@ def makeDataFrame(lRepositories, boGitHub):
         initDF(df2, id, _columns, " ")
         df2.at[id, "URL"] = url
         df2.at[id, "Lenguaje"] = language
+        df2.at[id, "STAGES"] = 0
+        df2.at[id, "NUM_JOBS"] = 0
+        df2.at[id, "TOTAL_TASKS"] = 0
+        df2.at[id, "TASK_AVERAGE_PER_JOB"] = 0
         df = df.append(df2)
 
     return df
@@ -69,6 +77,11 @@ def makeEmptyDataFrame():
     _columns = getResultDFColumns()
     df = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df, id, _columns, " ")
+
+    df.at[id, "STAGES"] = 0
+    df.at[id, "NUM_JOBS"] = 0
+    df.at[id, "TOTAL_TASKS"] = 0
+    df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
 
     return df
 
@@ -87,6 +100,10 @@ def addDFRecord(repo, df, boGitHub):
     initDF(df2, id, _columns, " ")
     df2.at[id, "URL"] = url
     df2.at[id, "Lenguaje"] = language
+    df2.at[id, "STAGES"] = 0
+    df2.at[id, "NUM_JOBS"] = 0
+    df2.at[id, "TOTAL_TASKS"] = 0
+    df2.at[id, "TASK_AVERAGE_PER_JOB"] = 0
     df = df.append(df2)
 
     return df
@@ -142,10 +159,27 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df):
 
     ciObjType = type(ciObj)
     if isinstance(ciObj, ymlp.CIObj):
-        df.at[id, "STAGES"] += "\n" + str(ciObj.getStages())
-        df.at[id, "NUM_JOBS"] += "\n" + str(len(ciObj.getJobs()))
-        #df.at[id, "TOTAL_TASKS"] += 0
-        #df.at[id, "TASK_AVERAGE_PER_JOB"] += 0
+        if len(str(df.at[id, "STAGES"]))<=1:
+            df.at[id, "STAGES"] = str(ciObj.getStages())
+        else:
+            df.at[id, "STAGES"] += "\n" + str(ciObj.getStages())
+
+        df.at[id, "NUM_JOBS"] += len(ciObj.getJobs())
+
+        nTasks = 0
+        for job in ciObj.getJobs():
+            nTasks += len(job.getTasks())
+
+        df.at[id, "TOTAL_TASKS"] += nTasks
+
+        tasks = df.at[id, "TOTAL_TASKS"]
+        jobs = df.at[id, "NUM_JOBS"]
+        if jobs == 0:
+            taskAverage = -1
+        else:
+            taskAverage = tasks/jobs
+
+        df.at[id, "TASK_AVERAGE_PER_JOB"] = taskAverage
     
     return df
 

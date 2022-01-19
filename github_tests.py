@@ -14,9 +14,9 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-ciTool = ci.HerramientasCI.CI2
-organization = "PanJiaChen"
-repo = "vue-element-admin"
+ciTool = ci.HerramientasCI.CI4
+organization = "android"
+repo = "sunflower"
 
 continueTest = True
 
