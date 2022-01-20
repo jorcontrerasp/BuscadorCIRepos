@@ -134,11 +134,35 @@ def getFileContent(project, filePath, boGitHub):
                 return ""
 
 def getStrToFile(content):
+    '''CASOS MUY CONCRETOS'''
+    content = content.replace("node","_node")
+    content = content.replace("new","_new")
+    #content = content.replace("'*'","_*")
+
+    '''RESTO'''
     content = content.replace("b''","")
     content = content.replace("b'","")
-    content = content.replace("'","")
+    #content = content.replace("'","")
+    content = content.replace("\\\\n","\\_n")
     content = content.replace("\\n","\n")
+    content = content.replace("\\\"","")
+    content = content.replace("\\\\","")
+    content = content.replace("`","")
+
+    #content = content.replace("_*", "'*'")
+    
     parts = content.split("\n")
 
-    return parts
+    #PARA QUITARLE LA COMILLA DEL FINAL
+    lastE = parts[len(parts)-1]
+    '''lastE_aux = lastE.strip()[len(lastE.strip())-1]
+    if lastE_aux == "'":'''
+    parts[len(parts)-1] = lastE[0:len(lastE)-1]
+    r = []
+    for part in parts:
+        part_aux = part.strip()
+        if len(part_aux)>1 or (len(part_aux)<=1 and part_aux != '.'):
+            r.append(part)
+
+    return r
         

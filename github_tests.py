@@ -14,9 +14,9 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-ciTool = ci.HerramientasCI.CI4
-organization = "android"
-repo = "sunflower"
+ciTool = ci.HerramientasCI.CI2
+organization = "OpenGenus"
+repo = "cosmos"
 
 continueTest = True
 

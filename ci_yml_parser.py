@@ -122,7 +122,7 @@ def parseGitLabYAML(yamlFile):
         stagesContent = getValueArrayParam(dataLoaded, 'stages')
         if len(stagesContent)==0:
             stages.append("?")
-        elif isinstance(stagesContent, list):
+        elif isinstance(stagesContent, list) or isinstance(stagesContent, dict):
             for w in stagesContent:
                 stages.append(w)
         else:
@@ -159,13 +159,12 @@ def parseGitHubActionsYAML(yamlFile):
         for topLevel in dataLoaded:
             topLevelContent = dataLoaded[topLevel]
             if topLevel == True: # on
-                if isinstance(topLevelContent, list):
+                if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for w in topLevelContent:
                         when.append(w)
                 else:
-                    for w in topLevelContent:
-                        when.append(w)
-                        break
+                    when.append(topLevelContent)
+                    
             if 'jobs' == topLevel and len(topLevelContent)>0:
                 for j in topLevelContent:
                     job = CIJob()
@@ -190,12 +189,19 @@ def parseTravisYAML(yamlFile):
     except:
         return None
     jobs = []
+    outJob = None
     when = []
     strdl = str(dataLoaded)
     if not strdl == "None":
-        when.append("?")
         for topLevel in dataLoaded:
             topLevelContent = dataLoaded[topLevel]
+            if 'stages' == topLevel:
+                if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
+                    for w in topLevelContent:
+                        when.append(w)
+                else:
+                    when.append(topLevelContent)
+
             if 'jobs' == topLevel:
                 includeContent = getValueArrayParam(topLevelContent, 'include')
                 for j in includeContent:
@@ -212,15 +218,30 @@ def parseTravisYAML(yamlFile):
                     if len(script)>0:
                         for task in script:
                             jobSteps.append(task)
-                            job.setTasks(jobSteps)
-                            jobs.append(job)
-            elif 'script' == topLevel:
-                job = CIJob()
+                    
+                    job.setTasks(jobSteps)
+                    jobs.append(job)
+
+            elif topLevel in ['before_install','install','after_install','before_script','script','after_script']:
+                if str(outJob) == 'None':
+                    outJob = CIJob()
+                    outJob.setStage("?")
                 jobSteps = []
-                job.setStage("?")
-                jobSteps.append(topLevelContent)
-                job.setTasks(jobSteps)
-                jobs.append(job)
+                if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
+                    for tlc in topLevelContent:
+                        jobSteps.append(tlc)
+                else:
+                    jobSteps.append(topLevelContent)
+                jobTasks = outJob.getTasks()
+                for step in jobSteps:
+                    jobTasks.append(step)
+                outJob.setTasks(jobTasks)
+
+        if str(outJob) != 'None':
+            jobs.append(outJob)
+
+        if len(when)==0:
+            when.append("?")
             
     ciObj = CIObj()
     ciObj.setStages(when)
@@ -257,7 +278,7 @@ def makeYMLTmpFile(repo, path, boGitHub):
     if isinstance(decoded, list):
         i = 0
         for d in decoded:
-            if "yml" in d.getExtension():
+            if "yml" in d.getExtension() or "yaml" in d.getExtension():
                 parts = aux.getStrToFile(d.getContent())
         
                 try:
@@ -286,16 +307,19 @@ doTest = False
 if doTest:
     print("Iniciando proceso.")
 
-    f = "yml_example_files/apple_turicreate_gitlab-ci.yml"
-    obj = parseGitLabYAML(f)
+    #f = "yml_example_files/apple_turicreate_gitlab-ci.yml"
+    #obj = parseGitLabYAML(f)
 
-    f = "yml_example_files/hacker-laws_build-on-pull-request.yaml"
-    obj = parseGitHubActionsYAML(f)
+    #f = "yml_example_files/hacker-laws_build-on-pull-request.yaml"
+    #obj = parseGitHubActionsYAML(f)
 
-    f = "yml_example_files/facebook_prophet_travis-ci.yml"
+    #f = "yml_example_files/facebook_prophet_travis-ci.yml"
+    #obj = parseTravisYAML(f)
+
+    f = "yml_example_files/igListKit_travis.yml"
     obj = parseTravisYAML(f)
 
-    config = parseConfigParam("process", "execute")
-    print(config)
+    #config = parseConfigParam("process", "execute")
+    #print(config)
 
     print("Parseo finalizado.")
