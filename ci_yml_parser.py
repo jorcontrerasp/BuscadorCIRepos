@@ -282,7 +282,7 @@ def makeYMLTmpFile(repo, path, boGitHub):
                 parts = aux.getStrToFile(d.getContent())
         
                 try:
-                    fileName = str(tmpFile + "_" + str(i))
+                    fileName = str(tmpFile + "_" + str(i)) + "." + str(d.getExtension())
                     with open(fileName, 'a') as f:
                         for part in parts:
                             f.write(part + "\n")
@@ -293,7 +293,8 @@ def makeYMLTmpFile(repo, path, boGitHub):
         parts = aux.getStrToFile(decoded)
     
         try:
-            with open(tmpFile, 'a') as f:
+            fileName = tmpFile + ".yml"
+            with open(fileName, 'a') as f:
                 for part in parts:
                     f.write(part + "\n")
         finally:

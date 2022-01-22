@@ -10,6 +10,7 @@ import ci_yml_parser as ymlp
 
 # Configuración de la búsqueda GitLab.
 config = "gitlab"
+N_ERROR_PAGE_ATTEMPTS = ymlp.parseConfigParam(config, "N_ERROR_PAGE_ATTEMPTS")
 LANGUAGE = ymlp.parseConfigParam(config, "LANGUAGE")
 N_MAX_SEARCHES = ymlp.parseConfigParam(config, "N_MAX_SEARCHES")
 N_MIN_STARS = ymlp.parseConfigParam(config, "N_MIN_STARS")
@@ -40,12 +41,19 @@ def doSearch1By1GitLabApi(df, df2, df3):
     token = aux.readFile("tokens/gitlab_token.txt")
     gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
     
+    #2114823
+    errorAttempts = 0
     i = 1
     lFound = []
     lResult = []
     idAfter = 0
     while i<=N_MAX_SEARCHES:
         try:
+
+            if errorAttempts >= N_ERROR_PAGE_ATTEMPTS:
+                idAfter = idAfter + 20
+                errorAttempts = 0
+
             projects = gl.projects.list(visibility='public',
                                         ast_activity_after='2020-01-01T00:00:00Z',
                                         #all=True,
@@ -104,8 +112,10 @@ def doSearch1By1GitLabApi(df, df2, df3):
                 i = i + 1
                 if (lSize >= N_MAX_PROJECTS):
                     break
-        except:
+        except Exception as e:
             aux.printLog(": Se ha producido un ERROR de búsqueda en la página " + str(i) + ".", logging.ERROR)
+            aux.writeInLogFile("EXCEPT --> página: " + str(i) + "; idAfter: " + str(idAfter) + "; [" + str(e) + "]")
+            errorAttempts = errorAttempts + 1
             i = i + 1
     
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.

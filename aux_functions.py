@@ -9,6 +9,7 @@ from github import GithubException
 import ci_yml_parser as ymlp
 import gitlab_search as gls
 import github_search as ghs
+import os
 
 def makePickle(fileName, lRepositories):
     printLog("Generando fichero pickle...", logging.INFO)
@@ -64,6 +65,15 @@ def printLog(msg, level):
     else:
         logging.info(msg)
 
+def writeInLogFile(mensaje):
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
+
+    f = open("logs/f.log", "a")
+    f.write(mensaje)
+    f.write("\n")
+    f.close
+
 def getTimestamp():
     timestamp = str(datetime.datetime.now())[0:19]
     return timestamp
@@ -97,22 +107,22 @@ def getFileContent(project, filePath, boGitHub):
                         fileObj.setExtension(extension)
                         b = base64.b64decode(res2.content)
                         str_res = b.decode("utf-8")
-                        fileObj.setContent(str(str_res))
+                        fileObj.setContent(decodeStr(str_res))
                         fileList.append(fileObj)
                 return fileList
             else:
-                return str(res.decoded_content)
+                return decodeStr(res.decoded_content)
         except GithubException:
             blob = getBlobContent(project, "master", filePath)
             b64 = base64.b64decode(blob.content)
             content = b64.decode("utf8")
-            return str(content)
+            return decodeStr(content)
     else:
         try:
             res = project.files.get(file_path=filePath, ref='master')
             b = base64.b64decode(res.content)
             str_res = b.decode("utf-8")
-            return str(str_res)
+            return decodeStr(str_res)
         except:
             try:
                 res = project.repository_tree(filePath)
@@ -127,42 +137,54 @@ def getFileContent(project, filePath, boGitHub):
                         resFile = project.files.get(file_path=rPath, ref='master')
                         b = base64.b64decode(resFile.content)
                         str_res = b.decode("utf-8")
-                        fileObj.setContent(str(str_res))
+                        fileObj.setContent(decodeStr(str_res))
                         fileList.append(fileObj)
                 return fileList
             except:
                 return ""
 
+def decodeStr(value):
+    r = ""
+    try:
+        r = value.decode()
+    except:
+        r = value
+    return str(r)
+
 def getStrToFile(content):
-    '''CASOS MUY CONCRETOS'''
-    content = content.replace("node","_node")
-    content = content.replace("new","_new")
-    #content = content.replace("'*'","_*")
 
-    '''RESTO'''
-    content = content.replace("b''","")
-    content = content.replace("b'","")
-    #content = content.replace("'","")
-    content = content.replace("\\\\n","\\_n")
-    content = content.replace("\\n","\n")
-    content = content.replace("\\\"","")
-    content = content.replace("\\\\","")
-    content = content.replace("`","")
+    content_aux = decodeStr(content)
 
-    #content = content.replace("_*", "'*'")
-    
-    parts = content.split("\n")
+    #CASOS MUY CONCRETOS
+    content_aux = content_aux.replace("node","_node")
+    content_aux = content_aux.replace("new","_new")
+    content_aux = content_aux.replace("npm","_npm")
+    content_aux = content_aux.replace("n24333f8a63b6825ea9c5514f83c2829b004d1fee","_n24333f8a63b6825ea9c5514f83c2829b004d1fee")
+    content_aux = content_aux.replace("n8933bad161af4178b1185d1a37fbf41ea5269c55","_n8933bad161af4178b1185d1a37fbf41ea5269c55")
+    content_aux = content_aux.replace("nd56f5187479451eabf01fb78af6dfcb131a6481e","_nd56f5187479451eabf01fb78af6dfcb131a6481e")
+    content_aux = content_aux.replace("n84831b9409646a918e30573bab4c9c91346d8abd","_n84831b9409646a918e30573bab4c9c91346d8abd")
+    content_aux = content_aux.replace("setup.py.\\n","setup.py.\\_n")
+
+    #RESTO
+    content_aux = content_aux.replace("\\n","\\_n")
+    #content_aux = content_aux.replace("\\\\n","\\_n")
+    #content_aux = content_aux.replace("\\n","\n")
+    content_aux = content_aux.replace("\\\"","")
+    content_aux = content_aux.replace("\\\\","")
+
+    parts = content_aux.split("\n")
 
     #PARA QUITARLE LA COMILLA DEL FINAL
     lastE = parts[len(parts)-1]
-    '''lastE_aux = lastE.strip()[len(lastE.strip())-1]
-    if lastE_aux == "'":'''
     parts[len(parts)-1] = lastE[0:len(lastE)-1]
+    #PARA QUITARLE LÍNEAS EN LAS QUE SOLO VENGA UN PUNTO
     r = []
     for part in parts:
         part_aux = part.strip()
-        if len(part_aux)>1 or (len(part_aux)<=1 and part_aux != '.'):
+        addToReturn = (len(part_aux)>1 or (len(part_aux)<=1 and part_aux != '.'))
+        if addToReturn:
             r.append(part)
+            
 
     return r
         

@@ -1,7 +1,7 @@
 process:
   execute: True
-  doGithubSearch: True
-  doGitlabSearch: False
+  doGithubSearch: False
+  doGitlabSearch: True
   usePickleFile: False
   useResultsExcelFile: False
   tmpDirectory: tmp
@@ -11,12 +11,13 @@ github:
   filterCommits: False
   MAX_COMMITS: 10000
   MIN_COMMITS: 1000
-  randomizeRepos: True
+  randomizeRepos: False
   N_RANDOM: 100
   onlyPositives: True
 gitlab:
   #Si buscamos solo positivos, search1By1 será True sí o sí (se controla por programa), da igual lo que venga en el fichero de configuración.
   search1By1: True
+  N_ERROR_PAGE_ATTEMPTS: 2
   LANGUAGE: ALL
   N_MAX_SEARCHES: 118550
   N_MIN_STARS: 50

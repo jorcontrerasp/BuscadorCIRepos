@@ -14,9 +14,9 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-ciTool = ci.HerramientasCI.CI2
-organization = "OpenGenus"
-repo = "cosmos"
+ciTool = ci.HerramientasCI.CI4
+organization = "rustdesk"
+repo = "rustdesk"
 
 continueTest = True
 
@@ -46,7 +46,8 @@ if continueTest:
 
     found,df,df3 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3)
 
-    d.makeEXCEL(df, "fExcelPruebas")
-    d.makeEXCEL(df2, "fExcelPruebas2")
+    d.makeEXCEL(df, "_resultados_github")
+    d.makeEXCEL(df2, "_contadores")
+    d.makeEXCEL(df3, "_lenguajes_github")
 
     print(str(len(foundList)))
