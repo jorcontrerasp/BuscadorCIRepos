@@ -55,7 +55,7 @@ def doSearch1By1GitLabApi(df, df2, df3):
                 errorAttempts = 0
 
             projects = gl.projects.list(visibility='public',
-                                        ast_activity_after='2020-01-01T00:00:00Z',
+                                        last_activity_after='2018-01-01T00:00:00Z',
                                         #all=True,
                                         pagination='keyset',
                                         id_after=idAfter,
