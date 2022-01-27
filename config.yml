@@ -1,6 +1,6 @@
 process:
   execute: True
-  doGithubSearch: False
+  doGithubSearch: True
   doGitlabSearch: True
   usePickleFile: False
   useResultsExcelFile: False
@@ -19,8 +19,8 @@ gitlab:
   search1By1: True
   N_ERROR_PAGE_ATTEMPTS: 2
   LANGUAGE: ALL
-  N_MAX_SEARCHES: 118550
-  N_MIN_STARS: 50
+  N_MAX_SEARCHES: 218550
+  N_MIN_STARS: 25
   onlyPositives: True
   #Si solo buscamos positivos, N_MAX_PROJECTS será el nº máximo de positivos a encontrar.
   #Si buscamos tanto positivos como negativos, N_MAX_PROJECTS será el número máximo de projectos que tratará (sean o no positivos en CI).

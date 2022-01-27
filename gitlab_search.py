@@ -53,18 +53,15 @@ def doSearch1By1GitLabApi(df, df2, df3):
             if errorAttempts >= N_ERROR_PAGE_ATTEMPTS:
                 idAfter = idAfter + 20
                 errorAttempts = 0
+            
+            projects = gl.projects.list(visibility='public', 
+                                        last_activity_after='2016-01-01T00:00:00Z', 
+                                        pagination='keyset', 
+                                        id_after=idAfter, 
+                                        page=1, 
+                                        order_by='id', 
+                                        sort='asc')
 
-            projects = gl.projects.list(visibility='public',
-                                        last_activity_after='2018-01-01T00:00:00Z',
-                                        #all=True,
-                                        pagination='keyset',
-                                        id_after=idAfter,
-                                        #use_keyset_pagination=True,
-                                        page=1,
-                                        #per_page=100,
-                                        order_by='id',
-                                        sort='asc'
-                                        )
             if len(projects)==0:
                 aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
                 break
