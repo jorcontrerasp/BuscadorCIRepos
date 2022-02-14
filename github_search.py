@@ -123,11 +123,17 @@ def searchReposGitHubApi(lRepositories, df, df2, df3):
         if found:
             lFound.append(repo)
 
+    df = d.updateDataFrameNumPositivesCIs(df)
+    
     df2 =d.updateTotalCounterDataFrame("Encontrados_GitHub", df, df2)
 
+    df4,df5 = d.makeLanguageAndCIStatisticsDF(df,True)
+
     # Generamos ficheros EXCEL con los resultados.
-    d.makeEXCEL(df, "resultados_github")
-    d.makeEXCEL(df3, "lenguajes_github")
+    d.makeEXCEL(df, "github_results")
+    d.makeEXCEL(df3, "github_languages")
+    d.makeEXCEL(df4, "github_language_statistics")
+    d.makeEXCEL(df5, "github_ci_statistics")
 
     return lFound
 

@@ -1,1 +1,1 @@
-created:<2015-01-01 pushed:>2020-01-01 stars:>=490 forks:>=290 language:java archived:false is:public
+created:2008-01-01..2016-01-01 pushed:>2018-01-01 stars:>=10495 forks:>=1495 archived:false is:public

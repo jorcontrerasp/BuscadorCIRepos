@@ -34,6 +34,6 @@ df3 = d.makeEmptyLanguageDataFrame()
 
 lEncontrados = gls.searchInProjectsGitLabApi(lProjects, df, df2, df3)
 
-d.makeEXCEL(df2, "_contadores")
+d.makeEXCEL(df2, "_counting")
 
 print("Fin de la prueba.")

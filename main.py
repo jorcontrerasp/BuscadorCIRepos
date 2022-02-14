@@ -24,7 +24,7 @@ def executeProcess():
         fRepos = ""
 
         # Generamos un DataFrame donde irán los contadores.
-        fCount = "results/contadores.xlsx"
+        fCount = "results/counting.xlsx"
         if useResultsExcelFile:
                 if os.path.exists(fCount):
                     counterDF = pd.read_excel(fCount, index_col=0)
@@ -36,8 +36,8 @@ def executeProcess():
         if doGithubSearch:
 
             fRepos = "github_repos.pickle"
-            fResults = "results/resultados_github.xlsx"
-            fLanguages = "results/lenguajes_github.xlsx"
+            fResults = "results/github_results.xlsx"
+            fLanguages = "results/github_languajes.xlsx"
 
             # Generamos un DataFrame donde irán los resultados.
             # githubDF = d.makeDataFrame(lFinal, True)
@@ -69,8 +69,8 @@ def executeProcess():
 
         if doGitlabSearch:
             fRepos = "gitlab_repos.pickle"
-            fResults = "results/resultados_gitlab.xlsx"
-            fLanguages = "results/languages_gitlab.xlsx"
+            fResults = "results/gitlab_results.xlsx"
+            fLanguages = "results/gitlab_languages.xlsx"
 
             lFound = []
             lResult = []
@@ -102,7 +102,7 @@ def executeProcess():
                 lFound,lResult = gls.doSearchGitLabApi(gitlabDF, counterDF, gitlabLanguageDF)
             
         # Generamos un fichero EXCEL con los contadores.
-        d.makeEXCEL(counterDF, "contadores")
+        d.makeEXCEL(counterDF, "counting")
 
         aux.printLog("Proceso finalizado.", logging.INFO)
 

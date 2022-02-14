@@ -7,11 +7,13 @@ import aux_functions as aux
 import logging
 import os
 import ci_yml_parser as ymlp
+import gitlab_search as gls
 
 def getResultDFColumns():
     _columns = []
     _columns.append("URL")
     _columns.append("Lenguaje")
+    _columns.append("N_CI_+")
     for ciTool in ci.getCIToolsValueList():
         _columns.append(ciTool)
 
@@ -20,6 +22,17 @@ def getResultDFColumns():
     _columns.append("TOTAL_TASKS")
     _columns.append("TASK_AVERAGE_PER_JOB")
     
+    return _columns
+
+def getStatisticsDFColumns():
+    _columns = []
+    _columns.append("Num_repos")
+    _columns.append("Total_jobs")
+    _columns.append("Min")
+    _columns.append("Max")
+    _columns.append("Media")
+    _columns.append("Mediana")
+
     return _columns
 
 def initDF(df, id, columns, initValue):
@@ -38,12 +51,15 @@ def makeDataFrame(lRepositories, boGitHub):
     else:
         id = repo1.attributes['path_with_namespace']
         url1 = repo1.attributes['web_url']
-        language1 = ','.join(repo1.languages())
+        #language1 = ','.join(repo1.languages())
+        language1 = ','.join(gls.getBackendLanguages(repo1.languages()))
+        
 
     df = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df, id, _columns, " ")
     df.at[id, "URL"] = url1
     df.at[id, "Lenguaje"] = language1
+    df.at[id, "N_CI_+"] = 0
     df.at[id, "STAGES"] = 0
     df.at[id, "NUM_JOBS"] = 0
     df.at[id, "TOTAL_TASKS"] = 0
@@ -57,12 +73,13 @@ def makeDataFrame(lRepositories, boGitHub):
         else:
             id = repo.attributes['path_with_namespace']
             url = repo.attributes['web_url']
-            language = ','.join(repo.languages())
+            language = ','.join(gls.getBackendLanguages(repo.languages()))
 
         df2 = pd.DataFrame([],index=[id],columns=_columns)
         initDF(df2, id, _columns, " ")
         df2.at[id, "URL"] = url
         df2.at[id, "Lenguaje"] = language
+        df2.at[id, "N_CI_+"] = 0
         df2.at[id, "STAGES"] = 0
         df2.at[id, "NUM_JOBS"] = 0
         df2.at[id, "TOTAL_TASKS"] = 0
@@ -78,6 +95,7 @@ def makeEmptyDataFrame():
     df = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df, id, _columns, " ")
 
+    df.at[id, "N_CI_+"] = 0
     df.at[id, "STAGES"] = 0
     df.at[id, "NUM_JOBS"] = 0
     df.at[id, "TOTAL_TASKS"] = 0
@@ -94,12 +112,14 @@ def addDFRecord(repo, df, boGitHub):
     else:
         id = repo.attributes['path_with_namespace']
         url = repo.attributes['web_url']
-        language = ','.join(repo.languages())
+        #language = ','.join(repo.languages())
+        language = ','.join(gls.getBackendLanguages(repo.languages()))
         
     df2 = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df2, id, _columns, " ")
     df2.at[id, "URL"] = url
     df2.at[id, "Lenguaje"] = language
+    df2.at[id, "N_CI_+"] = 0
     df2.at[id, "STAGES"] = 0
     df2.at[id, "NUM_JOBS"] = 0
     df2.at[id, "TOTAL_TASKS"] = 0
@@ -225,9 +245,45 @@ def countRepos1FoundUnless(df):
 
     return cont
 
+def updateDataFrameNumPositivesCIs(df):
+    pValue = "***"
+    for index, row in df.iterrows():
+        cont = 0
+        if row[ci.HerramientasCI.CI1.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI2.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI3.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI4.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI5.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI6.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI7.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI8.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI9.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI10.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI11.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI12.value] == pValue:
+            cont += 1
+        if row[ci.HerramientasCI.CI13.value] == pValue:
+            cont += 1
+        
+        df.at[index, "N_CI_+"] = cont
+
+    return df
+
 def existsDFRecord(id, df):
         try:
-            df.at[id, ci.HerramientasCI.CI1.value]
+            #df.at[id, ci.HerramientasCI.CI1.value]
+            df.loc[id]
             return True
         except:
             return False
@@ -250,3 +306,96 @@ def printDF(df):
     print("----------------------------------------------------------------------------------------------------")
     print(df)
     print("----------------------------------------------------------------------------------------------------")
+
+def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
+    id = "EmptyRecord"
+    pValue = "***"
+
+    aux.printLog("Generando DataFrame de estadísticas por lenguaje...", logging.INFO)
+    _columns = getStatisticsDFColumns()
+    df1 = pd.DataFrame([],index=[id],columns=_columns)
+    initDF(df1, id, _columns, 0)
+
+    aux.printLog("Generando DataFrame de estadísticas por CI...", logging.INFO)
+    _columns = getStatisticsDFColumns()
+    df2 = pd.DataFrame([],index=[id],columns=_columns)
+    initDF(df2, id, _columns, 0)
+    df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI2.value)
+    df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI4.value)
+    df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI8.value)
+
+    for index,row in resultsDF.iterrows():
+        language = row["Lenguaje"]
+        if boGitHub:
+            id = language
+        else:
+            id = gls.getFirstBackendLanguage(language.split(","))
+
+        if len(id)>0 and id != ' ':
+            if not existsDFRecord(id, df1):
+                df1 = addStatisticsDFRecord(df1, id)
+            
+            df1 = updateDataFrameStatistics(df1, id, row)
+
+        boTravis = row[ci.HerramientasCI.CI2.value] == pValue
+        boGitHubActions = row[ci.HerramientasCI.CI4.value] == pValue
+        boGitLabCI = row[ci.HerramientasCI.CI8.value] == pValue
+        
+        if boTravis:
+            id = ci.HerramientasCI.CI2.value
+            df2 = updateDataFrameStatistics(df2, id, row)
+        
+        if boGitHubActions:
+            id = ci.HerramientasCI.CI4.value
+            df2 = updateDataFrameStatistics(df2, id, row)
+        
+        if boGitLabCI:
+            id = ci.HerramientasCI.CI8.value
+            df2 = updateDataFrameStatistics(df2, id, row)
+    
+    # HACER MEDIA.
+    df1 = updateStaticsDFJobAverage(df1)
+    df2 = updateStaticsDFJobAverage(df2)
+
+    return df1,df2
+        
+
+def addStatisticsDFRecord(df, id):
+    _columns = getStatisticsDFColumns()
+    df2 = pd.DataFrame([],index=[id],columns=_columns)
+    initDF(df2, id, _columns, 0)
+    df = df.append(df2)
+
+    return df
+
+def updateDataFrameStatistics(df, id, row):
+    df.at[id, "Num_repos"] += 1
+    nJobs = row["NUM_JOBS"]
+    df.at[id, "Total_jobs"] += nJobs
+
+    minJobs = df.at[id, "Min"]
+    if minJobs == 0:
+        df.at[id, "Min"] = nJobs
+    elif(nJobs > 0 and nJobs < minJobs):
+        df.at[id, "Min"] = nJobs
+    
+    maxJobs = df.at[id, "Max"]
+    if(nJobs > 0 and nJobs > maxJobs):
+        df.at[id, "Max"] = nJobs
+
+    df.at[id, "Media"] = 0
+    df.at[id, "Mediana"] = 0
+
+    return df
+
+def updateStaticsDFJobAverage(df):
+    for index,row in df.iterrows():
+        if index != "EmptyRecord":
+            nRepos = row["Num_repos"]
+            tJobs = row["Total_jobs"]
+            jobAverage = 0
+            if nRepos>0:
+                jobAverage = tJobs/nRepos
+            df.at[index, "Media"] = jobAverage
+    
+    return df

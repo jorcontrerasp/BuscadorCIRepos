@@ -29,12 +29,22 @@ def doSearchGitLabApi(df, df2, df3):
         lFound,lResult = doSearch1By1GitLabApi(df, df2, df3)
     else:
         # Obtenemos la lista de repositorios Gitlab.
-        lFound = getGitlabProjects()
+        lFound = getGitLabProjects()
 
         # Aplicamos el proceso.
         lResult = searchInProjectsGitLabApi(lFound, df, df2, df3)
 
     return lFound,lResult
+
+def listProyectsGitLabApi(gl):
+    projects = gl.projects.list(visibility='public', 
+                                        last_activity_after='2016-01-01T00:00:00Z', 
+                                        pagination='keyset', 
+                                        id_after=idAfter, 
+                                        page=1, 
+                                        order_by='id', 
+                                        sort='asc')
+    return projects
 
 def doSearch1By1GitLabApi(df, df2, df3):
     # private github_token or personal github_token authentication
@@ -123,15 +133,21 @@ def doSearch1By1GitLabApi(df, df2, df3):
     # Imprimimos la lista de proyectos
     aux.printLog("Nº de proyectos: " + str(len(lFound)), logging.INFO)
 
+    df = d.updateDataFrameNumPositivesCIs(df)
+
     df2 = d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
 
+    df4,df5 = d.makeLanguageAndCIStatisticsDF(df,False)
+
     # Generamos un fichero EXCEL con los resultados.
-    d.makeEXCEL(df, "resultados_gitlab")
-    d.makeEXCEL(df3, "lenguajes_gitlab")
+    d.makeEXCEL(df, "gitlab_results")
+    d.makeEXCEL(df3, "gitlab_languages")
+    d.makeEXCEL(df4, "gitlab_language_statistics")
+    d.makeEXCEL(df5, "gitlab_ci_statistics")
     
     return lFound,lResult
 
-def getGitlabProjects():
+def getGitLabProjects():
     # private github_token or personal github_token authentication
     token = aux.readFile("tokens/gitlab_token.txt")
     gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
@@ -142,17 +158,13 @@ def getGitlabProjects():
     while i<=N_MAX_SEARCHES:
         try:
 
-            projects = gl.projects.list(visibility='public',
-                                        last_activity_after='2020-01-01T00:00:00Z',
-                                        #all=True,
-                                        pagination='keyset',
-                                        id_after=idAfter,
-                                        #use_keyset_pagination=True,
-                                        page=1,
-                                        #per_page=100,
-                                        order_by='id',
-                                        sort='asc'
-                                        )
+            projects = gl.projects.list(visibility='public', 
+                                        last_activity_after='2016-01-01T00:00:00Z', 
+                                        pagination='keyset', 
+                                        id_after=idAfter, 
+                                        page=1, 
+                                        order_by='id', 
+                                        sort='asc')
 
             if len(projects)==0:
                 aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
@@ -255,11 +267,17 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3):
         if found:
             lFound.append(project)
 
+    df = d.updateDataFrameNumPositivesCIs(df)
+
     df2 = d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
 
+    df4,df5 = d.makeLanguageAndCIStatisticsDF(df,False)
+
     # Generamos ficheros EXCEL con los resultados.
-    d.makeEXCEL(df, "resultados_gitlab")
-    d.makeEXCEL(df3, "lenguajes_gitlab")
+    d.makeEXCEL(df, "gitlab_results")
+    d.makeEXCEL(df3, "gitlab_languages")
+    d.makeEXCEL(df4, "gitlab_language_statistics")
+    d.makeEXCEL(df5, "gitlab_ci_statistics")
 
     return lFound
 
@@ -279,12 +297,8 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                     df = d.updateDataFrameCiColumn(project, "***", CITool, False, df)
                     df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
 
-                    language = "None"
                     languages = project.languages()
-                    if len(languages)>0:
-                        for l in languages:
-                            language = l
-                            break
+                    language = getFirstBackendLanguage(languages)
 
                     if not d.existsDFRecord(language, df3):
                         df3 = d.addLanguageDFRecord(language, df3)
@@ -305,17 +319,13 @@ def searchGitLabPath(project, CITool, df, df2, df3):
             else:
                 found = True
                 if not d.existsDFRecord(project.attributes['path_with_namespace'], df):
-                        df = d.addDFRecord(project, df, False)
+                    df = d.addDFRecord(project, df, False)
                 
                 df = d.updateDataFrameCiColumn(project, "***", CITool, False, df)
                 df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
 
-                language = "None"
                 languages = project.languages()
-                if len(languages)>0:
-                    for l in languages:
-                        language = l
-                        break
+                language = getFirstBackendLanguage(languages)
 
                 if not d.existsDFRecord(language, df3):
                     df3 = d.addLanguageDFRecord(language, df3)
@@ -336,6 +346,43 @@ def searchGitLabPath(project, CITool, df, df2, df3):
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
     return found,df,df3
+
+def getFrontendLanguages():
+    frontLanguages = []
+    frontLanguages.append("html")
+    frontLanguages.append("css")
+    frontLanguages.append("scss")
+    frontLanguages.append("haml")
+    return frontLanguages
+
+def getBackendLanguages(languages):
+    frontLanguages = getFrontendLanguages()
+    backendLanguages = []
+    if len(languages)>0:
+        for l in languages:
+            blockLanguage = False
+            for frontL in frontLanguages:
+                if l.lower() == frontL.lower():
+                    blockLanguage = True
+                    break
+            if not blockLanguage:
+                backendLanguages.append(l)
+    return backendLanguages
+
+def getFirstBackendLanguage(languages):
+    frontLanguages = getFrontendLanguages()
+    language = "None"
+    if len(languages)>0:
+        for l in languages:
+            blockLanguage = False
+            for frontL in frontLanguages:
+                if l.lower() == frontL.lower():
+                    blockLanguage = True
+                    break
+            if not blockLanguage:
+                language = l
+                break
+    return language
 
 def isEmptyProject(project):
     return project.attributes['empty_repo']

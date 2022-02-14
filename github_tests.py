@@ -46,8 +46,8 @@ if continueTest:
 
     found,df,df3 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3)
 
-    d.makeEXCEL(df, "_resultados_github")
-    d.makeEXCEL(df2, "_contadores")
-    d.makeEXCEL(df3, "_lenguajes_github")
+    d.makeEXCEL(df, "__github_results")
+    d.makeEXCEL(df2, "_counting")
+    d.makeEXCEL(df3, "_github_languages")
 
     print(str(len(foundList)))
