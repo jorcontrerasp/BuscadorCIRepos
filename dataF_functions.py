@@ -35,6 +35,13 @@ def getStatisticsDFColumns():
 
     return _columns
 
+def getStageStatisticsDFColumns():
+    _columns = []
+    _columns.append("Num_projects_using")
+    _columns.append("Total_stages")
+
+    return _columns
+
 def initDF(df, id, columns, initValue):
     for c in columns:
         df.at[id, c] = initValue
@@ -171,7 +178,7 @@ def updateDataFrameCiColumn(repo, literal, CITool, boGitHub, df):
     
     return df
 
-def updateDataFrameCiObj(repo, ciObj, boGitHub, df):
+def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6):
     if boGitHub:
         id = repo.full_name
     else:
@@ -183,6 +190,8 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df):
             df.at[id, "STAGES"] = str(ciObj.getStages())
         else:
             df.at[id, "STAGES"] += "\n" + str(ciObj.getStages())
+
+        df6 = updateStageStatisticsDF(ciObj.getStages(), df6)
 
         df.at[id, "NUM_JOBS"] += len(ciObj.getJobs())
 
@@ -201,7 +210,7 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df):
 
         df.at[id, "TASK_AVERAGE_PER_JOB"] = taskAverage
     
-    return df
+    return df,df6
 
 def add1CounterDFRecord(fila, column, df):
     df.at[fila, column] += 1
@@ -331,7 +340,7 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
         else:
             id = gls.getFirstBackendLanguage(language.split(","))
 
-        if len(id)>0 and id != ' ':
+        if str(id) != "None" and len(id)>0 and id != ' ':
             if not existsDFRecord(id, df1):
                 df1 = addStatisticsDFRecord(df1, id)
             
@@ -397,5 +406,49 @@ def updateStaticsDFJobAverage(df):
             if nRepos>0:
                 jobAverage = tJobs/nRepos
             df.at[index, "Media"] = jobAverage
+    
+    return df
+
+def makeEmptyStageStatisticsDataFrame():
+    aux.printLog("Generando DataFrame de estadísticas de 'stages'...", logging.INFO)
+    id = "EmptyRecord"
+    _columns = getStageStatisticsDFColumns()
+    df = pd.DataFrame([],index=[id],columns=_columns)
+    initDF(df, id, _columns, 0)
+
+    return df
+
+def addStageStatisticsDFRecord(df, id):
+    _columns = getStageStatisticsDFColumns()
+    df2 = pd.DataFrame([],index=[id],columns=_columns)
+    initDF(df2, id, _columns, 0)
+    df = df.append(df2)
+
+    return df
+
+def updateStageStatisticsDF(lStage, df):
+    if isinstance(lStage, list):
+        for stage in lStage:
+            dfAux = makeEmptyStageStatisticsDataFrame()
+            if not existsDFRecord(stage, dfAux):
+                dfAux = addStageStatisticsDFRecord(dfAux, stage)
+                dfAux.at[stage, "Num_projects_using"] += 1
+                dfAux.at[stage, "Total_stages"] += 1
+            else:
+                dfAux.at[stage, "Total_stages"] += 1
+        
+        for index, row in dfAux.iterrows():
+            if not existsDFRecord(index, df):
+                df = addStageStatisticsDFRecord(df, index)
+
+            df.at[index, "Num_projects_using"] += 1
+            df.at[index, "Total_stages"] += dfAux.at[index, "Total_stages"]
+
+    else:
+        if not existsDFRecord(lStage, df):
+            df = addStageStatisticsDFRecord(df, lStage)
+
+        df.at[lStage, "Num_projects_using"] += 1
+        df.at[lStage, "Total_stages"] += 1
     
     return df

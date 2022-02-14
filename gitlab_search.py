@@ -22,17 +22,17 @@ if onlyPositives:
 else:
     search1By1 = ymlp.parseConfigParam(config, "search1By1")
 
-def doSearchGitLabApi(df, df2, df3):
+def doSearchGitLabApi(df, df2, df3, df6):
     lFound = []
     lResult = []
     if search1By1:
-        lFound,lResult = doSearch1By1GitLabApi(df, df2, df3)
+        lFound,lResult = doSearch1By1GitLabApi(df, df2, df3, df6)
     else:
         # Obtenemos la lista de repositorios Gitlab.
         lFound = getGitLabProjects()
 
         # Aplicamos el proceso.
-        lResult = searchInProjectsGitLabApi(lFound, df, df2, df3)
+        lResult = searchInProjectsGitLabApi(lFound, df, df2, df3, df6)
 
     return lFound,lResult
 
@@ -46,7 +46,7 @@ def listProyectsGitLabApi(gl):
                                         sort='asc')
     return projects
 
-def doSearch1By1GitLabApi(df, df2, df3):
+def doSearch1By1GitLabApi(df, df2, df3, df6):
     # private github_token or personal github_token authentication
     token = aux.readFile("tokens/gitlab_token.txt")
     gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
@@ -94,13 +94,13 @@ def doSearch1By1GitLabApi(df, df2, df3):
                                 for l in languages:
                                     if LANGUAGE.lower() == str(l).lower():
                                         lFound.append(project)
-                                        found,df,df3 = searchInProjectGitLabApi(project, df, df2, df3)
+                                        found,df,df3,df6 = searchInProjectGitLabApi(project, df, df2, df3, df6)
                                         if found:
                                             lResult.append(project)
                                         break
                             else:
                                 lFound.append(project)
-                                found,df,df3 = searchInProjectGitLabApi(project, df, df2, df3)
+                                found,df,df3,df6 = searchInProjectGitLabApi(project, df, df2, df3, df6)
                                 if found:
                                     lResult.append(project)
 
@@ -144,6 +144,7 @@ def doSearch1By1GitLabApi(df, df2, df3):
     d.makeEXCEL(df3, "gitlab_languages")
     d.makeEXCEL(df4, "gitlab_language_statistics")
     d.makeEXCEL(df5, "gitlab_ci_statistics")
+    d.makeEXCEL(df6, "gitlab_stage_statistics")
     
     return lFound,lResult
 
@@ -215,50 +216,50 @@ def getGitLabProjects():
 
     return lResult
 
-def searchInProjectGitLabApi(project, df, df2, df3):
+def searchInProjectGitLabApi(project, df, df2, df3, df6):
     if not onlyPositives and not d.existsDFRecord(project.attributes['path_with_namespace'], df):
         df = d.addDFRecord(project, df, False)
 
-    found1,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3)
-    found2,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3)
-    found3,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3)
-    found4,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3)
-    found5,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3)
-    found6,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3)
-    found7,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3)
-    found8,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3)
-    found9,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3)
-    found10,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3)
-    found11,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3)
-    found12,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3)
-    found13,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3)
+    found1,df,df3,df6 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6)
+    found2,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6)
+    found3,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3, df6)
+    found4,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3, df6)
+    found5,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3, df6)
+    found6,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3, df6)
+    found7,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3, df6)
+    found8,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3, df6)
+    found9,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3, df6)
+    found10,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3, df6)
+    found11,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3, df6)
+    found12,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
+    found13,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
 
     # Si lo ha encontrado:
     # - lo añadimos a la lista de encontrados.
     found = found1 or found2 or found3 or found4 or found5 or found6 or found7 \
                     or found8 or found9 or found10 or found11 or found12 or found13
 
-    return found,df,df3
+    return found,df,df3,df6
 
-def searchInProjectsGitLabApi(lProjects, df, df2, df3):
+def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
     lFound = []
     for project in lProjects:
         if not onlyPositives and not d.existsDFRecord(project.attributes['path_with_namespace'], df):
             df = d.addDFRecord(project, df, False)
 
-        found1,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3)
-        found2,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3)
-        found3,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3)
-        found4,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3)
-        found5,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3)
-        found6,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3)
-        found7,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3)
-        found8,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3)
-        found9,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3)
-        found10,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3)
-        found11,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3)
-        found12,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3)
-        found13,df,df3 = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3)
+        found1,df,df3,df6 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6)
+        found2,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6)
+        found3,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3, df6)
+        found4,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3, df6)
+        found5,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3, df6)
+        found6,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3, df6)
+        found7,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3, df6)
+        found8,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3, df6)
+        found9,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3, df6)
+        found10,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3, df6)
+        found11,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3, df6)
+        found12,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
+        found13,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -278,10 +279,11 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3):
     d.makeEXCEL(df3, "gitlab_languages")
     d.makeEXCEL(df4, "gitlab_language_statistics")
     d.makeEXCEL(df5, "gitlab_ci_statistics")
+    d.makeEXCEL(df6, "gitlab_stage_statistics")
 
     return lFound
 
-def searchGitLabPath(project, CITool, df, df2, df3):
+def searchGitLabPath(project, CITool, df, df2, df3, df6):
     aux.printLog("Buscando '" + CITool.value + "' en '" + project.attributes['path_with_namespace'] + "'", logging.INFO)
     found = False
     try:
@@ -310,11 +312,11 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                         for ciObj in ciObjRes:
                             str_ciobj = str(ciObj)
                             if str_ciobj != 'None':
-                                df = d.updateDataFrameCiObj(project, ciObj, False, df)
+                                df,df6 = d.updateDataFrameCiObj(project, ciObj, False, df, df6)
                     else:
                         str_ciobj = str(ciObjRes)
                         if str_ciobj != 'None':
-                            df = d.updateDataFrameCiObj(project, ciObjRes, False, df)
+                            df,df6 = d.updateDataFrameCiObj(project, ciObjRes, False, df, df6)
                         
             else:
                 found = True
@@ -337,15 +339,15 @@ def searchGitLabPath(project, CITool, df, df2, df3):
                     for ciObj in ciObjRes:
                         str_ciobj = str(ciObj)
                         if str_ciobj != 'None':
-                            df = d.updateDataFrameCiObj(project, ciObj, False, df)
+                            df,df6 = d.updateDataFrameCiObj(project, ciObj, False, df, df6)
                 else:
                     str_ciobj = str(ciObjRes)
                     if str_ciobj != 'None':
-                        df = d.updateDataFrameCiObj(project, ciObjRes, False, df)
+                        df,df6 = d.updateDataFrameCiObj(project, ciObjRes, False, df, df6)
     except:
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
-    return found,df,df3
+    return found,df,df3,df6
 
 def getFrontendLanguages():
     frontLanguages = []
