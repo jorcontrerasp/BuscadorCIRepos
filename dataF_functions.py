@@ -428,8 +428,8 @@ def addStageStatisticsDFRecord(df, id):
 
 def updateStageStatisticsDF(lStage, df):
     if isinstance(lStage, list):
+        dfAux = makeEmptyStageStatisticsDataFrame()
         for stage in lStage:
-            dfAux = makeEmptyStageStatisticsDataFrame()
             if not existsDFRecord(stage, dfAux):
                 dfAux = addStageStatisticsDFRecord(dfAux, stage)
                 dfAux.at[stage, "Num_projects_using"] += 1

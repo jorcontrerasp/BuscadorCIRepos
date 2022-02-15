@@ -1,7 +1,7 @@
 process:
   execute: True
-  doGithubSearch: False
-  doGitlabSearch: True
+  doGithubSearch: True
+  doGitlabSearch: False
   usePickleFile: False
   useResultsExcelFile: False
   tmpDirectory: tmp
@@ -11,7 +11,7 @@ github:
   filterCommits: False
   MAX_COMMITS: 10000
   MIN_COMMITS: 1000
-  randomizeRepos: True
+  randomizeRepos: False
   N_RANDOM: 10
   onlyPositives: True
 gitlab:
