@@ -15,8 +15,8 @@ token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
 ciTool = ci.HerramientasCI.CI4
-organization = "rustdesk"
-repo = "rustdesk"
+organization = "ardalis"
+repo = "CleanArchitecture"
 
 continueTest = True
 
@@ -34,6 +34,7 @@ if continueTest:
     df = d.makeDataFrame(filteredRepos, True)
     df2 = d.makeCounterDataFrame()
     df3 = d.makeEmptyLanguageDataFrame()
+    df6 = d.makeEmptyStageStatisticsDataFrame()
 
     files = ci.getCISearchFiles(ciTool.value)
     for file in files:
@@ -42,12 +43,13 @@ if continueTest:
     aux.printGitHubRepoList(filteredRepos)
 
     foundList = []
-    #foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3)
+    #foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
 
-    found,df,df3 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3)
+    found,df,df3,df6 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3, df6)
 
     d.makeEXCEL(df, "__github_results")
     d.makeEXCEL(df2, "_counting")
     d.makeEXCEL(df3, "_github_languages")
+    d.makeEXCEL(df6, "_gitlab_stage_statistics")
 
     print(str(len(foundList)))

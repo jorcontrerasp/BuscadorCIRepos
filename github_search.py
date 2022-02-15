@@ -234,15 +234,18 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3, df6):
             df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
             ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
+            projectAddedToStageStatistics = False
             if isinstance(ciObjRes, list):
                 for ciObj in ciObjRes:
                     str_ciobj = str(ciObj)
                     if str_ciobj != 'None':
-                        df,df6 = d.updateDataFrameCiObj(repo, ciObj, True, df, df6)
+                        df,df6 = d.updateDataFrameCiObj(repo, ciObj, True, df, df6, projectAddedToStageStatistics)
+                        projectAddedToStageStatistics = True
             else:
                 str_ciobj = str(ciObjRes)
                 if str_ciobj != 'None':
-                    df,df6 = d.updateDataFrameCiObj(repo, ciObjRes, True, df, df6)
+                    df,df6 = d.updateDataFrameCiObj(repo, ciObjRes, True, df, df6, projectAddedToStageStatistics)
+                    projectAddedToStageStatistics = True
 
             return True,df,df3,df6
     

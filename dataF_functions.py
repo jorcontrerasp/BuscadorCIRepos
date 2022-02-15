@@ -178,7 +178,7 @@ def updateDataFrameCiColumn(repo, literal, CITool, boGitHub, df):
     
     return df
 
-def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6):
+def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, projectAddedToStageStatistics):
     if boGitHub:
         id = repo.full_name
     else:
@@ -191,7 +191,7 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6):
         else:
             df.at[id, "STAGES"] += "\n" + str(ciObj.getStages())
 
-        df6 = updateStageStatisticsDF(ciObj.getStages(), df6)
+        df6 = updateStageStatisticsDF(ciObj.getStages(), df6, projectAddedToStageStatistics)
 
         df.at[id, "NUM_JOBS"] += len(ciObj.getJobs())
 
@@ -426,7 +426,7 @@ def addStageStatisticsDFRecord(df, id):
 
     return df
 
-def updateStageStatisticsDF(lStage, df):
+def updateStageStatisticsDF(lStage, df, projectAddedToStageStatistics):
     if isinstance(lStage, list):
         dfAux = makeEmptyStageStatisticsDataFrame()
         for stage in lStage:
@@ -440,15 +440,21 @@ def updateStageStatisticsDF(lStage, df):
         for index, row in dfAux.iterrows():
             if not existsDFRecord(index, df):
                 df = addStageStatisticsDFRecord(df, index)
+                df.at[index, "Num_projects_using"] += 1
+            else:
+                if not projectAddedToStageStatistics:
+                    df.at[index, "Num_projects_using"] += 1
 
-            df.at[index, "Num_projects_using"] += 1
             df.at[index, "Total_stages"] += dfAux.at[index, "Total_stages"]
 
     else:
         if not existsDFRecord(lStage, df):
             df = addStageStatisticsDFRecord(df, lStage)
+            df.at[lStage, "Num_projects_using"] += 1
+        else:
+            if not projectAddedToStageStatistics:
+                df.at[lStage, "Num_projects_using"] += 1
 
-        df.at[lStage, "Num_projects_using"] += 1
         df.at[lStage, "Total_stages"] += 1
     
     return df
