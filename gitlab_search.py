@@ -308,15 +308,16 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
                     df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
                     ciObjRes = ymlp.getParseObj(project, path, CITool, False)
+                    lStagesProjectAdded = []
                     if isinstance(ciObjRes, list):
                         for ciObj in ciObjRes:
                             str_ciobj = str(ciObj)
                             if str_ciobj != 'None':
-                                df,df6 = d.updateDataFrameCiObj(project, ciObj, False, df, df6)
+                                df,df6,lStagesProjectAdded = d.updateDataFrameCiObj(project, ciObj, False, df, df6, lStagesProjectAdded)
                     else:
                         str_ciobj = str(ciObjRes)
                         if str_ciobj != 'None':
-                            df,df6 = d.updateDataFrameCiObj(project, ciObjRes, False, df, df6)
+                            df,df6,lStagesProjectAdded = d.updateDataFrameCiObj(project, ciObjRes, False, df, df6, lStagesProjectAdded)
                         
             else:
                 found = True
@@ -335,15 +336,16 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
                 df3 = d.add1CounterDFRecord(language, CITool.value, df3)
 
                 ciObjRes = ymlp.getParseObj(project, path, CITool, False)
+                lStagesProjectAdded = []
                 if isinstance(ciObjRes, list):
                     for ciObj in ciObjRes:
                         str_ciobj = str(ciObj)
                         if str_ciobj != 'None':
-                            df,df6 = d.updateDataFrameCiObj(project, ciObj, False, df, df6)
+                            df,df6,lStagesProjectAdded = d.updateDataFrameCiObj(project, ciObj, False, df, df6, lStagesProjectAdded)
                 else:
                     str_ciobj = str(ciObjRes)
                     if str_ciobj != 'None':
-                        df,df6 = d.updateDataFrameCiObj(project, ciObjRes, False, df, df6)
+                        df,df6,lStagesProjectAdded = d.updateDataFrameCiObj(project, ciObjRes, False, df, df6, lStagesProjectAdded)
     except:
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
