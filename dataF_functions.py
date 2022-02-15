@@ -178,7 +178,7 @@ def updateDataFrameCiColumn(repo, literal, CITool, boGitHub, df):
     
     return df
 
-def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, projectAddedToStageStatistics):
+def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
     if boGitHub:
         id = repo.full_name
     else:
@@ -191,7 +191,7 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, projectAddedToStageStat
         else:
             df.at[id, "STAGES"] += "\n" + str(ciObj.getStages())
 
-        df6 = updateStageStatisticsDF(ciObj.getStages(), df6, projectAddedToStageStatistics)
+        df6,lStagesProjectAdded = updateStageStatisticsDF(ciObj.getStages(), df6, lStagesProjectAdded)
 
         df.at[id, "NUM_JOBS"] += len(ciObj.getJobs())
 
@@ -210,7 +210,7 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, projectAddedToStageStat
 
         df.at[id, "TASK_AVERAGE_PER_JOB"] = taskAverage
     
-    return df,df6
+    return df,df6,lStagesProjectAdded
 
 def add1CounterDFRecord(fila, column, df):
     df.at[fila, column] += 1
@@ -426,7 +426,7 @@ def addStageStatisticsDFRecord(df, id):
 
     return df
 
-def updateStageStatisticsDF(lStage, df, projectAddedToStageStatistics):
+def updateStageStatisticsDF(lStage, df, lStagesProjectAdded):
     if isinstance(lStage, list):
         dfAux = makeEmptyStageStatisticsDataFrame()
         for stage in lStage:
@@ -442,8 +442,9 @@ def updateStageStatisticsDF(lStage, df, projectAddedToStageStatistics):
                 df = addStageStatisticsDFRecord(df, index)
                 df.at[index, "Num_projects_using"] += 1
             else:
-                if not projectAddedToStageStatistics:
+                if not (index in lStagesProjectAdded):
                     df.at[index, "Num_projects_using"] += 1
+                    lStagesProjectAdded.append(index)
 
             df.at[index, "Total_stages"] += dfAux.at[index, "Total_stages"]
 
@@ -452,9 +453,10 @@ def updateStageStatisticsDF(lStage, df, projectAddedToStageStatistics):
             df = addStageStatisticsDFRecord(df, lStage)
             df.at[lStage, "Num_projects_using"] += 1
         else:
-            if not projectAddedToStageStatistics:
-                df.at[lStage, "Num_projects_using"] += 1
+            if not (index in lStagesProjectAdded):
+                    df.at[index, "Num_projects_using"] += 1
+                    lStagesProjectAdded.append(index)
 
         df.at[lStage, "Total_stages"] += 1
     
-    return df
+    return df,lStagesProjectAdded
