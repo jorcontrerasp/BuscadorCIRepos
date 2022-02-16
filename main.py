@@ -5,10 +5,11 @@ import dataF_functions as d
 import github_search as ghs
 import gitlab_search as gls
 import aux_functions as aux
+import ci_yml_parser as ymlp
 import pandas as pd
 import os
 import logging
-import ci_yml_parser as ymlp
+
 
 # Configuración del proceso de búsqueda.
 config = "process"
@@ -41,7 +42,6 @@ def executeProcess():
             fStageStatistics = "results/github_stage_statistics.xlsx"
 
             # Generamos un DataFrame donde irán los resultados.
-            # githubDF = d.makeDataFrame(lFinal, True)
             if useResultsExcelFile:
                 if os.path.exists(fResults):
                     githubDF = pd.read_excel(fResults, index_col=0)
@@ -81,7 +81,6 @@ def executeProcess():
             lResult = []
 
             # Generamos un DataFrame donde irán los resultados.
-            # gitlabDF = d.makeDataFrame(lFinal, False)
             if useResultsExcelFile:
                 if os.path.exists(fResults):
                     gitlabDF = pd.read_excel(fResults, index_col=0)

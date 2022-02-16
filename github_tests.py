@@ -15,19 +15,17 @@ token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
 ciTool = ci.HerramientasCI.CI4
-organization = "ardalis"
-repo = "CleanArchitecture"
-
-continueTest = True
+repoName = "ardalis/CleanArchitecture"
+doTest = True
+doSearchInAllCiTools = False
 
 try:
-    repo = g.get_repo(organization + "/" + repo)
+    repo = g.get_repo(repoName)
 except UnknownObjectException as e:
-    print("El repositorio " + organization + "/" + repo + " no existe en GitHub: " + str(e))
-    continueTest = False
+    print("El repositorio " + repoName + " no existe en GitHub: " + str(e))
+    doTest = False
 
-if continueTest:
-    print("Continuar con el proceso.")
+if doTest:
 
     filteredRepos = [repo]
 
@@ -36,20 +34,14 @@ if continueTest:
     df3 = d.makeEmptyLanguageDataFrame()
     df6 = d.makeEmptyStageStatisticsDataFrame()
 
-    files = ci.getCISearchFiles(ciTool.value)
-    for file in files:
-        print(str(file))
+    if doSearchInAllCiTools:
+        foundList = []
+        foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
+    else:
+        found,df,df3,df6 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3, df6)
+        d.makeEXCEL(df, "__github_results")
+        d.makeEXCEL(df2, "_counting")
+        d.makeEXCEL(df3, "_github_languages")
+        d.makeEXCEL(df6, "_gitlab_stage_statistics")
 
-    aux.printGitHubRepoList(filteredRepos)
-
-    foundList = []
-    #foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
-
-    found,df,df3,df6 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3, df6)
-
-    d.makeEXCEL(df, "__github_results")
-    d.makeEXCEL(df2, "_counting")
-    d.makeEXCEL(df3, "_github_languages")
-    d.makeEXCEL(df6, "_gitlab_stage_statistics")
-
-    print(str(len(foundList)))
+print("Fin de la prueba.")

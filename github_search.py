@@ -2,12 +2,12 @@
 
 #Importamos las librerías necesarias.
 from github import Github
-import random
 import aux_functions as aux
-import ci_tools as ci
-import dataF_functions as d
-import logging
 import ci_yml_parser as ymlp
+import dataF_functions as d
+import ci_tools as ci
+import random
+import logging
 import calendar
 import time
 import datetime
@@ -83,8 +83,6 @@ def getContents(repo, path):
     core_remaining = rl_core.remaining
     rl_search = rl.search
     search_remaining = rl_search.remaining
-    # core | Limit: 5000, Remaining: 5000, Reset: 2020-01-08 14:09:16.
-    # search | Limit: 30, Remaining: 29, Reset: 2020-01-08 13:10:16.
     if core_remaining <= 0:
         reset_timestamp = calendar.timegm(rl_core.reset.timetuple())
         sleep_time = reset_timestamp - calendar.timegm(time.gmtime()) + 5
@@ -123,11 +121,7 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
         if found:
             lFound.append(repo)
 
-    df = d.updateDataFrameNumPositivesCIs(df)
-
-    df2 =d.updateTotalCounterDataFrame("Encontrados_GitHub", df, df2)
-
-    df4,df5 = d.makeLanguageAndCIStatisticsDF(df,True)
+    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, True)
 
     # Generamos ficheros EXCEL con los resultados.
     d.makeEXCEL(df, "github_results")
@@ -138,30 +132,6 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
 
     return lFound
 
-def searchInRepo(repo, literal):
-    found = False
-    #contents = repo.get_contents("")
-    contents = getContents(repo, "")
-    while contents:
-        contentFile = contents.pop(0)
-        if literal in contentFile.path.lower():
-            found = True
-            break
-        else:
-            if contentFile.type == "dir":
-                contents.extend(repo.get_contents(contentFile.path))
-    return found
-
-def searchInRoot(repo, literal):
-    found = False
-    #contents = repo.get_contents("")
-    contents = getContents(repo, "")
-    for contentFile in contents:
-        if literal in contentFile.path.lower():
-            found = True
-            break
-    return found
-
 def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
     aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
     try:
@@ -169,7 +139,6 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
             literals = ci.getCISearchFiles(CITool.value)
 
         path = literals.pop(0)
-        #repo.get_contents(path)
         getContents(repo, path)
 
         if not d.existsDFRecord(repo.full_name, df):
@@ -212,7 +181,6 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3, df6):
     for path in literals:
         encontrado = False
         try:
-            #c = repo.get_contents(path)
             c = getContents(repo, path)
             encontrado = True
         except:
@@ -248,3 +216,25 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3, df6):
             return True,df,df3,df6
     
     return False,df,df3,df6
+
+def searchInRepo(repo, literal):
+    found = False
+    contents = getContents(repo, "")
+    while contents:
+        contentFile = contents.pop(0)
+        if literal in contentFile.path.lower():
+            found = True
+            break
+        else:
+            if contentFile.type == "dir":
+                contents.extend(repo.get_contents(contentFile.path))
+    return found
+
+def searchInRoot(repo, literal):
+    found = False
+    contents = getContents(repo, "")
+    for contentFile in contents:
+        if literal in contentFile.path.lower():
+            found = True
+            break
+    return found

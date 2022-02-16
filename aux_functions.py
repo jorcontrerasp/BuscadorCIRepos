@@ -1,14 +1,14 @@
 #AQUÍ se definirán las funciones auxiliares del programa.
 
 #Importamos las librerías necesarias.
-import pickle
-import datetime
-import logging
-import base64
 from github import GithubException
 import ci_yml_parser as ymlp
 import gitlab_search as gls
 import github_search as ghs
+import pickle
+import datetime
+import logging
+import base64
 import os
 
 def makePickle(fileName, lRepositories):
@@ -22,17 +22,6 @@ def loadRepositories(file):
     with open(file, 'rb') as f:
         repositories = pickle.load(f)
     return repositories
-
-def printGitHubRepoList(repositories):
-    print("Lista de repositorios: ")
-    for project in repositories:
-        projectName = project.full_name.split("/")[1]
-        print(project.full_name)
-
-def printGitLabProyectList(projects):
-    print("Lista de proyectos: ")
-    for project in projects:
-        print(project.attributes['path_with_namespace'])
 
 def getItFile(path):
     if "/" in path:
@@ -48,6 +37,17 @@ def readFile(file):
         r = str(content.decode())
         f.close()
         return r
+
+def printGitHubRepoList(repositories):
+    print("Lista de repositorios: ")
+    for project in repositories:
+        projectName = project.full_name.split("/")[1]
+        print(project.full_name)
+
+def printGitLabProyectList(projects):
+    print("Lista de proyectos: ")
+    for project in projects:
+        print(project.attributes['path_with_namespace'])
 
 def printLog(msg, level):
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s'
@@ -94,12 +94,10 @@ def getBlobContent(project, branch, path_name):
 def getFileContent(project, filePath, boGitHub):
     if boGitHub:
         try:
-            #res = project.get_contents(filePath)
             res = ghs.getContents(project, filePath)
             if isinstance(res, list):
                 fileList = []
                 for r in res:
-                    #res2 = project.get_contents(r.path)
                     res2 = ghs.getContents(project, r.path)
                     if not isinstance(res2, list):
                         extension = r.path.split(".")[len(r.path.split("."))-1]
@@ -167,8 +165,6 @@ def getStrToFile(content):
 
     #RESTO
     content_aux = content_aux.replace("\\n","\\_n")
-    #content_aux = content_aux.replace("\\\\n","\\_n")
-    #content_aux = content_aux.replace("\\n","\n")
     content_aux = content_aux.replace("\\\"","")
     content_aux = content_aux.replace("\\\\","")
 
@@ -185,6 +181,5 @@ def getStrToFile(content):
         if addToReturn:
             r.append(part)
             
-
     return r
         

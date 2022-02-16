@@ -3,10 +3,10 @@
 #Importamos las librerías necesarias.
 import gitlab
 import aux_functions as aux
-import ci_tools as ci
 import dataF_functions as d
-import logging
 import ci_yml_parser as ymlp
+import ci_tools as ci
+import logging
 
 # Configuración de la búsqueda GitLab.
 config = "gitlab"
@@ -36,7 +36,18 @@ def doSearchGitLabApi(df, df2, df3, df6):
 
     return lFound,lResult
 
-def listProyectsGitLabApi(gl):
+def authenticate():
+    # AUTHENTICATE
+    token = aux.readFile("tokens/gitlab_token.txt")
+    gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
+
+    return gl
+
+def listProyectsGitLabApi(idAfter):
+    # AUTHENTICATE
+    gl = authenticate()
+
+    # GET PROJECTS
     projects = gl.projects.list(visibility='public', 
                                         last_activity_after='2016-01-01T00:00:00Z', 
                                         pagination='keyset', 
@@ -47,11 +58,6 @@ def listProyectsGitLabApi(gl):
     return projects
 
 def doSearch1By1GitLabApi(df, df2, df3, df6):
-    # private github_token or personal github_token authentication
-    token = aux.readFile("tokens/gitlab_token.txt")
-    gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
-    
-    #2114823
     errorAttempts = 0
     i = 1
     lFound = []
@@ -64,13 +70,7 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
                 idAfter = idAfter + 20
                 errorAttempts = 0
             
-            projects = gl.projects.list(visibility='public', 
-                                        last_activity_after='2016-01-01T00:00:00Z', 
-                                        pagination='keyset', 
-                                        id_after=idAfter, 
-                                        page=1, 
-                                        order_by='id', 
-                                        sort='asc')
+            projects = listProyectsGitLabApi(idAfter)
 
             if len(projects)==0:
                 aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
@@ -133,11 +133,7 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
     # Imprimimos la lista de proyectos
     aux.printLog("Nº de proyectos: " + str(len(lFound)), logging.INFO)
 
-    df = d.updateDataFrameNumPositivesCIs(df)
-
-    df2 = d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
-
-    df4,df5 = d.makeLanguageAndCIStatisticsDF(df,False)
+    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, False)
 
     # Generamos un fichero EXCEL con los resultados.
     d.makeEXCEL(df, "gitlab_results")
@@ -149,23 +145,17 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
     return lFound,lResult
 
 def getGitLabProjects():
-    # private github_token or personal github_token authentication
-    token = aux.readFile("tokens/gitlab_token.txt")
-    gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
-
     i = 1
     lResult = []
     idAfter = 0
     while i<=N_MAX_SEARCHES:
         try:
 
-            projects = gl.projects.list(visibility='public', 
-                                        last_activity_after='2016-01-01T00:00:00Z', 
-                                        pagination='keyset', 
-                                        id_after=idAfter, 
-                                        page=1, 
-                                        order_by='id', 
-                                        sort='asc')
+            if errorAttempts >= N_ERROR_PAGE_ATTEMPTS:
+                idAfter = idAfter + 20
+                errorAttempts = 0
+
+            projects = listProyectsGitLabApi(idAfter)
 
             if len(projects)==0:
                 aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
@@ -203,6 +193,8 @@ def getGitLabProjects():
                     break
         except:
             aux.printLog(": Se ha producido un ERROR de búsqueda en la página " + str(i) + ".", logging.ERROR)
+            aux.writeInLogFile("EXCEPT --> página: " + str(i) + "; idAfter: " + str(idAfter) + "; [" + str(e) + "]")
+            errorAttempts = errorAttempts + 1
             i = i + 1
 
     # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
@@ -235,7 +227,6 @@ def searchInProjectGitLabApi(project, df, df2, df3, df6):
     found13,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
 
     # Si lo ha encontrado:
-    # - lo añadimos a la lista de encontrados.
     found = found1 or found2 or found3 or found4 or found5 or found6 or found7 \
                     or found8 or found9 or found10 or found11 or found12 or found13
 
@@ -268,11 +259,7 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
         if found:
             lFound.append(project)
 
-    df = d.updateDataFrameNumPositivesCIs(df)
-
-    df2 = d.updateTotalCounterDataFrame("Encontrados_GitLab", df, df2)
-
-    df4,df5 = d.makeLanguageAndCIStatisticsDF(df,False)
+    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, False)
 
     # Generamos ficheros EXCEL con los resultados.
     d.makeEXCEL(df, "gitlab_results")

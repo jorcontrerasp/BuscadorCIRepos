@@ -1,12 +1,12 @@
-import io
-import yaml
+import ci_yml_parser as ymlp
 import aux_functions as aux
-import os
 import ci_tools as ci
-import logging
 import shutil
 from shutil import rmtree
-import ci_yml_parser as ymlp
+import logging
+import yaml
+import io
+import os
 
 class FileObj:
     extension = ""

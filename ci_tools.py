@@ -36,7 +36,6 @@ def getCIToolsValueList():
     
     return lCITools
 
-
 def getCISearchFiles(CITool):
     files = []
     if CITool in HerramientasCI.CI1.value:
