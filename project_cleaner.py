@@ -10,20 +10,26 @@ config = "process"
 tmpDirectory = ymlp.parseConfigParam(config, "tmpDirectory")
 tmpFile = tmpDirectory + ymlp.parseConfigParam(config, "tmpFile")
 
+#CONFIGURACIÓN DEL BORRADO DE FICHEROS
+deletePickles = True
+deleteResults = True
+deleteTmpFiles = True
+deleteLogs = True
+
 def cleanProject():
     try:
         print("Limpiando proyecto...")
 
         #ELIMINAR CARPETAS Y FICHEROS BASURA
-        if os.path.exists(tmpDirectory):
+        if deleteTmpFiles and os.path.exists(tmpDirectory):
             rmtree("./" + tmpDirectory)
-        if os.path.exists("results"):
+        if deleteResults and os.path.exists("results"):
             rmtree("results")
-        if os.path.exists("logs"):
+        if deleteLogs and os.path.exists("logs"):
             rmtree("logs")
-        if os.path.exists("github_repos.pickle"):
+        if deletePickles and os.path.exists("github_repos.pickle"):
             os.remove("github_repos.pickle")
-        if os.path.exists("gitlab_repos.pickle"):
+        if deletePickles and os.path.exists("gitlab_repos.pickle"):
             os.remove("gitlab_repos.pickle")
 
         #CREAR CARPETAS
