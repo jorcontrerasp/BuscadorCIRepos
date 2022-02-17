@@ -1,6 +1,7 @@
 #AQUÍ se definirán las funciones relacionadas con los datos resultantes.
 
 #Importamos las librerías necesarias.
+import string
 import pandas as pd
 import aux_functions as aux
 import ci_yml_parser as ymlp
@@ -329,6 +330,11 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
 
     for index,row in resultsDF.iterrows():
         language = row["Lenguaje"]
+
+        if not isinstance(language, str):
+            language = "EMPTY"
+            aux.writeInLogFile("EMPTY language in proyect: " + index)
+
         if boGitHub:
             id = language
         else:

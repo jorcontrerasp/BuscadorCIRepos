@@ -234,7 +234,16 @@ def searchInProjectGitLabApi(project, df, df2, df3, df6):
 
 def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
     lFound = []
+    i = 1
     for project in lProjects:
+        
+        if onlyPositives:
+            lFoundLen = len(lFound)
+            if lFoundLen >= N_MAX_PROJECTS:
+                break
+        elif i > N_MAX_PROJECTS:
+            break
+
         if not onlyPositives and not d.existsDFRecord(project.attributes['path_with_namespace'], df):
             df = d.addDFRecord(project, df, False)
 
@@ -258,6 +267,8 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
                      or found8 or found9 or found10 or found11 or found12 or found13
         if found:
             lFound.append(project)
+        
+        i = i + 1
 
     df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, False)
 

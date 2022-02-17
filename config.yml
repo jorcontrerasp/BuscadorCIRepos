@@ -1,9 +1,9 @@
 process:
   execute: True
-  doGithubSearch: True
-  doGitlabSearch: False
+  doGithubSearch: False
+  doGitlabSearch: True
   usePickleFile: True
-  useResultsExcelFile: True
+  useResultsExcelFile: False
   tmpDirectory: tmp
   tmpFile: /ftmp
 github:
