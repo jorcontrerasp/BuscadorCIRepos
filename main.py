@@ -38,7 +38,7 @@ def executeProcess():
 
             fRepos = "github_repos.pickle"
             fResults = "results/github_results.xlsx"
-            fLanguages = "results/github_languajes.xlsx"
+            fLanguages = "results/github_languages.xlsx"
             fStageStatistics = "results/github_stage_statistics.xlsx"
 
             # Generamos un DataFrame donde irán los resultados.
@@ -56,16 +56,8 @@ def executeProcess():
                 githubLanguagesDF = d.makeEmptyLanguageDataFrame()
                 githubStageStatisticsDF = d.makeEmptyStageStatisticsDataFrame()
                 
-            if usePickleFile:
-                aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
-                if os.path.exists(fRepos):
-                    
-                    lFound = aux.loadRepositories(fRepos)
-                else:
-                    raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
-            else:
-                # Obtenemos la lista de repositorios Github.
-                lFound = ghs.getGithubRepos()
+            # Obtenemos la lista de repositorios Github.
+            lFound = ghs.getGithubRepos(usePickleFile)
 
             # Aplicamos el proceso.
             lResult = []

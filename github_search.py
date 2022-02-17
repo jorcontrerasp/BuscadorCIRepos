@@ -11,6 +11,7 @@ import logging
 import calendar
 import time
 import datetime
+import os
 
 # Configuración de la búsqueda GitHub.
 config = "github"
@@ -30,34 +31,38 @@ def authenticate():
 
     return g
 
-def getGithubRepos():
-    g = authenticate()
-
-    q = aux.readFile(queryFile)
-    #query = mq.mGithubQuery.getQueryIni()
-    aux.printLog("Ejecutando query: " + queryFile, logging.INFO)
-    generator = g.search_repositories(query=q)
-
-    # Convertimos el generador en una lista de repositorios.
-    aux.printLog("Generando lista de repositorios GitHub...", logging.INFO)
-    repositories = list(generator)
-
-    # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
+def getGithubRepos(usePickleFile):
     fRepos = "github_repos.pickle"
-    aux.makePickle(fRepos, repositories)
-    repositories = aux.loadRepositories(fRepos)
-
-    # Filtramos por el número de COMMITS.
-    filteredRepos = []
-
-    if filterCommits:
-        for repo in repositories:
-            commits = repo.get_commits().totalCount
-            if commits >= MIN_COMMITS and commits <= MAX_COMMITS:
-                filteredRepos.append(repo)
+    if usePickleFile:
+        aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
+        if os.path.exists(fRepos):
+            
+            filteredRepos = aux.loadRepositories(fRepos)
+        else:
+            raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
     else:
-        for repo in repositories:
-            filteredRepos.append(repo)
+        g = authenticate()
+
+        q = aux.readFile(queryFile)
+        #query = mq.mGithubQuery.getQueryIni()
+        aux.printLog("Ejecutando query: " + queryFile, logging.INFO)
+        generator = g.search_repositories(query=q)
+
+        # Convertimos el generador en una lista de repositorios.
+        aux.printLog("Generando lista de repositorios GitHub...", logging.INFO)
+        repositories = list(generator)
+
+        # Filtramos por el número de COMMITS.
+        filteredRepos = []
+
+        if filterCommits:
+            for repo in repositories:
+                commits = repo.get_commits().totalCount
+                if commits >= MIN_COMMITS and commits <= MAX_COMMITS:
+                    filteredRepos.append(repo)
+        else:
+            for repo in repositories:
+                filteredRepos.append(repo)
 
     # Seleccionamos N repositorios de manera aleatoria:
     lFinal = []
@@ -68,6 +73,10 @@ def getGithubRepos():
                 lFinal.append(item)
     else:
         lFinal = filteredRepos
+
+    # Guardamos la información de los repositorios recuperados en un archivo binario de Python.
+    aux.makePickle(fRepos, lFinal)
+    lFinal = aux.loadRepositories(fRepos)
 
     # Imprimimos la lista de repositorios
     aux.printGitHubRepoList(lFinal)

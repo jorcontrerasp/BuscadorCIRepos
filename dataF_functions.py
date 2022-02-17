@@ -334,7 +334,7 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
         else:
             id = gls.getFirstBackendLanguage(language.split(","))
 
-        if str(id) != "None" and len(id)>0 and id != ' ':
+        if str(id) != "None" and len(str(id))>0 and id != ' ':
             if not existsDFRecord(id, df1):
                 df1 = addStatisticsDFRecord(df1, id)
             
@@ -404,7 +404,7 @@ def updateStaticsDFJobAverage(df):
     return df
 
 def makeEmptyStageStatisticsDataFrame():
-    aux.printLog("Generando DataFrame de estadísticas de 'stages'...", logging.INFO)
+    aux.printLog("Generando DataFrame vacío de estadísticas de 'stages'...", logging.INFO)
     id = "EmptyRecord"
     _columns = getStageStatisticsDFColumns()
     df = pd.DataFrame([],index=[id],columns=_columns)
