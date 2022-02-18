@@ -43,10 +43,7 @@ def authenticate():
 
     return gl
 
-def listProyectsGitLabApi(idAfter):
-    # AUTHENTICATE
-    gl = authenticate()
-
+def listProyectsGitLabApi(gl,idAfter):
     # GET PROJECTS
     projects = gl.projects.list(visibility='public', 
                                         last_activity_after='2016-01-01T00:00:00Z', 
@@ -63,6 +60,10 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
     lFound = []
     lResult = []
     idAfter = 0
+
+    # AUTHENTICATE
+    gl = authenticate()
+
     while i<=N_MAX_SEARCHES:
         try:
 
@@ -70,7 +71,7 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
                 idAfter = idAfter + 20
                 errorAttempts = 0
             
-            projects = listProyectsGitLabApi(idAfter)
+            projects = listProyectsGitLabApi(gl,idAfter)
 
             if len(projects)==0:
                 aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
@@ -148,6 +149,10 @@ def getGitLabProjects():
     i = 1
     lResult = []
     idAfter = 0
+
+    # AUTHENTICATE
+    gl = authenticate()
+
     while i<=N_MAX_SEARCHES:
         try:
 
@@ -155,7 +160,7 @@ def getGitLabProjects():
                 idAfter = idAfter + 20
                 errorAttempts = 0
 
-            projects = listProyectsGitLabApi(idAfter)
+            projects = listProyectsGitLabApi(gl,idAfter)
 
             if len(projects)==0:
                 aux.printLog("No se ha encontrado ningún projecto en la búsqueda " + str(i), logging.WARNING)
