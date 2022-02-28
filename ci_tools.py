@@ -54,8 +54,8 @@ def getCISearchFiles(CITool):
     elif CITool in HerramientasCI.CI6.value:
         files.append("bamboo-specs/bamboo.yml")
         files.append("bamboo-specs/bamboo.yaml")
-    #elif herramientaCI in HerramientasCI.CI7.value:
-        # NO ME QUEDA CLARO QUÉ AÑADIR EN ESTE CASO.
+    elif CITool in HerramientasCI.CI7.value:
+        files.append("tasks")
     elif CITool in HerramientasCI.CI8.value:
         files.append(".gitlab-ci.yml")
     elif CITool in HerramientasCI.CI9.value:

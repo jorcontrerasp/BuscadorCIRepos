@@ -225,7 +225,7 @@ def parseTravisYAML(yamlFile):
             elif topLevel in ['before_install','install','after_install','before_script','script','after_script']:
                 if str(outJob) == 'None':
                     outJob = CIJob()
-                    outJob.setStage("?")
+                    outJob.setStage(topLevel)
                 jobSteps = []
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for tlc in topLevelContent:
