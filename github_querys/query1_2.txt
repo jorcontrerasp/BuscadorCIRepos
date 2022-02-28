@@ -1,0 +1,1 @@
+created:2010-01-01..2016-01-01 pushed:<2018-01-01 stars:>=500 forks:>=250 archived:false is:public
