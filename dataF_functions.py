@@ -168,18 +168,21 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
 
     ciObjType = type(ciObj)
     if isinstance(ciObj, ymlp.CIObj):
-
         lStages = []
         stages = ciObj.getStages()
-        if "?" in str(stages):
+        str_stages = str(stages)
+        if len(stages) == 1 and "?" in stages:
             jobs = ciObj.getJobs()
             for job in jobs:
-                lStages.append(job.getStage())
+                if len(job.getStage())>0:
+                    lStages.append(job.getStage())
         elif isinstance(stages, list):
             for stage in stages:
-                lStages.append(stage)
+                if len(stage)>0:
+                    lStages.append(stage)
         else:
-            lStages.append(stages)
+            if len(stages)>0:
+                lStages.append(stages)
 
         if len(str(df.at[id, "STAGES"]))<=1:
             df.at[id, "STAGES"] = str(lStages)

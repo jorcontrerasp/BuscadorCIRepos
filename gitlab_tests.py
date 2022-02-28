@@ -9,7 +9,7 @@ import dataF_functions as d
 token = aux.readFile("tokens/gitlab_token.txt")
 gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
-project_name_with_namespace = "gitlab-examples/ssh-private-key"
+project_name_with_namespace = "pycqa/flake8-docstrings"
 project = gl.projects.get(project_name_with_namespace)
 
 doTest = True

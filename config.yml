@@ -1,7 +1,7 @@
 process:
   execute: True
-  doGithubSearch: True
-  doGitlabSearch: False
+  doGithubSearch: False
+  doGitlabSearch: True
   usePickleFile: False
   useResultsExcelFile: False
   tmpDirectory: tmp
@@ -24,4 +24,4 @@ gitlab:
   onlyPositives: True
   #Si solo buscamos positivos, N_MAX_PROJECTS será el nº máximo de positivos a encontrar.
   #Si buscamos tanto positivos como negativos, N_MAX_PROJECTS será el número máximo de projectos que tratará (sean o no positivos en CI).
-  N_MAX_PROJECTS: 500
+  N_MAX_PROJECTS: 25

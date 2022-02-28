@@ -137,8 +137,11 @@ def parseGitLabYAML(yamlFile):
                 job = CIJob()
                 job.setStage(stage)
                 jobTasks = []
-                for task in script:
-                    jobTasks.append(task)
+                if isinstance(script, list):
+                    for task in script:
+                        jobTasks.append(task)
+                else:
+                    jobTasks.append(script)
                 job.setTasks(jobTasks)
                 jobs.append(job)
     ciObj = CIObj()
