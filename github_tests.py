@@ -14,8 +14,8 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-ciTool = ci.HerramientasCI.CI4
-repoName = "ardalis/CleanArchitecture"
+ciTool = ci.HerramientasCI.CI2
+repoName = "zhihu/Matisse"
 doTest = True
 doSearchInAllCiTools = False
 
@@ -39,7 +39,7 @@ if doTest:
         foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
     else:
         found,df,df3,df6 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3, df6)
-        d.makeEXCEL(df, "__github_results")
+        d.makeEXCEL(df, "_github_results")
         d.makeEXCEL(df2, "_counting")
         d.makeEXCEL(df3, "_github_languages")
         d.makeEXCEL(df6, "_gitlab_stage_statistics")

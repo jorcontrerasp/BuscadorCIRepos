@@ -12,6 +12,10 @@ class FileObj:
     extension = ""
     content = ""
 
+    def __init__(self) -> None:
+        self.extension = ""
+        self.content = ""
+
     # GETTER & SETTER
     def getExtension(self):
         return self.extension
@@ -28,6 +32,10 @@ class FileObj:
 class CIJob:
     stage = ""
     tasks = [] 
+    
+    def __init__(self) -> None:
+        self.stage = ""
+        self.tasks = []
 
     # GETTER & SETTER
     def getStage(self):
@@ -45,6 +53,10 @@ class CIJob:
 class CIObj:
     stages = []
     jobs = []
+
+    def __init__(self) -> None:
+        self.stages = []
+        self.jobs = []
 
     # GETTER & SETTER
     def getStages(self):
@@ -244,7 +256,7 @@ def parseTravisYAML(yamlFile):
                     jobs.append(job)
 
             elif topLevel in getMainYMLStages():
-                if str(outJob) == 'None':
+                '''if str(outJob) == 'None':
                     outJob = CIJob()
                     outJob.setStage(topLevel)
                 jobSteps = []
@@ -256,10 +268,23 @@ def parseTravisYAML(yamlFile):
                 jobTasks = outJob.getTasks()
                 for step in jobSteps:
                     jobTasks.append(step)
+                outJob.setTasks(jobTasks)'''
+                outJob = CIJob()
+                outJob.setStage(topLevel)
+                jobSteps = []
+                if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
+                    for tlc in topLevelContent:
+                        jobSteps.append(tlc)
+                else:
+                    jobSteps.append(topLevelContent)
+                jobTasks = outJob.getTasks()
+                for step in jobSteps:
+                    jobTasks.append(step)
                 outJob.setTasks(jobTasks)
+                jobs.append(outJob)
 
-        if str(outJob) != 'None':
-            jobs.append(outJob)
+        '''if str(outJob) != 'None':
+            jobs.append(outJob)'''
 
         if len(when)==0:
             when.append("?")
