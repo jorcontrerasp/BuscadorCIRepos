@@ -122,11 +122,7 @@ def getParseObj(repo, path, CITool, boGitHub):
         return ciObj
 
 def parseGitLabYAML(yamlFile):
-    try:
-        dataLoaded = yaml.safe_load(open(yamlFile))
-    except:
-        return None
-
+    dataLoaded = loadData(yamlFile)
     jobs = []
     stages = []
     strdl = str(dataLoaded)
@@ -142,7 +138,8 @@ def parseGitLabYAML(yamlFile):
         
         for topLevel in dataLoaded:
 
-            topLevelContent = dataLoaded[topLevel]
+            #topLevelContent = dataLoaded[topLevel]
+            topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             stage = getValueArrayParam(topLevelContent, 'stage')
             script = getValueArrayParam(topLevelContent, 'script')
 
@@ -195,16 +192,14 @@ def parseGitLabYAML(yamlFile):
     
 def parseGitHubActionsYAML(yamlFile):
     # La etiqueta 'on' la detecta como True ¿?
-    try:
-        dataLoaded = yaml.safe_load(open(yamlFile))
-    except:
-        return None
+    dataLoaded = loadData(yamlFile)
     jobs = []
     when = []
     strdl = str(dataLoaded)
     if not strdl == "None":
         for topLevel in dataLoaded:
-            topLevelContent = dataLoaded[topLevel]
+            #topLevelContent = dataLoaded[topLevel]
+            topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             if topLevel == True: # on
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for w in topLevelContent:
@@ -217,7 +212,8 @@ def parseGitHubActionsYAML(yamlFile):
                     job = CIJob()
                     job.setStage(when)
                     jobSteps = []
-                    jobContent = topLevelContent[j]
+                    #jobContent = topLevelContent[j]
+                    jobContent = getValueArrayParam(topLevelContent, j)
                     steps = getValueArrayParam(jobContent, 'steps')
                     if len(steps)>0:
                         for step in steps:
@@ -231,17 +227,15 @@ def parseGitHubActionsYAML(yamlFile):
     return ciObj
 
 def parseTravisYAML(yamlFile):
-    try:
-        dataLoaded = yaml.safe_load(open(yamlFile))
-    except:
-        return None
+    dataLoaded = loadData(yamlFile)
     jobs = []
     outJob = None
     when = []
     strdl = str(dataLoaded)
     if not strdl == "None":
         for topLevel in dataLoaded:
-            topLevelContent = dataLoaded[topLevel]
+            #topLevelContent = dataLoaded[topLevel]
+            topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             if 'stages' == topLevel:
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for w in topLevelContent:
@@ -270,19 +264,6 @@ def parseTravisYAML(yamlFile):
                     jobs.append(job)
 
             elif topLevel in getMainYMLStages():
-                '''if str(outJob) == 'None':
-                    outJob = CIJob()
-                    outJob.setStage(topLevel)
-                jobSteps = []
-                if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
-                    for tlc in topLevelContent:
-                        jobSteps.append(tlc)
-                else:
-                    jobSteps.append(topLevelContent)
-                jobTasks = outJob.getTasks()
-                for step in jobSteps:
-                    jobTasks.append(step)
-                outJob.setTasks(jobTasks)'''
                 outJob = CIJob()
                 outJob.setStage(topLevel)
                 jobSteps = []
@@ -297,9 +278,6 @@ def parseTravisYAML(yamlFile):
                 outJob.setTasks(jobTasks)
                 jobs.append(outJob)
 
-        '''if str(outJob) != 'None':
-            jobs.append(outJob)'''
-
         if len(when)==0:
             when.append("?")
             
@@ -307,6 +285,13 @@ def parseTravisYAML(yamlFile):
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
     return ciObj
+
+def loadData(ymlFile):
+    try:
+        dataLoaded = yaml.safe_load(open(ymlFile))
+        return dataLoaded
+    except:
+        return None
     
 def getDataYAML(yamlContent):
     # Write YAML file
@@ -373,24 +358,3 @@ def makeYMLTmpFile(repo, path, boGitHub):
 config = "process"
 tmpDirectory = parseConfigParam(config, "tmpDirectory")
 tmpFile = tmpDirectory + parseConfigParam(config, "tmpFile")
-
-doTest = False
-if doTest:
-    print("Iniciando proceso.")
-
-    #f = "yml_example_files/apple_turicreate_gitlab-ci.yml"
-    #obj = parseGitLabYAML(f)
-
-    #f = "yml_example_files/hacker-laws_build-on-pull-request.yaml"
-    #obj = parseGitHubActionsYAML(f)
-
-    #f = "yml_example_files/facebook_prophet_travis-ci.yml"
-    #obj = parseTravisYAML(f)
-
-    f = "yml_example_files/igListKit_travis.yml"
-    obj = parseTravisYAML(f)
-
-    #config = parseConfigParam("process", "execute")
-    #print(config)
-
-    print("Parseo finalizado.")
