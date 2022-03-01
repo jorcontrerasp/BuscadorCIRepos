@@ -9,7 +9,10 @@ import dataF_functions as d
 token = aux.readFile("tokens/gitlab_token.txt")
 gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 
-project_name_with_namespace = "pycqa/flake8-docstrings"
+# gitlab-com/www-gitlab-com
+# gitlab-org/gitlab-foss
+# pycqa/flake8-docstrings
+project_name_with_namespace = "gitlab-org/gitlab-foss"
 project = gl.projects.get(project_name_with_namespace)
 
 doTest = True

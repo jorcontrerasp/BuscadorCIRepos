@@ -141,11 +141,25 @@ def parseGitLabYAML(yamlFile):
             stages.append(stagesContent)
         
         for topLevel in dataLoaded:
+
             topLevelContent = dataLoaded[topLevel]
             stage = getValueArrayParam(topLevelContent, 'stage')
             script = getValueArrayParam(topLevelContent, 'script')
 
-            if topLevel in getMainYMLStages():
+            if topLevel == "workflow":
+                rules = getValueArrayParam(topLevelContent, 'rules')
+                if len(rules)>0:
+                    job = CIJob()
+                    job.setStage(stages)
+                    jobTasks = []
+                    if isinstance(rules, list):
+                        for rule in rules:
+                            jobTasks.append(rule)
+                    else:
+                        jobTasks.append(rules)
+                    job.setTasks(jobTasks)
+                    jobs.append(job)
+            elif topLevel in getMainYMLStages():
                 job = CIJob()
                 job.setStage(topLevel)
                 jobTasks = []
