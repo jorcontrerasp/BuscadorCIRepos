@@ -133,7 +133,25 @@ def parseGitLabYAML(yamlFile):
             stage = getValueArrayParam(topLevelContent, 'stage')
             script = getValueArrayParam(topLevelContent, 'script')
 
-            if len(script)>0:
+            if topLevel in getMainYMLStages():
+                job = CIJob()
+                job.setStage(topLevel)
+                jobTasks = []
+                if len(script)>0:
+                    if isinstance(script, list):
+                        for task in script:
+                            jobTasks.append(task)
+                    else:
+                        jobTasks.append(script)
+                else:
+                    if isinstance(topLevelContent, list):
+                        for task in topLevelContent:
+                            jobTasks.append(task)
+                    else:
+                        jobTasks.append(topLevelContent)
+                job.setTasks(jobTasks)
+                jobs.append(job)
+            elif len(script)>0:
                 job = CIJob()
                 job.setStage(stage)
                 jobTasks = []
@@ -225,7 +243,7 @@ def parseTravisYAML(yamlFile):
                     job.setTasks(jobSteps)
                     jobs.append(job)
 
-            elif topLevel in ['before_install','install','after_install','before_script','script','after_script']:
+            elif topLevel in getMainYMLStages():
                 if str(outJob) == 'None':
                     outJob = CIJob()
                     outJob.setStage(topLevel)
@@ -268,6 +286,16 @@ def getValueArrayParam(level,param):
     except:
         value = ""
     return value
+
+def getMainYMLStages():
+    stages = []
+    stages.append('before_install')
+    stages.append('install')
+    stages.append('after_install')
+    stages.append('before_script')
+    stages.append('script')
+    stages.append('after_script')
+    return stages
 
 def parseConfigParam(l1, l2):
     dataLoaded = yaml.safe_load(open("config.yml"))
