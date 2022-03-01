@@ -17,8 +17,8 @@ import os
 config = "github"
 queryFile = ymlp.parseConfigParam(config, "queryFile")
 filterCommits = ymlp.parseConfigParam(config, "filterCommits")
-MAX_COMMITS = ymlp.parseConfigParam(config, "MAX_COMMITS")
 MIN_COMMITS = ymlp.parseConfigParam(config, "MIN_COMMITS")
+MAX_COMMITS = ymlp.parseConfigParam(config, "MAX_COMMITS")
 randomizeRepos = ymlp.parseConfigParam(config, "randomizeRepos")
 N_RANDOM = ymlp.parseConfigParam(config, "N_RANDOM")
 onlyPositives = ymlp.parseConfigParam(config, "onlyPositives")
