@@ -10,7 +10,6 @@ import ci_tools as ci
 import logging
 import os
 
-
 def getResultDFColumns():
     _columns = []
     _columns.append("URL")
@@ -110,16 +109,8 @@ def makeDataFrame(lRepositories, boGitHub):
 
 def makeEmptyDataFrame():
     aux.printLog("Generando DataFrame vacío...", logging.INFO)
-    #id = "pd_empty_record"
     _columns = getResultDFColumns()
     df = pd.DataFrame([],index=[],columns=_columns)
-    #initDF(df, id, _columns, " ")
-
-    #df.at[id, "N_CI_+"] = 0
-    #df.at[id, "STAGES"] = " "
-    #df.at[id, "NUM_JOBS"] = 0
-    #df.at[id, "TOTAL_TASKS"] = 0
-    #df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
 
     return df
 
@@ -280,10 +271,8 @@ def updateTotalCounterDataFrame(column,df,df2):
 
 def makeEmptyLanguageDataFrame():
     aux.printLog("Generando DataFrame por lenguajes vacío...", logging.INFO)
-    #id = "pd_empty_record"
     _columns = ci.getCIToolsValueList()
     df = pd.DataFrame([],index=[],columns=_columns)
-    #initDF(df, id, _columns, 0)
 
     return df
 
@@ -331,18 +320,15 @@ def updateDataFrameNumPositivesCIs(df):
     return df
 
 def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
-    #id = "pd_empty_record"
     pValue = "***"
 
     aux.printLog("Generando DataFrame de estadísticas por lenguaje...", logging.INFO)
     _columns = getStatisticsDFColumns()
     df1 = pd.DataFrame([],index=[],columns=_columns)
-    #initDF(df1, id, _columns, 0)
 
     aux.printLog("Generando DataFrame de estadísticas por CI...", logging.INFO)
     _columns = getStatisticsDFColumns()
     df2 = pd.DataFrame([],index=[],columns=_columns)
-    #initDF(df2, id, _columns, 0)
     df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI2.value)
     df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI4.value)
     df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI8.value)
@@ -430,10 +416,8 @@ def updateStaticsDFJobAverage(df):
 
 def makeEmptyStageStatisticsDataFrame():
     aux.printLog("Generando DataFrame vacío de estadísticas de 'stages'...", logging.INFO)
-    #id = "pd_empty_record"
     _columns = getStageStatisticsDFColumns()
     df = pd.DataFrame([],index=[],columns=_columns)
-    #initDF(df, id, _columns, 0)
 
     return df
 
