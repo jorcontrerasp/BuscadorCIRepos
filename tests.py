@@ -16,7 +16,7 @@ print(l)
 
 df = d.makeEmptyDataFrame()
 try:
-    if d.existsDFRecord("EmptyRecord",df):
+    if d.existsDFRecord("pd_empty_record",df):
         print("EXISTE")
     else:
         print("NO EXISTE")

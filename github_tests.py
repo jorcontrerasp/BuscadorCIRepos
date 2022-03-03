@@ -15,7 +15,9 @@ token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
 ciTool = ci.HerramientasCI.CI2
-repoName = "zhihu/Matisse"
+# zhihu/Matisse
+# EOSIO/eos
+repoName = "EOSIO/eos"
 doTest = True
 doSearchInAllCiTools = False
 

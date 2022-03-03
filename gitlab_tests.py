@@ -12,7 +12,9 @@ gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 # gitlab-com/www-gitlab-com
 # gitlab-org/gitlab-foss
 # pycqa/flake8-docstrings
-project_name_with_namespace = "gitlab-org/gitlab-foss"
+# gitlab-data/analytics --> ¿emoticonos a los stages?
+# zaaksysteem/zaaksysteem --> Se está haciendo lower() de los STAGES, ¿es lo mismo release que Release, por ejemplo? 
+project_name_with_namespace = "zaaksysteem/zaaksysteem"
 project = gl.projects.get(project_name_with_namespace)
 
 doTest = True
