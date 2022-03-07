@@ -14,10 +14,11 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-ciTool = ci.HerramientasCI.CI2
+ciTool = ci.HerramientasCI.CI4
 # zhihu/Matisse
 # EOSIO/eos
-repoName = "EOSIO/eos"
+# AMAI-GmbH/AI-Expert-Roadmap 
+repoName = "AMAI-GmbH/AI-Expert-Roadmap"
 doTest = True
 doSearchInAllCiTools = False
 

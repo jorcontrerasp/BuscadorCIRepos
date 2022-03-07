@@ -74,7 +74,9 @@ def makeDataFrame(lRepositories, boGitHub):
         url1 = repo1.attributes['web_url']
         language1 = ','.join(gls.getBackendLanguages(repo1.languages()))
 
-    df = pd.DataFrame([],index=[id.lower()],columns=_columns)
+    id = id.lower()
+
+    df = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df, id, _columns, " ")
     df.at[id, "URL"] = url1
     df.at[id, "Lenguaje"] = language1
@@ -94,7 +96,9 @@ def makeDataFrame(lRepositories, boGitHub):
             url = repo.attributes['web_url']
             language = ','.join(gls.getBackendLanguages(repo.languages()))
 
-        df2 = pd.DataFrame([],index=[id.lower()],columns=_columns)
+        id = id.lower()
+
+        df2 = pd.DataFrame([],index=[id],columns=_columns)
         initDF(df2, id, _columns, " ")
         df2.at[id, "URL"] = url
         df2.at[id, "Lenguaje"] = language
@@ -124,8 +128,10 @@ def addDFRecord(repo, df, boGitHub):
         id = repo.attributes['path_with_namespace']
         url = repo.attributes['web_url']
         language = ','.join(gls.getBackendLanguages(repo.languages()))
-        
-    df2 = pd.DataFrame([],index=[id.lower()],columns=_columns)
+
+    id = id.lower()
+
+    df2 = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df2, id, _columns, " ")
     df2.at[id, "URL"] = url
     df2.at[id, "Lenguaje"] = language
@@ -144,6 +150,8 @@ def updateDataFrameCiColumn(repo, literal, CITool, boGitHub, df):
     else:
         id = repo.attributes['path_with_namespace']
 
+    id = id.lower()
+
     df.at[id, CITool.value] = literal
     
     return df
@@ -153,6 +161,8 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
         id = repo.full_name
     else:
         id = repo.attributes['path_with_namespace']
+
+    id = id.lower()
 
     ciObjType = type(ciObj)
     if isinstance(ciObj, ymlp.CIObj):
@@ -345,6 +355,8 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
         else:
             id = gls.getFirstBackendLanguage(language.split(","))
 
+        id = id.lower()
+
         if str(id) != "None" and len(str(id))>0 and id != ' ':
             if not existsDFRecord(id, df1):
                 df1 = addStatisticsDFRecord(df1, id)
@@ -356,15 +368,15 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
         boGitLabCI = row[ci.HerramientasCI.CI8.value] == pValue
         
         if boTravis:
-            id = ci.HerramientasCI.CI2.value
+            id = ci.HerramientasCI.CI2.value.lower()
             df2 = updateDataFrameStatistics(df2, id, row)
         
         if boGitHubActions:
-            id = ci.HerramientasCI.CI4.value
+            id = ci.HerramientasCI.CI4.value.lower()
             df2 = updateDataFrameStatistics(df2, id, row)
         
         if boGitLabCI:
-            id = ci.HerramientasCI.CI8.value
+            id = ci.HerramientasCI.CI8.value.lower()
             df2 = updateDataFrameStatistics(df2, id, row)
     
     # HACER MEDIA.
@@ -375,8 +387,9 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
         
 
 def addStatisticsDFRecord(df, id):
+    id = id.lower()
     _columns = getStatisticsDFColumns()
-    df2 = pd.DataFrame([],index=[id.lower()],columns=_columns)
+    df2 = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df2, id, _columns, 0)
     df = df.append(df2)
 
@@ -422,8 +435,9 @@ def makeEmptyStageStatisticsDataFrame():
     return df
 
 def addStageStatisticsDFRecord(df, id):
+    id = id.lower()
     _columns = getStageStatisticsDFColumns()
-    df2 = pd.DataFrame([],index=[id.lower()],columns=_columns)
+    df2 = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df2, id, _columns, 0)
     df = df.append(df2)
 
