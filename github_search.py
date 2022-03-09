@@ -130,7 +130,7 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
         if found:
             lFound.append(repo)
 
-    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, True)
+    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, True)
 
     # Generamos ficheros EXCEL con los resultados.
     d.makeEXCEL(df, "github_results")

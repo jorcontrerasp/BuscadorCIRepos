@@ -13,7 +13,8 @@ import os
 def getResultDFColumns():
     _columns = []
     _columns.append("URL")
-    _columns.append("Lenguaje")
+    _columns.append("Lenguaje Ppal.")
+    _columns.append("Lenguajes")
     _columns.append("N_CI_+")
     for ciTool in ci.getCIToolsValueList():
         _columns.append(ciTool)
@@ -69,17 +70,20 @@ def makeDataFrame(lRepositories, boGitHub):
         id = repo1.full_name
         url1 = repo1.html_url
         language1 = repo1.language
+        languages1 = " "
     else:
         id = repo1.attributes['path_with_namespace']
         url1 = repo1.attributes['web_url']
-        language1 = ','.join(gls.getBackendLanguages(repo1.languages()))
+        language1 = gls.getFirstBackendLanguage(repo1.languages())
+        languages1 = ','.join(gls.getBackendLanguages(repo1.languages()))
 
     id = id.lower()
 
     df = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df, id, _columns, " ")
     df.at[id, "URL"] = url1
-    df.at[id, "Lenguaje"] = language1
+    df.at[id, "Lenguaje Ppal."] = language1
+    df.at[id, "Lenguajes"] = languages1
     df.at[id, "N_CI_+"] = 0
     df.at[id, "STAGES"] = " "
     df.at[id, "NUM_JOBS"] = 0
@@ -91,17 +95,20 @@ def makeDataFrame(lRepositories, boGitHub):
             id = repo.full_name
             url = repo.html_url
             language = repo.language
+            languages = " "
         else:
             id = repo.attributes['path_with_namespace']
             url = repo.attributes['web_url']
-            language = ','.join(gls.getBackendLanguages(repo.languages()))
+            language = gls.getFirstBackendLanguage(repo.languages())
+            languages = ','.join(gls.getBackendLanguages(repo.languages()))
 
         id = id.lower()
 
         df2 = pd.DataFrame([],index=[id],columns=_columns)
         initDF(df2, id, _columns, " ")
         df2.at[id, "URL"] = url
-        df2.at[id, "Lenguaje"] = language
+        df2.at[id, "Lenguaje Ppal."] = language
+        df2.at[id, "Lenguajes"] = languages
         df2.at[id, "N_CI_+"] = 0
         df2.at[id, "STAGES"] = " "
         df2.at[id, "NUM_JOBS"] = 0
@@ -124,17 +131,20 @@ def addDFRecord(repo, df, boGitHub):
         id = repo.full_name
         url = repo.html_url
         language = repo.language
+        languages = " "
     else:
         id = repo.attributes['path_with_namespace']
         url = repo.attributes['web_url']
-        language = ','.join(gls.getBackendLanguages(repo.languages()))
+        language = gls.getFirstBackendLanguage(repo.languages())
+        languages = ','.join(gls.getBackendLanguages(repo.languages()))
 
     id = id.lower()
 
     df2 = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df2, id, _columns, " ")
     df2.at[id, "URL"] = url
-    df2.at[id, "Lenguaje"] = language
+    df2.at[id, "Lenguaje Ppal."] = language
+    df2.at[id, "Lenguajes"] = languages
     df2.at[id, "N_CI_+"] = 0
     df2.at[id, "STAGES"] = " "
     df2.at[id, "NUM_JOBS"] = 0
@@ -209,7 +219,7 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
     
     return df,df6,lStagesProjectAdded
 
-def doAuxWithResultsDF(df, df2, boGitHub):
+def doAuxWithResultsDF(df, df2, languagesDF, boGitHub):
     counterColumn = ""
     if boGitHub:
         counterColumn = "Encontrados_GitHub"
@@ -217,7 +227,7 @@ def doAuxWithResultsDF(df, df2, boGitHub):
         counterColumn = "Encontrados_GitLab"
     df = updateDataFrameNumPositivesCIs(df)
     df2 = updateTotalCounterDataFrame(counterColumn, df, df2)
-    df4,df5 = makeLanguageAndCIStatisticsDF(df,boGitHub)
+    df4,df5 = makeLanguageAndCIStatisticsDF(df,languagesDF,boGitHub)
 
     return df,df2,df4,df5
 
@@ -329,7 +339,7 @@ def updateDataFrameNumPositivesCIs(df):
 
     return df
 
-def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
+def makeLanguageAndCIStatisticsDF(resultsDF, languagesDF, boGitHub):
     pValue = "***"
 
     aux.printLog("Generando DataFrame de estadísticas por lenguaje...", logging.INFO)
@@ -344,7 +354,7 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
     df2 = addStatisticsDFRecord(df2, ci.HerramientasCI.CI8.value)
 
     for index,row in resultsDF.iterrows():
-        language = row["Lenguaje"]
+        language = row["Lenguaje Ppal."]
 
         if not isinstance(language, str):
             language = "EMPTY"
@@ -355,9 +365,10 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
         else:
             id = gls.getFirstBackendLanguage(language.split(","))
 
-        id = id.lower()
-
         if str(id) != "None" and len(str(id))>0 and id != ' ':
+
+            id = id.lower()
+
             if not existsDFRecord(id, df1):
                 df1 = addStatisticsDFRecord(df1, id)
             
@@ -379,9 +390,39 @@ def makeLanguageAndCIStatisticsDF(resultsDF, boGitHub):
             id = ci.HerramientasCI.CI8.value.lower()
             df2 = updateDataFrameStatistics(df2, id, row)
     
-    # HACER MEDIA.
+    # CALCULAR MEDIA.
     df1 = updateStaticsDFJobAverage(df1)
     df2 = updateStaticsDFJobAverage(df2)
+    
+    # CALCULAR MEDIANA.
+    df1,df2 = updateStaticsDFJobMean(df1,df2,resultsDF,languagesDF)
+
+    return df1,df2
+
+def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
+    for index,row in dfLanguages.iterrows():
+        dfResultsLanguageMask = dfResults["Lenguaje Ppal."] == index
+        dfResultsLanguage = dfResults[dfResultsLanguageMask]
+        median = dfResultsLanguage["NUM_JOBS"].median()
+        df1.at[index.lower(), "Mediana"] = median
+
+    c = 'Travis'
+    dfResultsTravisMask = dfResults[c] == '***'
+    dfResultsTravis = dfResults[dfResultsTravisMask]
+    median = dfResultsTravis["NUM_JOBS"].median()
+    df2.at[c.lower(), "Mediana"] = median
+    
+    c = 'GitHub Actions'
+    dfResultsGitHubActionsMask = dfResults[c] == '***'
+    dfResultsGitHubActions = dfResults[dfResultsGitHubActionsMask]
+    median = dfResultsGitHubActions["NUM_JOBS"].median()
+    df2.at[c.lower(), "Mediana"] = median
+
+    c = 'GitLab CI'
+    dfResultsGitLabMask = dfResults[c] == '***'
+    dfResultsGitLab = dfResults[dfResultsGitLabMask]
+    median = dfResultsGitLab["NUM_JOBS"].median()
+    df2.at[c.lower(), "Mediana"] = median
 
     return df1,df2
         

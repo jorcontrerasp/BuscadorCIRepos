@@ -134,7 +134,7 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
     # Imprimimos la lista de proyectos
     aux.printLog("Nº de proyectos: " + str(len(lFound)), logging.INFO)
 
-    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, False)
+    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, False)
 
     # Generamos un fichero EXCEL con los resultados.
     d.makeEXCEL(df, "gitlab_results")
@@ -275,7 +275,7 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
         
         i = i + 1
 
-    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, False)
+    df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, False)
 
     # Generamos ficheros EXCEL con los resultados.
     d.makeEXCEL(df, "gitlab_results")
