@@ -300,7 +300,7 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
                         df = d.addDFRecord(project, df, False)
                     
                     df = d.updateDataFrameCiColumn(project, "***", CITool, False, df)
-                    df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
+                    df2 = d.add1CounterDFRecord(CITool.value.lower(), "Encontrados_GitLab", df2)
 
                     languages = project.languages()
                     language = getFirstBackendLanguage(languages)
@@ -308,7 +308,7 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
                     if not d.existsDFRecord(language, df3):
                         df3 = d.addLanguageDFRecord(language, df3)
                     
-                    df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+                    df3 = d.add1CounterDFRecord(language.lower(), CITool.value, df3)
 
                     ciObjRes = ymlp.getParseObj(project, path, CITool, False)
                     lStagesProjectAdded = []
@@ -328,7 +328,7 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
                     df = d.addDFRecord(project, df, False)
                 
                 df = d.updateDataFrameCiColumn(project, "***", CITool, False, df)
-                df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitLab", df2)
+                df2 = d.add1CounterDFRecord(CITool.value.lower(), "Encontrados_GitLab", df2)
 
                 languages = project.languages()
                 language = getFirstBackendLanguage(languages)
@@ -336,7 +336,7 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
                 if not d.existsDFRecord(language, df3):
                     df3 = d.addLanguageDFRecord(language, df3)
                 
-                df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+                df3 = d.add1CounterDFRecord(language.lower(), CITool.value, df3)
 
                 ciObjRes = ymlp.getParseObj(project, path, CITool, False)
                 lStagesProjectAdded = []

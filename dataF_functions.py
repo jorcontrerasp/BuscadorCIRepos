@@ -235,8 +235,12 @@ def makeCounterDataFrame():
     aux.printLog("Generando DataFrame contadores...", logging.INFO)
     columna1 = "Encontrados_GitHub"
     columna2 = "Encontrados_GitLab"
-    _index = ci.getCIToolsValueList()
-    _index.append("Totales")
+    _index = []
+    rows = ci.getCIToolsValueList()
+    rows.append("Totales")
+    for row in rows:
+        rLow = row.lower()
+        _index.append(rLow)
     df = pd.DataFrame([],index=_index,columns=[columna1, columna2])
 
     for i in _index:
@@ -248,6 +252,7 @@ def makeCounterDataFrame():
     return df
 
 def add1CounterDFRecord(fila, column, df):
+    fila = fila.lower()
     df.at[fila, column] += 1
     return df
 
@@ -286,7 +291,8 @@ def countRepos1FoundUnless(df):
 
 def updateTotalCounterDataFrame(column,df,df2):
     totales = countRepos1FoundUnless(df)
-    df2.at["Totales", column] = totales
+    row = "Totales".lower()
+    df2.at[row, column] = totales
     return df2
 
 def makeEmptyLanguageDataFrame():
@@ -298,6 +304,7 @@ def makeEmptyLanguageDataFrame():
 
 def addLanguageDFRecord(language, df):
     _columns = ci.getCIToolsValueList()
+    language = language.lower()
     df2 = pd.DataFrame([],index=[language],columns=_columns)
     initDF(df2, language, _columns, 0)
     df = df.append(df2)

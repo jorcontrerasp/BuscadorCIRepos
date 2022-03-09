@@ -154,7 +154,7 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
             df = d.addDFRecord(repo, df, True)
             
         df = d.updateDataFrameCiColumn(repo, "***", CITool, True, df)
-        df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
+        df2 = d.add1CounterDFRecord(CITool.value.lower(), "Encontrados_GitHub", df2)
 
         language = "None"
         if len(repo.language) > 0:
@@ -162,7 +162,7 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
         if not d.existsDFRecord(language, df3):
             df3 = d.addLanguageDFRecord(language, df3)
         
-        df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+        df3 = d.add1CounterDFRecord(language.lower(), CITool.value, df3)
 
         ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
         lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
@@ -201,7 +201,7 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3, df6):
                 df = d.addDFRecord(repo, df, True)
             
             df = d.updateDataFrameCiColumn(repo, "***", CITool, True, df)
-            df2 = d.add1CounterDFRecord(CITool.value, "Encontrados_GitHub", df2)
+            df2 = d.add1CounterDFRecord(CITool.value.lower(), "Encontrados_GitHub", df2)
 
             language = "None"
             if len(str(repo.language)) > 0:
@@ -209,7 +209,7 @@ def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3, df6):
             if not d.existsDFRecord(language, df3):
                 df3 = d.addLanguageDFRecord(language, df3)
             
-            df3 = d.add1CounterDFRecord(language, CITool.value, df3)
+            df3 = d.add1CounterDFRecord(language.lower(), CITool.value, df3)
 
             ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
             lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
