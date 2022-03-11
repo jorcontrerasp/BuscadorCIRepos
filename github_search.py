@@ -12,6 +12,8 @@ import calendar
 import time
 import datetime
 import os
+import requests
+import json
 
 # Configuración de la búsqueda GitHub.
 config = "github"
@@ -262,3 +264,16 @@ def searchInRoot(repo, literal):
             found = True
             break
     return found
+
+def getAllRepoLanguages(languages_url):
+    languages = []
+    try:
+        languages_response = requests.get(languages_url)
+        text = languages_response.text
+        loaded_json = json.loads(text)
+        for l in loaded_json:
+            languages.append(l)
+    except:
+        languages = []
+    
+    return languages

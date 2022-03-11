@@ -6,6 +6,7 @@ import pandas as pd
 import aux_functions as aux
 import ci_yml_parser as ymlp
 import gitlab_search as gls
+import github_search as ghs
 import ci_tools as ci
 import logging
 import os
@@ -70,7 +71,10 @@ def makeDataFrame(lRepositories, boGitHub):
         id = repo1.full_name
         url1 = repo1.html_url
         language1 = repo1.language
-        languages1 = " "
+        languages = " "
+        lLanguages = ghs.getAllRepoLanguages(repo.languages_url)
+        if len(lLanguages)>0:
+            languages = ','.join(lLanguages)
     else:
         id = repo1.attributes['path_with_namespace']
         url1 = repo1.attributes['web_url']
@@ -96,6 +100,9 @@ def makeDataFrame(lRepositories, boGitHub):
             url = repo.html_url
             language = repo.language
             languages = " "
+            lLanguages = ghs.getAllRepoLanguages(repo.languages_url)
+            if len(lLanguages)>0:
+                languages = ','.join(lLanguages)
         else:
             id = repo.attributes['path_with_namespace']
             url = repo.attributes['web_url']
@@ -132,6 +139,9 @@ def addDFRecord(repo, df, boGitHub):
         url = repo.html_url
         language = repo.language
         languages = " "
+        lLanguages = ghs.getAllRepoLanguages(repo.languages_url)
+        if len(lLanguages)>0:
+            languages = ','.join(lLanguages)
     else:
         id = repo.attributes['path_with_namespace']
         url = repo.attributes['web_url']

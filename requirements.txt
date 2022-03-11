@@ -4,3 +4,4 @@ pandas
 openpyxl
 logging
 pyyaml
+requests
