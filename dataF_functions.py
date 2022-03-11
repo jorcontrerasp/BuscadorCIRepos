@@ -82,13 +82,13 @@ def makeDataFrame(lRepositories, boGitHub):
     df = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df, id, _columns, " ")
     df.at[id, "URL"] = url1
-    df.at[id, "Lenguaje Ppal."] = language1
+    df.at[id, "Lenguaje Ppal."] = str(language1).lower()
     df.at[id, "Lenguajes"] = languages1
     df.at[id, "N_CI_+"] = 0
     df.at[id, "STAGES"] = " "
     df.at[id, "NUM_JOBS"] = 0
     df.at[id, "TOTAL_TASKS"] = 0
-    df.at[id, "TASK_AVERAGE_PER_JOB"] = 0
+    df.at[id, "TASK_AVERAGE_PER_JOB"] = round(0,2)
 
     for repo in lRepositories[1:len(lRepositories)]:
         if boGitHub:
@@ -107,13 +107,13 @@ def makeDataFrame(lRepositories, boGitHub):
         df2 = pd.DataFrame([],index=[id],columns=_columns)
         initDF(df2, id, _columns, " ")
         df2.at[id, "URL"] = url
-        df2.at[id, "Lenguaje Ppal."] = language
+        df2.at[id, "Lenguaje Ppal."] = str(language).lower()
         df2.at[id, "Lenguajes"] = languages
         df2.at[id, "N_CI_+"] = 0
         df2.at[id, "STAGES"] = " "
         df2.at[id, "NUM_JOBS"] = 0
         df2.at[id, "TOTAL_TASKS"] = 0
-        df2.at[id, "TASK_AVERAGE_PER_JOB"] = 0
+        df2.at[id, "TASK_AVERAGE_PER_JOB"] = round(0,2)
         df = df.append(df2)
 
     return df
@@ -143,13 +143,13 @@ def addDFRecord(repo, df, boGitHub):
     df2 = pd.DataFrame([],index=[id],columns=_columns)
     initDF(df2, id, _columns, " ")
     df2.at[id, "URL"] = url
-    df2.at[id, "Lenguaje Ppal."] = language
+    df2.at[id, "Lenguaje Ppal."] = str(language).lower()
     df2.at[id, "Lenguajes"] = languages
     df2.at[id, "N_CI_+"] = 0
     df2.at[id, "STAGES"] = " "
     df2.at[id, "NUM_JOBS"] = 0
     df2.at[id, "TOTAL_TASKS"] = 0
-    df2.at[id, "TASK_AVERAGE_PER_JOB"] = 0
+    df2.at[id, "TASK_AVERAGE_PER_JOB"] = round(0,2)
     df = df.append(df2)
 
     return df
@@ -215,7 +215,7 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
         else:
             taskAverage = tasks/jobs
 
-        df.at[id, "TASK_AVERAGE_PER_JOB"] = taskAverage
+        df.at[id, "TASK_AVERAGE_PER_JOB"] = round(taskAverage,2)
     
     return df,df6,lStagesProjectAdded
 
@@ -364,17 +364,16 @@ def makeLanguageAndCIStatisticsDF(resultsDF, languagesDF, boGitHub):
         language = row["Lenguaje Ppal."]
 
         if not isinstance(language, str):
-            language = "EMPTY"
-            aux.writeInLogFile("EMPTY language in proyect: " + index)
+            language = "None"
+            aux.writeInLogFile("makeLanguageAndCIStatisticsDF(resultsDF, languagesDF, boGitHub) - EMPTY language in proyect: " + index)
 
         if boGitHub:
             id = language
         else:
             id = gls.getFirstBackendLanguage(language.split(","))
 
-        if str(id) != "None" and len(str(id))>0 and id != ' ':
-
-            id = id.lower()
+        id = id.lower()
+        if len(str(id))>0 and id != ' ':
 
             if not existsDFRecord(id, df1):
                 df1 = addStatisticsDFRecord(df1, id)
@@ -411,25 +410,25 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
         dfResultsLanguageMask = dfResults["Lenguaje Ppal."] == index
         dfResultsLanguage = dfResults[dfResultsLanguageMask]
         median = dfResultsLanguage["NUM_JOBS"].median()
-        df1.at[index.lower(), "Mediana"] = median
+        df1.at[index.lower(), "Mediana"] = round(median,2)
 
     c = 'Travis'
     dfResultsTravisMask = dfResults[c] == '***'
     dfResultsTravis = dfResults[dfResultsTravisMask]
     median = dfResultsTravis["NUM_JOBS"].median()
-    df2.at[c.lower(), "Mediana"] = median
+    df2.at[c.lower(), "Mediana"] = round(median,2)
     
     c = 'GitHub Actions'
     dfResultsGitHubActionsMask = dfResults[c] == '***'
     dfResultsGitHubActions = dfResults[dfResultsGitHubActionsMask]
     median = dfResultsGitHubActions["NUM_JOBS"].median()
-    df2.at[c.lower(), "Mediana"] = median
+    df2.at[c.lower(), "Mediana"] = round(median,2)
 
     c = 'GitLab CI'
     dfResultsGitLabMask = dfResults[c] == '***'
     dfResultsGitLab = dfResults[dfResultsGitLabMask]
     median = dfResultsGitLab["NUM_JOBS"].median()
-    df2.at[c.lower(), "Mediana"] = median
+    df2.at[c.lower(), "Mediana"] = round(median,2)
 
     return df1,df2
         
@@ -458,8 +457,8 @@ def updateDataFrameStatistics(df, id, row):
     if(nJobs > 0 and nJobs > maxJobs):
         df.at[id, "Max"] = nJobs
 
-    df.at[id, "Media"] = 0
-    df.at[id, "Mediana"] = 0
+    df.at[id, "Media"] = round(0,2)
+    df.at[id, "Mediana"] = round(0,2)
 
     return df
 
@@ -471,7 +470,7 @@ def updateStaticsDFJobAverage(df):
             jobAverage = 0
             if nRepos>0:
                 jobAverage = tJobs/nRepos
-            df.at[index, "Media"] = jobAverage
+            df.at[index, "Media"] = round(jobAverage,2)
     
     return df
 

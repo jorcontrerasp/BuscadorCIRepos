@@ -18,7 +18,8 @@ ciTool = ci.HerramientasCI.CI4
 # zhihu/Matisse
 # EOSIO/eos
 # AMAI-GmbH/AI-Expert-Roadmap 
-repoName = "AMAI-GmbH/AI-Expert-Roadmap"
+# jwasham/coding-interview-university
+repoName = "jwasham/coding-interview-university"
 doTest = True
 doSearchInAllCiTools = False
 
@@ -42,9 +43,14 @@ if doTest:
         foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
     else:
         found,df,df3,df6 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3, df6)
+
+        df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, True)
+
         d.makeEXCEL(df, "_github_results")
         d.makeEXCEL(df2, "_counting")
         d.makeEXCEL(df3, "_github_languages")
+        d.makeEXCEL(df4, "_github_language_statistics")
+        d.makeEXCEL(df5, "_github_ci_statistics")
         d.makeEXCEL(df6, "_gitlab_stage_statistics")
 
 print("Fin de la prueba.")
