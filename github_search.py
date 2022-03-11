@@ -109,19 +109,33 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
         if not onlyPositives and not d.existsDFRecord(repo.full_name, df):
             df = d.addDFRecord(repo, df, True)
 
-        found1,df,df3,df6 = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI1, df, df2, df3, df6)
-        found2,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI2, df, df2, df3, df6)
-        found3,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI3, df, df2, df3, df6)
-        found4,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI4, df, df2, df3, df6)
-        found5,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI5, df, df2, df3, df6)
-        found6,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI6, df, df2, df3, df6)
-        found7,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI7, df, df2, df3, df6)
-        found8,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI8, df, df2, df3, df6)
-        found9,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI9, df, df2, df3, df6)
-        found10,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI10, df, df2, df3, df6)
-        found11,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI11, df, df2, df3, df6)
-        found12,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI12, df, df2, df3, df6)
-        found13,df,df3,df6  = searchLiteralPathFromRoot2(repo, ci.HerramientasCI.CI13, df, df2, df3, df6)
+        #found1,df,df3,df6 = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI1, [], df, df2, df3, df6)
+        #found2,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI2, [], df, df2, df3, df6)
+        #found3,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI3, [], df, df2, df3, df6)
+        #found4,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI4, [], df, df2, df3, df6)
+        #found5,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI5, [], df, df2, df3, df6)
+        #found6,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI6, [], df, df2, df3, df6)
+        #found7,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI7, [], df, df2, df3, df6)
+        #found8,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI8, [], df, df2, df3, df6)
+        #found9,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI9, [], df, df2, df3, df6)
+        #found10,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI10, [], df, df2, df3, df6)
+        #found11,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI11, [], df, df2, df3, df6)
+        #found12,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI12, [], df, df2, df3, df6)
+        #found13,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI13, [], df, df2, df3, df6)
+
+        found1,df,df3,df6 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI1, df, df2, df3, df6)
+        found2,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI2, df, df2, df3, df6)
+        found3,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI3, df, df2, df3, df6)
+        found4,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI4, df, df2, df3, df6)
+        found5,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI5, df, df2, df3, df6)
+        found6,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI6, df, df2, df3, df6)
+        found7,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, df, df2, df3, df6)
+        found8,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI8, df, df2, df3, df6)
+        found9,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI9, df, df2, df3, df6)
+        found10,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI10, df, df2, df3, df6)
+        found11,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI11, df, df2, df3, df6)
+        found12,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI12, df, df2, df3, df6)
+        found13,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI13, df, df2, df3, df6)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -141,7 +155,7 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
 
     return lFound
 
-def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
+def searchLiteralPathFromRoot_REC(repo, CITool, literals, df, df2, df3, df6):
     aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
     try:
         if len(literals)==0:
@@ -157,8 +171,8 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
         df2 = d.add1CounterDFRecord(CITool.value.lower(), "Encontrados_GitHub", df2)
 
         language = "None"
-        if len(repo.language) > 0:
-            language = repo.language
+        if len(str(repo.language)) > 0:
+            language = str(repo.language)
         if not d.existsDFRecord(language, df3):
             df3 = d.addLanguageDFRecord(language, df3)
         
@@ -179,12 +193,12 @@ def searchLiteralPathFromRoot(repo, CITool, literals, df, df2, df3, df6):
         return True,df,df3,df6
     except:
         if len(literals)>0:
-            found,df,df3,df6 = searchLiteralPathFromRoot(repo, CITool, literals, df, df2,df3,df6)
+            found,df,df3,df6 = searchLiteralPathFromRoot_REC(repo, CITool, literals, df, df2,df3,df6)
             return found,df,df3,df6
         else:
             return False,df,df3,df6
 
-def searchLiteralPathFromRoot2(repo, CITool, df, df2, df3, df6):
+def searchLiteralPathFromRoot(repo, CITool, df, df2, df3, df6):
     aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
     literals = ci.getCISearchFiles(CITool.value)
 

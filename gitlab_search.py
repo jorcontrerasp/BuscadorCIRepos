@@ -292,7 +292,8 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
     try:
         paths = ci.getCISearchFiles(CITool.value)
         for path in paths:
-            items = project.repository_tree(all=True, path=path)
+            #items = project.repository_tree(all=True, path=path)
+            items = getRepositoryTree(project,path)
             if len(items) == 0:
                 found = isFile(project,path)
                 if found:
@@ -353,6 +354,15 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6):
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
     return found,df,df3,df6
+
+def getRepositoryTree(project, path):
+    try:
+        items = project.repository_tree(all=True, path=path)
+    except:
+        aux.printLog("Proyecto " + project.attributes['path_with_namespace'] + " vacío.", logging.INFO)
+        items = []
+        
+    return items
 
 def getFrontendLanguages():
     frontLanguages = []

@@ -14,12 +14,13 @@ user = "jorcontrerasp"
 token = aux.readFile("tokens/github_token.txt")
 g = Github(user, token)
 
-ciTool = ci.HerramientasCI.CI4
+ciTool = ci.HerramientasCI.CI2
 # zhihu/Matisse
 # EOSIO/eos
 # AMAI-GmbH/AI-Expert-Roadmap 
 # jwasham/coding-interview-university
-repoName = "jwasham/coding-interview-university"
+# gztchan/awesome-design
+repoName = "gztchan/awesome-design"
 doTest = True
 doSearchInAllCiTools = False
 
@@ -42,8 +43,8 @@ if doTest:
         foundList = []
         foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
     else:
-        found,df,df3,df6 = ghs.searchLiteralPathFromRoot2(repo, ciTool, df, df2, df3, df6)
-
+        found,df,df3,df6 = ghs.searchLiteralPathFromRoot(repo, ciTool, df, df2, df3, df6)
+        #found,df,df3,df6 = ghs.searchLiteralPathFromRoot_REC(repo, ciTool, [], df, df2, df3, df6)
         df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, True)
 
         d.makeEXCEL(df, "_github_results")
