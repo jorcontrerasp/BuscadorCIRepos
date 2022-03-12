@@ -20,9 +20,10 @@ ciTool = ci.HerramientasCI.CI2
 # AMAI-GmbH/AI-Expert-Roadmap 
 # jwasham/coding-interview-university
 # gztchan/awesome-design
-repoName = "gztchan/awesome-design"
+# agalwood/motrix
+repoName = "agalwood/motrix"
 doTest = True
-doSearchInAllCiTools = False
+doSearchInAllCiTools = True
 
 try:
     repo = g.get_repo(repoName)
@@ -42,6 +43,7 @@ if doTest:
     if doSearchInAllCiTools:
         foundList = []
         foundList = ghs.searchReposGitHubApi(filteredRepos, df, df2, df3, df6)
+        d.makeEXCEL(df2, "_counting")
     else:
         found,df,df3,df6 = ghs.searchLiteralPathFromRoot(repo, ciTool, df, df2, df3, df6)
         #found,df,df3,df6 = ghs.searchLiteralPathFromRoot_REC(repo, ciTool, [], df, df2, df3, df6)

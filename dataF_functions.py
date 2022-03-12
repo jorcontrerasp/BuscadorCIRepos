@@ -71,10 +71,10 @@ def makeDataFrame(lRepositories, boGitHub):
         id = repo1.full_name
         url1 = repo1.html_url
         language1 = repo1.language
-        languages = " "
-        lLanguages = ghs.getAllRepoLanguages(repo.languages_url)
-        if len(lLanguages)>0:
-            languages = ','.join(lLanguages)
+        languages1 = " "
+        lLanguages1 = ghs.getAllRepoLanguages(repo1.languages_url)
+        if len(lLanguages1)>0:
+            languages1 = ','.join(lLanguages1)
     else:
         id = repo1.attributes['path_with_namespace']
         url1 = repo1.attributes['web_url']

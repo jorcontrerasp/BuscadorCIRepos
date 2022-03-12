@@ -15,7 +15,8 @@ gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 # gitlab-data/analytics --> ¿emoticonos a los stages?
 # zaaksysteem/zaaksysteem --> Se está haciendo lower() de los STAGES, ¿es lo mismo release que Release, por ejemplo? 
 # Millennium_Dawn/Millennium_Dawn
-project_name_with_namespace = "Millennium_Dawn/Millennium_Dawn"
+# xonotic/xonotic-data.pk3dir
+project_name_with_namespace = "xonotic/xonotic-data.pk3dir"
 project = gl.projects.get(project_name_with_namespace)
 
 doTest = True

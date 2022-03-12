@@ -147,7 +147,7 @@ def parseGitLabYAML(yamlFile):
                 rules = getValueArrayParam(topLevelContent, 'rules')
                 if len(rules)>0:
                     job = CIJob()
-                    job.setStage(stages)
+                    job.setStage(topLevel)
                     jobTasks = []
                     if isinstance(rules, list):
                         for rule in rules:
@@ -264,6 +264,7 @@ def parseTravisYAML(yamlFile):
                     jobs.append(job)
 
             elif topLevel in getMainYMLStages():
+                when.append(topLevel)
                 outJob = CIJob()
                 outJob.setStage(topLevel)
                 jobSteps = []

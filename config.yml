@@ -12,7 +12,7 @@ github:
   MIN_COMMITS: 1000
   MAX_COMMITS: 10000
   randomizeRepos: True
-  N_RANDOM: 100
+  N_RANDOM: 40
   onlyPositives: True
 gitlab:
   #Si buscamos solo positivos, search1By1 será True sí o sí (se controla por programa), da igual lo que venga en el fichero de configuración.
