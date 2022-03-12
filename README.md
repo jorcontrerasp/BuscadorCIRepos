@@ -14,6 +14,13 @@ Install Python libraries
 $ pip install -r requirements.txt
 ```
 
+## Diagramas
+<p>Flujo de ejecución sobre GitHub:</p>
+<img src="imgs/github_diagram.png" alt=“interfaz” width="450"/>
+
+<p>Flujo de ejecución sobre GitLab:</p>
+<img src="imgs/gitlab_diagram.png" alt=“interfaz” width="450"/>
+
 ## Build with 🛠️
 
 * [Visual Studio Code](https://code.visualstudio.com/)
