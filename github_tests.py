@@ -49,11 +49,11 @@ if doTest:
         #found,df,df3,df6 = ghs.searchLiteralPathFromRoot_REC(repo, ciTool, [], df, df2, df3, df6)
         df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, True)
 
-        d.makeEXCEL(df, "_github_results")
-        d.makeEXCEL(df2, "_counting")
-        d.makeEXCEL(df3, "_github_languages")
-        d.makeEXCEL(df4, "_github_language_statistics")
-        d.makeEXCEL(df5, "_github_ci_statistics")
-        d.makeEXCEL(df6, "_gitlab_stage_statistics")
+        d.makeEXCEL(df, "github/_github_results")
+        d.makeEXCEL(df2, "github/_counting")
+        d.makeEXCEL(df3, "github/_github_languages")
+        d.makeEXCEL(df4, "github/_github_language_statistics")
+        d.makeEXCEL(df5, "github/_github_ci_statistics")
+        d.makeEXCEL(df6, "github/_gitlab_stage_statistics")
 
 print("Fin de la prueba.")

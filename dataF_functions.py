@@ -540,16 +540,28 @@ def updateStageStatisticsDF(lStage, df, lStagesProjectAdded):
 def makeEXCEL(df, pFile):
     aux.printLog("Generando fichero Excel...", logging.INFO)
     folder = "results"
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+    makeDirectories(folder,pFile)
     df.to_excel(folder + "/" + pFile + ".xlsx")
 
 def makeCSV(df, pFile):
     aux.printLog("Generando fichero Csv...", logging.INFO)
     folder = "results"
+    makeDirectories(folder,pFile)
+    df.to_csv(folder + "/" + pFile + ".csv")
+
+def makeDirectories(folder, pFile):
     if not os.path.exists(folder):
         os.mkdir(folder)
-    df.to_csv(folder + "/" + pFile + ".csv")
+    fileDirectories = pFile.split("/")
+    i = 0
+    for directory in fileDirectories:
+        if i == len(fileDirectories)-1:
+            break
+        else:
+            folder = folder + "/" + directory
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            i = i+1
 
 def printDF(df):
     print("----------------------------------------------------------------------------------------------------")

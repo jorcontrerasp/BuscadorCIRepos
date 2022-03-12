@@ -37,9 +37,9 @@ def executeProcess():
         if doGithubSearch:
 
             fRepos = "github_repos.pickle"
-            fResults = "results/github_results.xlsx"
-            fLanguages = "results/github_languages.xlsx"
-            fStageStatistics = "results/github_stage_statistics.xlsx"
+            fResults = "results/github/github_results.xlsx"
+            fLanguages = "results/github/github_languages.xlsx"
+            fStageStatistics = "results/github/github_stage_statistics.xlsx"
 
             # Generamos un DataFrame donde irán los resultados.
             if useResultsExcelFile:
@@ -65,9 +65,9 @@ def executeProcess():
 
         if doGitlabSearch:
             fRepos = "gitlab_repos.pickle"
-            fResults = "results/gitlab_results.xlsx"
-            fLanguages = "results/gitlab_languages.xlsx"
-            fStageStatistics = "results/gitlab_stage_statistics.xlsx"
+            fResults = "results/gitlab/gitlab_results.xlsx"
+            fLanguages = "results/gitlab/gitlab_languages.xlsx"
+            fStageStatistics = "results/gitlab/gitlab_stage_statistics.xlsx"
 
             lFound = []
             lResult = []

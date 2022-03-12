@@ -137,11 +137,11 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
     df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, False)
 
     # Generamos un fichero EXCEL con los resultados.
-    d.makeEXCEL(df, "gitlab_results")
-    d.makeEXCEL(df3, "gitlab_languages")
-    d.makeEXCEL(df4, "gitlab_language_statistics")
-    d.makeEXCEL(df5, "gitlab_ci_statistics")
-    d.makeEXCEL(df6, "gitlab_stage_statistics")
+    d.makeEXCEL(df, "gitlab/gitlab_results")
+    d.makeEXCEL(df3, "gitlab/gitlab_languages")
+    d.makeEXCEL(df4, "gitlab/gitlab_language_statistics")
+    d.makeEXCEL(df5, "gitlab/gitlab_ci_statistics")
+    d.makeEXCEL(df6, "gitlab/gitlab_stage_statistics")
     
     return lFound,lResult
 
@@ -278,11 +278,11 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
     df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, False)
 
     # Generamos ficheros EXCEL con los resultados.
-    d.makeEXCEL(df, "gitlab_results")
-    d.makeEXCEL(df3, "gitlab_languages")
-    d.makeEXCEL(df4, "gitlab_language_statistics")
-    d.makeEXCEL(df5, "gitlab_ci_statistics")
-    d.makeEXCEL(df6, "gitlab_stage_statistics")
+    d.makeEXCEL(df, "gitlab/gitlab_results")
+    d.makeEXCEL(df3, "gitlab/gitlab_languages")
+    d.makeEXCEL(df4, "gitlab/gitlab_language_statistics")
+    d.makeEXCEL(df5, "gitlab/gitlab_ci_statistics")
+    d.makeEXCEL(df6, "gitlab/gitlab_stage_statistics")
 
     return lFound
 

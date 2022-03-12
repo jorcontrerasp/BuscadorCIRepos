@@ -38,7 +38,6 @@ def getGithubRepos(usePickleFile):
     if usePickleFile:
         aux.printLog("Utilizando el fichero " + fRepos + " para generar los repositorios GitHub.", logging.INFO)
         if os.path.exists(fRepos):
-            
             filteredRepos = aux.loadRepositories(fRepos)
         else:
             raise Exception("No se ha encontrado el fichero pickle en la raíz del proyecto.")
@@ -149,11 +148,11 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
     df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, True)
 
     # Generamos ficheros EXCEL con los resultados.
-    d.makeEXCEL(df, "github_results")
-    d.makeEXCEL(df3, "github_languages")
-    d.makeEXCEL(df4, "github_language_statistics")
-    d.makeEXCEL(df5, "github_ci_statistics")
-    d.makeEXCEL(df6, "github_stage_statistics")
+    d.makeEXCEL(df, "github/github_results")
+    d.makeEXCEL(df3, "github/github_languages")
+    d.makeEXCEL(df4, "github/github_language_statistics")
+    d.makeEXCEL(df5, "github/github_ci_statistics")
+    d.makeEXCEL(df6, "github/github_stage_statistics")
 
     return lFound
 
