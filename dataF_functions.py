@@ -90,10 +90,7 @@ def makeDataFrame(lRepositories, boGitHub):
         id = repo1.full_name
         url1 = repo1.html_url
         language1 = repo1.language
-        languages1 = " "
-        lLanguages1 = ghs.getAllRepoLanguages(repo1.languages_url)
-        if len(lLanguages1)>0:
-            languages1 = ','.join(lLanguages1)
+        languages1 = repo1.languages_url
     else:
         id = repo1.attributes['path_with_namespace']
         url1 = repo1.attributes['web_url']
@@ -118,10 +115,7 @@ def makeDataFrame(lRepositories, boGitHub):
             id = repo.full_name
             url = repo.html_url
             language = repo.language
-            languages = " "
-            lLanguages = ghs.getAllRepoLanguages(repo.languages_url)
-            if len(lLanguages)>0:
-                languages = ','.join(lLanguages)
+            languages = repo.languages_url
         else:
             id = repo.attributes['path_with_namespace']
             url = repo.attributes['web_url']
@@ -157,10 +151,7 @@ def addDFRecord(repo, df, boGitHub):
         id = repo.full_name
         url = repo.html_url
         language = repo.language
-        languages = " "
-        lLanguages = ghs.getAllRepoLanguages(repo.languages_url)
-        if len(lLanguages)>0:
-            languages = ','.join(lLanguages)
+        languages = repo.languages_url
     else:
         id = repo.attributes['path_with_namespace']
         url = repo.attributes['web_url']

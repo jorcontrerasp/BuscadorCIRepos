@@ -86,22 +86,29 @@ def getGithubRepos(usePickleFile):
     return lFinal
 
 def getContents(repo, path):
-    contents = None
-    g = authenticate()
-    rl = g.get_rate_limit()
-    rl_core = rl.core
-    core_remaining = rl_core.remaining
-    rl_search = rl.search
-    search_remaining = rl_search.remaining
-    if core_remaining <= 0:
-        reset_timestamp = calendar.timegm(rl_core.reset.timetuple())
-        sleep_time = reset_timestamp - calendar.timegm(time.gmtime()) + 5
-        print("API rate limit exceded: " + str(sleep_time) + " sleep_time. Waiting...")
-        time.sleep(sleep_time)
-        g = authenticate()
-        
+    # Aplicamos el control de la API rate.
+    doApiRateLimitControl()
+    # Obtenemos el contenido del repo.
     contents = repo.get_contents(path)
+
     return contents
+
+def doApiRateLimitControl():
+    try:
+        g = authenticate()
+        rl = g.get_rate_limit()
+        rl_core = rl.core
+        core_remaining = rl_core.remaining
+        rl_search = rl.search
+        search_remaining = rl_search.remaining
+        if core_remaining <= 0:
+            reset_timestamp = calendar.timegm(rl_core.reset.timetuple())
+            sleep_time = reset_timestamp - calendar.timegm(time.gmtime()) + 5
+            print("API rate limit exceded: " + str(sleep_time) + " sleep_time. Waiting...")
+            time.sleep(sleep_time)
+            g = authenticate()
+    except:
+        aux.printLog("Error al aplicar el control del API rate limit exceded...", logging.ERROR)
 
 def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
     lFound = []

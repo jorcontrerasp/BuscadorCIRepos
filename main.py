@@ -10,7 +10,6 @@ import pandas as pd
 import os
 import logging
 
-
 # Configuración del proceso de búsqueda.
 config = "process"
 execute = ymlp.parseConfigParam(config, "execute")

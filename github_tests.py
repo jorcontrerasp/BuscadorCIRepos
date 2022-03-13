@@ -21,7 +21,8 @@ ciTool = ci.HerramientasCI.CI2
 # jwasham/coding-interview-university
 # gztchan/awesome-design
 # agalwood/motrix
-repoName = "agalwood/motrix"
+# kr328/clashforandroid
+repoName = "kr328/clashforandroid"
 doTest = True
 doSearchInAllCiTools = True
 
