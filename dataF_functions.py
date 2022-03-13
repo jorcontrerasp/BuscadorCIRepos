@@ -54,7 +54,26 @@ def initDF(df, id, columns, initValue):
     except:
         print("ERROR indexing " + str(id))
 
+def initCIYamlColumns(id, df):
+    id = id.lower()
+    df.at[id, "STAGES"] = " "
+    df.at[id, "NUM_JOBS"] = 0
+    df.at[id, "TOTAL_TASKS"] = 0
+    df.at[id, "TASK_AVERAGE_PER_JOB"] = round(0,2)
+
+    return df
+
 def existsDFRecord(id, df):
+        try:
+            str_id = str(id).lower()
+            for index, row in df.iterrows():
+                if str(index) == str_id:
+                    return True
+            return False
+        except:
+            return False
+
+def existsDFRecord_2(id, df):
         try:
             str_id = str(id)
             df.loc[str_id.lower()]

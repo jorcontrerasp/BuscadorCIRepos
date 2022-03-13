@@ -110,6 +110,9 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
         if not onlyPositives and not d.existsDFRecord(repo.full_name, df):
             df = d.addDFRecord(repo, df, True)
 
+        if d.existsDFRecord(repo.full_name, df):
+            df = d.initCIYamlColumns(repo.full_name, df)
+
         #found1,df,df3,df6 = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI1, [], df, df2, df3, df6)
         #found2,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI2, [], df, df2, df3, df6)
         #found3,df,df3,df6  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI3, [], df, df2, df3, df6)

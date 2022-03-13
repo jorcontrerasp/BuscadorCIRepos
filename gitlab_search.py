@@ -216,6 +216,9 @@ def getGitLabProjects():
 def searchInProjectGitLabApi(project, df, df2, df3, df6):
     if not onlyPositives and not d.existsDFRecord(project.attributes['path_with_namespace'], df):
         df = d.addDFRecord(project, df, False)
+    
+    if d.existsDFRecord(project.attributes['path_with_namespace'], df):
+        df = d.initCIYamlColumns(project.attributes['path_with_namespace'], df)
 
     found1,df,df3,df6 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6)
     found2,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6)
@@ -251,6 +254,9 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
 
         if not onlyPositives and not d.existsDFRecord(project.attributes['path_with_namespace'], df):
             df = d.addDFRecord(project, df, False)
+
+        if d.existsDFRecord(project.attributes['path_with_namespace'], df):
+            df = d.initCIYamlColumns(project.attributes['path_with_namespace'], df)
 
         found1,df,df3,df6 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6)
         found2,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6)
