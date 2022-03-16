@@ -22,7 +22,8 @@ ciTool = ci.HerramientasCI.CI2
 # gztchan/awesome-design
 # agalwood/motrix
 # kr328/clashforandroid
-repoName = "kr328/clashforandroid"
+# salomonelli/best-resume-ever
+repoName = "salomonelli/best-resume-ever"
 doTest = True
 doSearchInAllCiTools = True
 

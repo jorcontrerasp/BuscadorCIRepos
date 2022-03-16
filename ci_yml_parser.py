@@ -37,6 +37,14 @@ class CIJob:
         self.stage = ""
         self.tasks = []
 
+    def CIJobToString(self):
+        job_str = "CIJob:\n" + "\t\t\t- Stage: " + str(self.stage) + "\n\t\t\t- Tasks: "
+        for task in self.tasks:
+            job_str = job_str + "\n\t\t\t\t* " + str(task)
+
+        job_str = job_str + "\n"
+        return str(job_str)
+
     # GETTER & SETTER
     def getStage(self):
         return self.stage
@@ -57,6 +65,14 @@ class CIObj:
     def __init__(self) -> None:
         self.stages = []
         self.jobs = []
+
+    def CIObjToString(self):
+        ci_str = "CIObj:\n" + "\t- Stages: " + str(self.stages) + "\n\t- Jobs: "
+        for job in self.jobs:
+            ci_str = ci_str + "\n\t\t> " + job.CIJobToString()
+
+        ci_str = ci_str + "\n"
+        return str(ci_str)
 
     # GETTER & SETTER
     def getStages(self):
@@ -138,7 +154,6 @@ def parseGitLabYAML(yamlFile):
         
         for topLevel in dataLoaded:
 
-            #topLevelContent = dataLoaded[topLevel]
             topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             stage = getValueArrayParam(topLevelContent, 'stage')
             script = getValueArrayParam(topLevelContent, 'script')
@@ -188,6 +203,7 @@ def parseGitLabYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(stages)
     ciObj.setJobs(jobs)
+    #print(ciObj.CIObjToString())
     return ciObj
     
 def parseGitHubActionsYAML(yamlFile):
@@ -198,7 +214,6 @@ def parseGitHubActionsYAML(yamlFile):
     strdl = str(dataLoaded)
     if not strdl == "None":
         for topLevel in dataLoaded:
-            #topLevelContent = dataLoaded[topLevel]
             topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             if topLevel == True: # on
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
@@ -224,6 +239,7 @@ def parseGitHubActionsYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
+    #print(ciObj.CIObjToString())
     return ciObj
 
 def parseTravisYAML(yamlFile):
@@ -234,20 +250,28 @@ def parseTravisYAML(yamlFile):
     strdl = str(dataLoaded)
     if not strdl == "None":
         for topLevel in dataLoaded:
-            #topLevelContent = dataLoaded[topLevel]
             topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             if 'stages' == topLevel:
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for w in topLevelContent:
-                        when.append(w)
+                        if isinstance(w, list) or isinstance(w, dict):
+                            nameContent = getValueArrayParam(w, "name")
+                            if len(str(nameContent))>0:
+                                when.append(nameContent)
+                            else:
+                                when.append(str(w))
+                        else:
+                            when.append(w)
                 else:
                     when.append(topLevelContent)
 
             if 'jobs' == topLevel:
                 includeContent = getValueArrayParam(topLevelContent, 'include')
                 for j in includeContent:
+                    stage = getValueArrayParam(j, 'stage')
+                    
                     job = CIJob()
-                    job.setStage(when)
+                    job.setStage(stage)
                     jobSteps = []
 
                     install = getValueArrayParam(j, 'install')
@@ -285,6 +309,7 @@ def parseTravisYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
+    #print(ciObj.CIObjToString())
     return ciObj
 
 def loadData(ymlFile):
