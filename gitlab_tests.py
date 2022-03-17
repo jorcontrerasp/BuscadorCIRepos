@@ -17,7 +17,8 @@ gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 # Millennium_Dawn/Millennium_Dawn
 # xonotic/xonotic-data.pk3dir
 # timvisee/ffsend
-project_name_with_namespace = "timvisee/ffsend"
+# mailman/mailman
+project_name_with_namespace = "gitlab-com/www-gitlab-com"
 project = gl.projects.get(project_name_with_namespace)
 
 doTest = True

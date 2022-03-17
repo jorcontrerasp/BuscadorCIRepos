@@ -164,7 +164,7 @@ def parseGitLabYAML(yamlFile):
                     job = CIJob()
                     job.setStage(topLevel)
                     jobTasks = []
-                    if isinstance(rules, list):
+                    if isinstance(rules, list) or isinstance(rules, dict):
                         for rule in rules:
                             jobTasks.append(rule)
                     else:
@@ -176,13 +176,13 @@ def parseGitLabYAML(yamlFile):
                 job.setStage(topLevel)
                 jobTasks = []
                 if len(script)>0:
-                    if isinstance(script, list):
+                    if isinstance(script, list) or isinstance(script, dict):
                         for task in script:
                             jobTasks.append(task)
                     else:
                         jobTasks.append(script)
                 else:
-                    if isinstance(topLevelContent, list):
+                    if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                         for task in topLevelContent:
                             jobTasks.append(task)
                     else:
@@ -191,9 +191,12 @@ def parseGitLabYAML(yamlFile):
                 jobs.append(job)
             elif len(script)>0:
                 job = CIJob()
+                if len(stage)==0:
+                    stage = "NON_STAGE"
+                    
                 job.setStage(stage)
                 jobTasks = []
-                if isinstance(script, list):
+                if isinstance(script, list) or isinstance(script, dict):
                     for task in script:
                         jobTasks.append(task)
                 else:
@@ -203,7 +206,8 @@ def parseGitLabYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(stages)
     ciObj.setJobs(jobs)
-    #print(ciObj.CIObjToString())
+    if boPrintCIObjs:
+        print(ciObj.CIObjToString())
     return ciObj
     
 def parseGitHubActionsYAML(yamlFile):
@@ -225,21 +229,29 @@ def parseGitHubActionsYAML(yamlFile):
             if 'jobs' == topLevel and len(topLevelContent)>0:
                 for j in topLevelContent:
                     job = CIJob()
+                    if len(when)==0:
+                        when = "NON_STAGE"
+
                     job.setStage(when)
                     jobSteps = []
-                    #jobContent = topLevelContent[j]
                     jobContent = getValueArrayParam(topLevelContent, j)
+
                     steps = getValueArrayParam(jobContent, 'steps')
                     if len(steps)>0:
-                        for step in steps:
-                            jobSteps.append(step)
+                        if isinstance(steps, list) or isinstance(steps, dict):
+                            for step in steps:
+                                jobSteps.append(step)
+                        else:
+                            jobSteps.append(steps)
+
                     job.setTasks(jobSteps)
                     jobs.append(job)
                     
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
-    #print(ciObj.CIObjToString())
+    if boPrintCIObjs:
+        print(ciObj.CIObjToString())
     return ciObj
 
 def parseTravisYAML(yamlFile):
@@ -269,6 +281,8 @@ def parseTravisYAML(yamlFile):
                 includeContent = getValueArrayParam(topLevelContent, 'include')
                 for j in includeContent:
                     stage = getValueArrayParam(j, 'stage')
+                    if len(stage)==0:
+                        stage = "NON_STAGE"
                     
                     job = CIJob()
                     job.setStage(stage)
@@ -276,13 +290,19 @@ def parseTravisYAML(yamlFile):
 
                     install = getValueArrayParam(j, 'install')
                     if len(install)>0:
-                        for task in install:
-                            jobSteps.append(task)
+                        if isinstance(install, list) or isinstance(install, dict):
+                            for task in install:
+                                jobSteps.append(task)
+                        else:
+                            jobSteps.append(install)
                     
                     script = getValueArrayParam(j, 'script')
                     if len(script)>0:
-                        for task in script:
-                            jobSteps.append(task)
+                        if isinstance(script, list) or isinstance(script, dict):
+                            for task in script:
+                                jobSteps.append(task)
+                        else:
+                            jobSteps.append(script)
                     
                     job.setTasks(jobSteps)
                     jobs.append(job)
@@ -292,11 +312,13 @@ def parseTravisYAML(yamlFile):
                 outJob = CIJob()
                 outJob.setStage(topLevel)
                 jobSteps = []
+
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for tlc in topLevelContent:
                         jobSteps.append(tlc)
                 else:
                     jobSteps.append(topLevelContent)
+
                 jobTasks = outJob.getTasks()
                 for step in jobSteps:
                     jobTasks.append(step)
@@ -309,7 +331,8 @@ def parseTravisYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
-    #print(ciObj.CIObjToString())
+    if boPrintCIObjs:
+        print(ciObj.CIObjToString())
     return ciObj
 
 def loadData(ymlFile):
@@ -381,6 +404,17 @@ def makeYMLTmpFile(repo, path, boGitHub):
         finally:
             f.close()
 
+def addStringOrList(eToAdd):
+    lReturn = []
+    if isinstance(eToAdd, list) or isinstance(eToAdd, dict):
+        for e in eToAdd:
+            lReturn.append(e)
+    else:
+        lReturn.append(eToAdd)
+    
+    return lReturn
+
+boPrintCIObjs = True
 config = "process"
 tmpDirectory = parseConfigParam(config, "tmpDirectory")
 tmpFile = tmpDirectory + parseConfigParam(config, "tmpFile")

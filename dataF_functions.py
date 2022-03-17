@@ -198,27 +198,37 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
     if isinstance(ciObj, ymlp.CIObj):
         lStages = []
         stages = ciObj.getStages()
-        str_stages = str(stages).lower()
-        if len(stages) == 1 and "?" in stages:
-            jobs = ciObj.getJobs()
-            for job in jobs:
-                stageJob = job.getStage()
-                if len(stageJob)>0:
-                    lStages.append(str(stageJob).lower())
-        elif isinstance(stages, list):
-            for stage in stages:
-                if len(stage)>0:
+        emptyCase = len(stages) == 1 and "?" in stages
+        if not emptyCase:
+            if isinstance(stages, list) or isinstance(stages, dict):
+                for stage in stages:
                     lStages.append(str(stage).lower())
-        else:
-            if len(stages)>0:
+            elif isinstance(stages, str):
                 lStages.append(str(stages).lower())
+        ciJobs = ciObj.getJobs()
+        for job in ciJobs:
+            stagesJob = job.getStage()
+            if isinstance(stagesJob, list) or isinstance(stagesJob, dict):
+                for stageJob in stagesJob:
+                    lStages.append(str(stageJob).lower())
+            elif isinstance(stagesJob, str):
+                lStages.append(str(stagesJob).lower())
 
-        if len(str(df.at[id, "STAGES"]))<=1:
-            df.at[id, "STAGES"] = str(lStages)
-        else:
-            df.at[id, "STAGES"] += "\n" + str(lStages)
+        dfStages = df.at[id, "STAGES"]
+        dfStages = dfStages.replace(" ","")
+        if dfStages != '' and len(dfStages)>0:
+            dfStages = dfStages.replace("[","")
+            dfStages = dfStages.replace("]","")
+            dfStages = dfStages.replace("'","")
+            dfStagesList = dfStages.split(",")
+            for stg in dfStagesList:
+                lStages.append(str(stg).lower())
 
-        df6,lStagesProjectAdded = updateStageStatisticsDF(lStages, df6, lStagesProjectAdded)
+        dataSetStages = list(set(lStages))
+
+        df.at[id, "STAGES"] = str(dataSetStages)
+
+        df6,lStagesProjectAdded = updateStageStatisticsDF(ciObj, df6, lStagesProjectAdded)
 
         df.at[id, "NUM_JOBS"] += len(ciObj.getJobs())
 
@@ -510,7 +520,47 @@ def addStageStatisticsDFRecord(df, id):
 
     return df
 
-def updateStageStatisticsDF(lStage, df, lStagesProjectAdded):
+def updateStageStatisticsDF(ciObj, df, lStagesProjectAdded):
+    lJobs = ciObj.getJobs()
+    dfAux = makeEmptyStageStatisticsDataFrame()
+    for job in lJobs:
+        lStage = job.getStage()
+        if len(lStage)==0:
+            lStage = ciObj.getStages()
+
+        if isinstance(lStage, list) or isinstance(lStage, dict):
+            for stage in lStage:
+                stage = stage.lower()
+                if not existsDFRecord(stage, dfAux):
+                    dfAux = addStageStatisticsDFRecord(dfAux, stage)
+                    dfAux.at[stage, "Num_projects_using"] += 1
+                    dfAux.at[stage, "Total_stages"] += 1
+                else:
+                    dfAux.at[stage, "Total_stages"] += 1
+        elif isinstance(lStage, str):
+            lStage = lStage.lower()
+            if not existsDFRecord(lStage, dfAux):
+                dfAux = addStageStatisticsDFRecord(dfAux, lStage)
+                dfAux.at[lStage, "Num_projects_using"] += 1
+                dfAux.at[lStage, "Total_stages"] += 1
+            else:
+                dfAux.at[lStage, "Total_stages"] += 1
+    
+    for index, row in dfAux.iterrows():
+        if not existsDFRecord(index, df):
+            df = addStageStatisticsDFRecord(df, index)
+            df.at[index, "Num_projects_using"] += 1
+            lStagesProjectAdded.append(index)
+        else:
+            if not (index in lStagesProjectAdded):
+                df.at[index, "Num_projects_using"] += 1
+                lStagesProjectAdded.append(index)
+
+        df.at[index, "Total_stages"] += dfAux.at[index, "Total_stages"]
+    
+    return df,lStagesProjectAdded
+
+def updateStageStatisticsDF2(lStage, df, lStagesProjectAdded):
     if isinstance(lStage, list):
         dfAux = makeEmptyStageStatisticsDataFrame()
         for stage in lStage:
@@ -526,6 +576,7 @@ def updateStageStatisticsDF(lStage, df, lStagesProjectAdded):
             if not existsDFRecord(index, df):
                 df = addStageStatisticsDFRecord(df, index)
                 df.at[index, "Num_projects_using"] += 1
+                lStagesProjectAdded.append(index)
             else:
                 if not (index in lStagesProjectAdded):
                     df.at[index, "Num_projects_using"] += 1

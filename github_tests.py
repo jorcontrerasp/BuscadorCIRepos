@@ -23,7 +23,8 @@ ciTool = ci.HerramientasCI.CI2
 # agalwood/motrix
 # kr328/clashforandroid
 # salomonelli/best-resume-ever
-repoName = "salomonelli/best-resume-ever"
+# facebook/create-react-app
+repoName = "facebook/create-react-app"
 doTest = True
 doSearchInAllCiTools = True
 
