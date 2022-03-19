@@ -36,3 +36,9 @@ print(bbb)
 
 ccc = aaa["aaa aaa"]
 print(ccc)
+
+lista = [1, 2, 3, 4, 5]
+for i in lista:
+    if i == 3:
+        continue
+    print(i)

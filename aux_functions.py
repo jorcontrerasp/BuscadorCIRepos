@@ -81,7 +81,6 @@ def getTimestamp():
 def getFileContent(project, filePath, boGitHub):
     if boGitHub:
         try:
-            #blob = getGitHubBlobContent(project, filePath)
             res = ghs.getContents(project, filePath)
             if isinstance(res, list):
                 fileList = []
@@ -121,8 +120,6 @@ def getGitHubBlobContent(project, path_name):
     try:
         # Obtener referencia del "branch"
         ref = project.get_git_ref(f'heads/{masterB}')
-        if not ref:
-            return searchGitHubBlobContentInBranches(project,path_name)
         # Obtener el árbol
         tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
         # Buscar ruta en el árbol
@@ -140,18 +137,21 @@ def getGitHubBlobContent(project, path_name):
 def searchGitHubBlobContentInBranches(project, path_name):
     branches = project.get_branches()
     for branch in branches:
-        branchName = branch.name
-        # Obtener referencia del "branch"
-        ref = project.get_git_ref(f'heads/{branchName}')
-        # Obtener el árbol
-        tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
-        # Buscar ruta en el árbol
-        sha = [x.sha for x in tree if x.path == path_name]
-        if not sha:
-            # SHA no encontrado
-            return None
-        # SHA encontrado
-        return project.get_git_blob(sha[0])
+        try:
+            branchName = branch.name
+            # Obtener referencia del "branch"
+            ref = project.get_git_ref(f'heads/{branchName}')
+            # Obtener el árbol
+            tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
+            # Buscar ruta en el árbol
+            sha = [x.sha for x in tree if x.path == path_name]
+            if not sha:
+                # SHA no encontrado
+                return None
+            # SHA encontrado
+            return project.get_git_blob(sha[0])
+        except:
+            continue
 
     return None
 
