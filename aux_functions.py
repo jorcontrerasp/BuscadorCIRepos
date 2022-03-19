@@ -78,22 +78,10 @@ def getTimestamp():
     timestamp = str(datetime.datetime.now())[0:19]
     return timestamp
 
-def getBlobContent(project, branch, path_name):
-    # Obtener referencia del "branch"
-    ref = project.get_git_ref(f'heads/{branch}')
-    # Obtener el árbol
-    tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
-    # Buscar ruta en el árbol
-    sha = [x.sha for x in tree if x.path == path_name]
-    if not sha:
-        # SHA no encontrado
-        return None
-    # SHA encontrado
-    return project.get_git_blob(sha[0])
-
 def getFileContent(project, filePath, boGitHub):
     if boGitHub:
         try:
+            #blob = getGitHubBlobContent(project, filePath)
             res = ghs.getContents(project, filePath)
             if isinstance(res, list):
                 fileList = []
@@ -111,35 +99,83 @@ def getFileContent(project, filePath, boGitHub):
             else:
                 return decodeStr(res.decoded_content)
         except GithubException:
-            blob = getBlobContent(project, "master", filePath)
+            blob = getGitHubBlobContent(project, filePath)
             b64 = base64.b64decode(blob.content)
             content = b64.decode("utf8")
             return decodeStr(content)
     else:
         try:
-            res = project.files.get(file_path=filePath, ref='master')
-            b = base64.b64decode(res.content)
-            str_res = b.decode("utf-8")
-            return decodeStr(str_res)
+            #res = project.files.get(file_path=filePath, ref='master')
+            res = gls.getFile(project,filePath,None)
+            if(str(res)!="None"):
+                b = base64.b64decode(res.content)
+                str_res = b.decode("utf-8")
+                return decodeStr(str_res)
+            else:
+                return searchGitLabBlobContent(project,filePath)
         except:
-            try:
-                res = project.repository_tree(filePath)
-                fileList = []
-                for r in res:
-                    rPath = r['path']
-                    rName = r['name']
-                    if gls.isFile(project,rPath):
-                        extension = rPath.split(".")[len(rPath.split("."))-1]
-                        fileObj = ymlp.FileObj()
-                        fileObj.setExtension(extension)
-                        resFile = project.files.get(file_path=rPath, ref='master')
-                        b = base64.b64decode(resFile.content)
-                        str_res = b.decode("utf-8")
-                        fileObj.setContent(decodeStr(str_res))
-                        fileList.append(fileObj)
-                return fileList
-            except:
-                return ""
+            return searchGitLabBlobContent(project,filePath)
+
+def getGitHubBlobContent(project, path_name):
+    masterB = "master"
+    try:
+        # Obtener referencia del "branch"
+        ref = project.get_git_ref(f'heads/{masterB}')
+        if not ref:
+            return searchGitHubBlobContentInBranches(project,path_name)
+        # Obtener el árbol
+        tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
+        # Buscar ruta en el árbol
+        sha = [x.sha for x in tree if x.path == path_name]
+        if not sha:
+            # SHA no encontrado
+            return None
+        # SHA encontrado
+        return project.get_git_blob(sha[0])
+    except:
+        return searchGitHubBlobContentInBranches(project,path_name)
+    
+    return None
+
+def searchGitHubBlobContentInBranches(project, path_name):
+    branches = project.get_branches()
+    for branch in branches:
+        branchName = branch.name
+        # Obtener referencia del "branch"
+        ref = project.get_git_ref(f'heads/{branchName}')
+        # Obtener el árbol
+        tree = project.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
+        # Buscar ruta en el árbol
+        sha = [x.sha for x in tree if x.path == path_name]
+        if not sha:
+            # SHA no encontrado
+            return None
+        # SHA encontrado
+        return project.get_git_blob(sha[0])
+
+    return None
+
+def searchGitLabBlobContent(project, filePath):
+    try:
+        res = project.repository_tree(filePath)
+        fileList = []
+        for r in res:
+            rPath = r['path']
+            rName = r['name']
+            boFile,branch = gls.isFile(project,rPath, False)
+            if boFile:
+                extension = rPath.split(".")[len(rPath.split("."))-1]
+                fileObj = ymlp.FileObj()
+                fileObj.setExtension(extension)
+                #resFile = project.files.get(file_path=rPath, ref='master')
+                resFile = gls.getFile(project,rPath,branch)
+                b = base64.b64decode(resFile.content)
+                str_res = b.decode("utf-8")
+                fileObj.setContent(decodeStr(str_res))
+                fileList.append(fileObj)
+        return fileList
+    except:
+        return ""
 
 def decodeStr(value):
     r = ""
@@ -170,9 +206,16 @@ def getStrToFile(content):
 
     parts = content_aux.split("\n")
 
-    #PARA QUITARLE LA COMILLA DEL FINAL
+    #PARA QUITARLE LA COMILLA/ESPACIO DEL FINAL
     lastE = parts[len(parts)-1]
-    parts[len(parts)-1] = lastE[0:len(lastE)-1]
+    if lastE != "":
+        lastE2 = lastE[len(lastE)-1]
+        if lastE2 == "'":
+            lastEAux = lastE[0:len(lastE)-1]
+            parts[len(parts)-1] = lastEAux
+    else:
+        lastEAux = lastE[0:len(lastE)-1]
+        parts[len(parts)-1] = lastEAux
     #PARA QUITARLE LÍNEAS EN LAS QUE SOLO VENGA UN PUNTO
     r = []
     for part in parts:

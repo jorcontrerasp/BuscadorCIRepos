@@ -122,7 +122,7 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
                     break
         except Exception as e:
             aux.printLog(": Se ha producido un ERROR de búsqueda en la página " + str(i) + ".", logging.ERROR)
-            aux.writeInLogFile("EXCEPT --> página: " + str(i) + "; idAfter: " + str(idAfter) + "; [" + str(e) + "]")
+            aux.writeInLogFile("> [EXCEPT] Página: " + str(i) + "; idAfter: " + str(idAfter) + "; [" + str(e) + "]")
             errorAttempts = errorAttempts + 1
             i = i + 1
     
@@ -198,7 +198,7 @@ def getGitLabProjects():
                     break
         except Exception as e:
             aux.printLog(": Se ha producido un ERROR de búsqueda en la página " + str(i) + ".", logging.ERROR)
-            aux.writeInLogFile("EXCEPT --> página: " + str(i) + "; idAfter: " + str(idAfter) + "; [" + str(e) + "]")
+            aux.writeInLogFile("> [EXCEPT] Página: " + str(i) + "; idAfter: " + str(idAfter) + "; [" + str(e) + "]")
             errorAttempts = errorAttempts + 1
             i = i + 1
 
@@ -220,21 +220,19 @@ def searchInProjectGitLabApi(project, df, df2, df3, df6):
     if d.existsDFRecord(project.attributes['path_with_namespace'], df):
         df = d.initCIYamlColumns(project.attributes['path_with_namespace'], df)
 
-    lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
-
-    found1,df,df3,df6,lStagesProjectAdded = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6, lStagesProjectAdded)
-    found2,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6, lStagesProjectAdded)
-    found3,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3, df6, lStagesProjectAdded)
-    found4,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3, df6, lStagesProjectAdded)
-    found5,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3, df6, lStagesProjectAdded)
-    found6,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3, df6, lStagesProjectAdded)
-    found7,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3, df6, lStagesProjectAdded)
-    found8,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3, df6, lStagesProjectAdded)
-    found9,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3, df6, lStagesProjectAdded)
-    found10,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3, df6, lStagesProjectAdded)
-    found11,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3, df6, lStagesProjectAdded)
-    found12,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6, lStagesProjectAdded)
-    found13,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6, lStagesProjectAdded)
+    found1,df,df3,df6 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6)
+    found2,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6)
+    found3,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3, df6)
+    found4,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3, df6)
+    found5,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3, df6)
+    found6,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3, df6)
+    found7,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3, df6)
+    found8,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3, df6)
+    found9,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3, df6)
+    found10,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3, df6)
+    found11,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3, df6)
+    found12,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
+    found13,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
 
     # Si lo ha encontrado:
     found = found1 or found2 or found3 or found4 or found5 or found6 or found7 \
@@ -260,21 +258,19 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
         if d.existsDFRecord(project.attributes['path_with_namespace'], df):
             df = d.initCIYamlColumns(project.attributes['path_with_namespace'], df)
 
-        lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
-
-        found1,df,df3,df6,lStagesProjectAdded = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6, lStagesProjectAdded)
-        found2,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6, lStagesProjectAdded)
-        found3,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3, df6, lStagesProjectAdded)
-        found4,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3, df6, lStagesProjectAdded)
-        found5,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3, df6, lStagesProjectAdded)
-        found6,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3, df6, lStagesProjectAdded)
-        found7,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3, df6, lStagesProjectAdded)
-        found8,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3, df6, lStagesProjectAdded)
-        found9,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3, df6, lStagesProjectAdded)
-        found10,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3, df6, lStagesProjectAdded)
-        found11,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3, df6, lStagesProjectAdded)
-        found12,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6, lStagesProjectAdded)
-        found13,df,df3,df6,lStagesProjectAdded  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6, lStagesProjectAdded)
+        found1,df,df3,df6 = searchGitLabPath(project, ci.HerramientasCI.CI1, df, df2, df3, df6)
+        found2,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI2, df, df2, df3, df6)
+        found3,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI3, df, df2, df3, df6)
+        found4,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI4, df, df2, df3, df6)
+        found5,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI5, df, df2, df3, df6)
+        found6,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI6, df, df2, df3, df6)
+        found7,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI7, df, df2, df3, df6)
+        found8,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI8, df, df2, df3, df6)
+        found9,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI9, df, df2, df3, df6)
+        found10,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI10, df, df2, df3, df6)
+        found11,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI11, df, df2, df3, df6)
+        found12,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
+        found13,df,df3,df6  = searchGitLabPath(project, ci.HerramientasCI.CI12, df, df2, df3, df6)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -296,16 +292,16 @@ def searchInProjectsGitLabApi(lProjects, df, df2, df3, df6):
 
     return lFound
 
-def searchGitLabPath(project, CITool, df, df2, df3, df6, lStagesProjectAdded):
+def searchGitLabPath(project, CITool, df, df2, df3, df6):
     aux.printLog("Buscando '" + CITool.value + "' en '" + project.attributes['path_with_namespace'] + "'", logging.INFO)
     found = False
     try:
+        lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
         paths = ci.getCISearchFiles(CITool.value)
         for path in paths:
-            #items = project.repository_tree(all=True, path=path)
             items = getRepositoryTree(project,path)
             if len(items) == 0:
-                found = isFile(project,path)
+                found,branch = isFile(project,path, True)
                 if found:
                     if not d.existsDFRecord(project.attributes['path_with_namespace'], df):
                         df = d.addDFRecord(project, df, False)
@@ -361,7 +357,7 @@ def searchGitLabPath(project, CITool, df, df2, df3, df6, lStagesProjectAdded):
     except:
         aux.printLog("Se ha producido un ERROR al buscar la ruta en el proyecto GitLab.", logging.INFO)
 
-    return found,df,df3,df6,lStagesProjectAdded
+    return found,df,df3,df6
 
 def getRepositoryTree(project, path):
     try:
@@ -419,9 +415,40 @@ def isEmptyProject2(project):
     except:
         return True
 
-def isFile(project, fPath):
+def isFile(project, fPath, onlyMaster):
     try:
         f = project.files.get(file_path=fPath, ref='master')
-        return True
+        return True, "master"
     except:
-        return False
+        if not onlyMaster:
+            branches = project.branches.list()
+            for branch in branches:
+                branchName = branch.name
+                try:
+                    f = project.files.get(file_path=fPath, ref=branchName)
+                    return True,branchName
+                except:
+                    #aux.printLog("Ruta " + str(fPath) + " no encontrada en la rama: " + str(branchName), logging.INFO)
+                    f = None
+            return False,""
+        return False,""
+
+def getFile(project, fPath, branch):
+    try:
+        f = None
+        if str(branch)!="None":
+            f = project.files.get(file_path=fPath, ref=branch)
+        else:
+            f = project.files.get(file_path=fPath, ref='master')
+        return f
+    except:
+        branches = project.branches.list()
+        for branch in branches:
+            branchName = branch.name
+            try:
+                f = project.files.get(file_path=fPath, ref=branchName)
+                return f
+            except:
+                #aux.printLog("Ruta " + str(fPath) + " no encontrada en la rama: " + str(branchName), logging.INFO)
+                f = None
+        return None

@@ -24,7 +24,11 @@ ciTool = ci.HerramientasCI.CI2
 # kr328/clashforandroid
 # salomonelli/best-resume-ever
 # facebook/create-react-app
-repoName = "facebook/create-react-app"
+# goldbergyoni/nodebestpractices
+# freecad/freecad
+# vuejs/core
+# artf/grapesjs
+repoName = "vuejs/core"
 doTest = True
 doSearchInAllCiTools = True
 

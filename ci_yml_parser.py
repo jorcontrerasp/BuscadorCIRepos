@@ -59,15 +59,17 @@ class CIJob:
         self.tasks = tasks
 
 class CIObj:
+    ciTool = ""
     stages = []
     jobs = []
 
     def __init__(self) -> None:
+        self.ciTool = ""
         self.stages = []
         self.jobs = []
 
     def CIObjToString(self):
-        ci_str = "CIObj:\n" + "\t- Stages: " + str(self.stages) + "\n\t- Jobs: "
+        ci_str = "CIObj(" + str(self.ciTool) + "):\n" + "\t- Stages: " + str(self.stages) + "\n\t- Jobs: "
         for job in self.jobs:
             ci_str = ci_str + "\n\t\t> " + job.CIJobToString()
 
@@ -75,6 +77,12 @@ class CIObj:
         return str(ci_str)
 
     # GETTER & SETTER
+    def getCiTool(self):
+        return self.ciTool
+
+    def setCiTool(self, ciTool):
+        self.ciTool = ciTool
+
     def getStages(self):
         return self.stages
 
@@ -96,20 +104,29 @@ def getParseObj(repo, path, CITool, boGitHub):
             os.mkdir(tmpDirectory)
 
         doYMLParse = CITool.value == ci.HerramientasCI.CI2.value or CITool.value == ci.HerramientasCI.CI4.value or CITool.value == ci.HerramientasCI.CI8.value
+
+        repoName = ""
+        if boGitHub:
+            repoName = repo.full_name
+        else:
+            repoName = repo.attributes['path_with_namespace']
         
         if doYMLParse:
             makeYMLTmpFile(repo, path, boGitHub)
             if os.path.exists(tmpFile):
                 ciObj = CIObj()
                 if CITool.value == ci.HerramientasCI.CI2.value:
-                    ciObj = parseTravisYAML(tmpFile)
+                    ciObj = parseTravisYAML(tmpFile,repoName)
                     os.remove(tmpFile)
                 elif CITool.value == ci.HerramientasCI.CI4.value:
-                    ciObj = parseGitHubActionsYAML(tmpFile)
+                    ciObj = parseGitHubActionsYAML(tmpFile,repoName)
                     os.remove(tmpFile)
                 elif CITool.value == ci.HerramientasCI.CI8.value:
-                    ciObj = parseGitLabYAML(tmpFile)
+                    ciObj = parseGitLabYAML(tmpFile,repoName)
                     os.remove(tmpFile)
+                ciObj.setCiTool(CITool.value)
+                if boPrintCIObjs:
+                    print(ciObj.CIObjToString())
             else:
                 if os.path.exists(tmpDirectory):
                     ymlFiles = os.listdir(tmpDirectory)
@@ -117,14 +134,17 @@ def getParseObj(repo, path, CITool, boGitHub):
                         ymlF = tmpDirectory + "/" + ymlF
                         ciObj = CIObj()
                         if CITool.value == ci.HerramientasCI.CI2.value:
-                            ciObj = parseTravisYAML(ymlF)
+                            ciObj = parseTravisYAML(ymlF,repoName)
                             os.remove(ymlF)
                         elif CITool.value == ci.HerramientasCI.CI4.value:
-                            ciObj = parseGitHubActionsYAML(ymlF)
+                            ciObj = parseGitHubActionsYAML(ymlF,repoName)
                             os.remove(ymlF)
                         elif CITool.value == ci.HerramientasCI.CI8.value:
-                            ciObj = parseGitLabYAML(ymlF)
+                            ciObj = parseGitLabYAML(ymlF,repoName)
                             os.remove(ymlF)
+                        ciObj.setCiTool(CITool.value)
+                        if boPrintCIObjs:
+                            print(ciObj.CIObjToString())
                         ciObjList.append(ciObj)
 
     except:
@@ -137,8 +157,8 @@ def getParseObj(repo, path, CITool, boGitHub):
     else:
         return ciObj
 
-def parseGitLabYAML(yamlFile):
-    dataLoaded = loadData(yamlFile)
+def parseGitLabYAML(yamlFile, repoName):
+    dataLoaded = loadData(yamlFile,repoName)
     jobs = []
     stages = []
     strdl = str(dataLoaded)
@@ -192,7 +212,7 @@ def parseGitLabYAML(yamlFile):
             elif len(script)>0:
                 job = CIJob()
                 if len(stage)==0:
-                    stage = "NON_STAGE"
+                    stage = "script"
                     
                 job.setStage(stage)
                 jobTasks = []
@@ -206,13 +226,11 @@ def parseGitLabYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(stages)
     ciObj.setJobs(jobs)
-    if boPrintCIObjs:
-        print(ciObj.CIObjToString())
     return ciObj
     
-def parseGitHubActionsYAML(yamlFile):
+def parseGitHubActionsYAML(yamlFile, repoName):
     # La etiqueta 'on' la detecta como True ¿?
-    dataLoaded = loadData(yamlFile)
+    dataLoaded = loadData(yamlFile,repoName)
     jobs = []
     when = []
     strdl = str(dataLoaded)
@@ -230,7 +248,7 @@ def parseGitHubActionsYAML(yamlFile):
                 for j in topLevelContent:
                     job = CIJob()
                     if len(when)==0:
-                        when = "NON_STAGE"
+                        when = "non_stage"
 
                     job.setStage(when)
                     jobSteps = []
@@ -250,12 +268,10 @@ def parseGitHubActionsYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
-    if boPrintCIObjs:
-        print(ciObj.CIObjToString())
     return ciObj
 
-def parseTravisYAML(yamlFile):
-    dataLoaded = loadData(yamlFile)
+def parseTravisYAML(yamlFile, repoName):
+    dataLoaded = loadData(yamlFile,repoName)
     jobs = []
     outJob = None
     when = []
@@ -280,21 +296,26 @@ def parseTravisYAML(yamlFile):
             if 'jobs' == topLevel:
                 includeContent = getValueArrayParam(topLevelContent, 'include')
                 for j in includeContent:
-                    stage = getValueArrayParam(j, 'stage')
-                    if len(stage)==0:
-                        stage = "NON_STAGE"
-                    
-                    job = CIJob()
-                    job.setStage(stage)
                     jobSteps = []
-
+                    jobStages = []
+                    stage = getValueArrayParam(j, 'stage')
                     install = getValueArrayParam(j, 'install')
+                    if len(stage)>0:
+                        if isinstance(stage, list) or isinstance(stage, dict):
+                            for s in stage:
+                                jobStages.append(s)
+                        else:
+                            jobStages.append(stage)
+
                     if len(install)>0:
                         if isinstance(install, list) or isinstance(install, dict):
                             for task in install:
                                 jobSteps.append(task)
                         else:
                             jobSteps.append(install)
+
+                        if len(jobStages)==0:
+                            jobStages.append("install")
                     
                     script = getValueArrayParam(j, 'script')
                     if len(script)>0:
@@ -303,7 +324,12 @@ def parseTravisYAML(yamlFile):
                                 jobSteps.append(task)
                         else:
                             jobSteps.append(script)
-                    
+                        
+                        if len(jobStages)==0:
+                            jobStages.append("script")
+
+                    job = CIJob()
+                    job.setStage(jobStages)
                     job.setTasks(jobSteps)
                     jobs.append(job)
 
@@ -331,15 +357,14 @@ def parseTravisYAML(yamlFile):
     ciObj = CIObj()
     ciObj.setStages(when)
     ciObj.setJobs(jobs)
-    if boPrintCIObjs:
-        print(ciObj.CIObjToString())
     return ciObj
 
-def loadData(ymlFile):
+def loadData(ymlFile, repoName):
     try:
         dataLoaded = yaml.safe_load(open(ymlFile))
         return dataLoaded
-    except:
+    except Exception as e:
+        aux.writeInLogFile("> [EXCEPT] Repositorio '" + repoName + "': el fichero de configuración " + str(ymlFile) + " no se ha podido parsear" + "; [" + str(e) + "]")
         return None
     
 def getDataYAML(yamlContent):

@@ -120,35 +120,33 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
         if d.existsDFRecord(repo.full_name, df):
             df = d.initCIYamlColumns(repo.full_name, df)
 
-        lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
+        #found1,df,df3,df6,lStagesProjectAdded = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI1, [], df, df2, df3, df6, [])
+        #found2,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI2, [], df, df2, df3, df6, [])
+        #found3,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI3, [], df, df2, df3, df6, [])
+        #found4,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI4, [], df, df2, df3, df6, [])
+        #found5,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI5, [], df, df2, df3, df6, [])
+        #found6,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI6, [], df, df2, df3, df6, [])
+        #found7,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI7, [], df, df2, df3, df6, [])
+        #found8,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI8, [], df, df2, df3, df6, [])
+        #found9,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI9, [], df, df2, df3, df6, [])
+        #found10,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI10, [], df, df2, df3, df6, [])
+        #found11,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI11, [], df, df2, df3, df6, [])
+        #found12,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI12, [], df, df2, df3, df6, [])
+        #found13,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI13, [], df, df2, df3, df6, [])
 
-        #found1,df,df3,df6,lStagesProjectAdded = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI1, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found2,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI2, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found3,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI3, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found4,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI4, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found5,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI5, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found6,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI6, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found7,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI7, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found8,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI8, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found9,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI9, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found10,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI10, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found11,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI11, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found12,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI12, [], df, df2, df3, df6, lStagesProjectAdded)
-        #found13,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot_REC(repo, ci.HerramientasCI.CI13, [], df, df2, df3, df6, lStagesProjectAdded)
-
-        found1,df,df3,df6,lStagesProjectAdded = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI1, df, df2, df3, df6, lStagesProjectAdded)
-        found2,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI2, df, df2, df3, df6, lStagesProjectAdded)
-        found3,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI3, df, df2, df3, df6, lStagesProjectAdded)
-        found4,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI4, df, df2, df3, df6, lStagesProjectAdded)
-        found5,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI5, df, df2, df3, df6, lStagesProjectAdded)
-        found6,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI6, df, df2, df3, df6, lStagesProjectAdded)
-        found7,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, df, df2, df3, df6, lStagesProjectAdded)
-        found8,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI8, df, df2, df3, df6, lStagesProjectAdded)
-        found9,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI9, df, df2, df3, df6, lStagesProjectAdded)
-        found10,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI10, df, df2, df3, df6, lStagesProjectAdded)
-        found11,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI11, df, df2, df3, df6, lStagesProjectAdded)
-        found12,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI12, df, df2, df3, df6, lStagesProjectAdded)
-        found13,df,df3,df6,lStagesProjectAdded  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI13, df, df2, df3, df6, lStagesProjectAdded)
+        found1,df,df3,df6 = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI1, df, df2, df3, df6)
+        found2,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI2, df, df2, df3, df6)
+        found3,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI3, df, df2, df3, df6)
+        found4,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI4, df, df2, df3, df6)
+        found5,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI5, df, df2, df3, df6)
+        found6,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI6, df, df2, df3, df6)
+        found7,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, df, df2, df3, df6)
+        found8,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI8, df, df2, df3, df6)
+        found9,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI9, df, df2, df3, df6)
+        found10,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI10, df, df2, df3, df6)
+        found11,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI11, df, df2, df3, df6)
+        found12,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI12, df, df2, df3, df6)
+        found13,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI13, df, df2, df3, df6)
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
@@ -191,6 +189,7 @@ def searchLiteralPathFromRoot_REC(repo, CITool, literals, df, df2, df3, df6, lSt
         
         df3 = d.add1CounterDFRecord(language.lower(), CITool.value, df3)
 
+        # lStagesProjectAdded --> Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
         ciObjRes = ymlp.getParseObj(repo, path, CITool, True)
         if isinstance(ciObjRes, list):
             for ciObj in ciObjRes:
@@ -205,15 +204,15 @@ def searchLiteralPathFromRoot_REC(repo, CITool, literals, df, df2, df3, df6, lSt
         return True,df,df3,df6,lStagesProjectAdded
     except:
         if len(literals)>0:
-            found,df,df3,df6 = searchLiteralPathFromRoot_REC(repo, CITool, literals, df, df2,df3,df6)
+            found,df,df3,df6,lStagesProjectAdded = searchLiteralPathFromRoot_REC(repo, CITool, literals, df, df2,df3,df6,lStagesProjectAdded)
             return found,df,df3,df6,lStagesProjectAdded
         else:
             return False,df,df3,df6,lStagesProjectAdded
 
-def searchLiteralPathFromRoot(repo, CITool, df, df2, df3, df6, lStagesProjectAdded):
+def searchLiteralPathFromRoot(repo, CITool, df, df2, df3, df6):
     aux.printLog("Buscando '" + CITool.value + "' en '" + repo.full_name + "'", logging.INFO)
+    lStagesProjectAdded = [] # Lista de 'stages' a los que se les ha hecho un +1 en proyectos que lo utilizan.
     literals = ci.getCISearchFiles(CITool.value)
-
     for path in literals:
         encontrado = False
         try:
@@ -248,9 +247,9 @@ def searchLiteralPathFromRoot(repo, CITool, df, df2, df3, df6, lStagesProjectAdd
                 if str_ciobj != 'None':
                     df,df6,lStagesProjectAdded = d.updateDataFrameCiObj(repo, ciObjRes, True, df, df6, lStagesProjectAdded)
 
-            return True,df,df3,df6,lStagesProjectAdded
+            return True,df,df3,df6
     
-    return False,df,df3,df6,lStagesProjectAdded
+    return False,df,df3,df6
 
 def searchInRepo(repo, literal):
     found = False

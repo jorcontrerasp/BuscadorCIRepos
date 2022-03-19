@@ -27,3 +27,12 @@ try:
         print("NO EXISTE")
 except:
     print("ERROR")
+
+aaa = dict()
+aaa["aaa aaa"] = "aaa"
+print(aaa)
+bbb = aaa.keys()
+print(bbb)
+
+ccc = aaa["aaa aaa"]
+print(ccc)

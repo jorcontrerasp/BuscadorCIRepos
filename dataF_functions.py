@@ -10,6 +10,7 @@ import github_search as ghs
 import ci_tools as ci
 import logging
 import os
+import json
 
 def getResultDFColumns():
     _columns = []
@@ -214,38 +215,77 @@ def updateDataFrameCiObj(repo, ciObj, boGitHub, df, df6, lStagesProjectAdded):
             elif isinstance(stagesJob, str):
                 lStages.append(str(stagesJob).lower())
 
+        ciStages = ""
         dfStages = df.at[id, "STAGES"]
-        dfStages = dfStages.replace(" ","")
-        if dfStages != '' and len(dfStages)>0:
-            dfStages = dfStages.replace("[","")
-            dfStages = dfStages.replace("]","")
-            dfStages = dfStages.replace("'","")
-            dfStagesList = dfStages.split(",")
+        if dfStages != " ":
+            for stageJson in dfStages:
+                if ciObj.getCiTool().lower() == stageJson:
+                    ciStages = dfStages[stageJson]
+                    ciStages = ciStages.replace(" ","")
+                    break
+        else:
+            dfStages = dict()
+        if ciStages != '' and len(ciStages)>0:
+            ciStages = ciStages.replace("[","")
+            ciStages = ciStages.replace("]","")
+            ciStages = ciStages.replace("'","")
+            dfStagesList = ciStages.split(",")
             for stg in dfStagesList:
                 lStages.append(str(stg).lower())
-
+            
         dataSetStages = list(set(lStages))
 
-        df.at[id, "STAGES"] = str(dataSetStages)
+        key = ciObj.getCiTool().lower()
+
+        dfStages[str(key)] = str(dataSetStages)
+        df.at[id, "STAGES"] = dfStages
 
         df6,lStagesProjectAdded = updateStageStatisticsDF(ciObj, df6, lStagesProjectAdded)
 
-        df.at[id, "NUM_JOBS"] += len(ciObj.getJobs())
+        dfNJobs = df.at[id, "NUM_JOBS"]
+        ciJobs = 0
+        if dfNJobs != 0:
+            for nJobsJson in dfNJobs:
+                if ciObj.getCiTool().lower() == nJobsJson:
+                    ciJobs = int(dfNJobs[nJobsJson])
+                    break
+        else:
+            dfNJobs = dict()
+
+        dfNJobs[str(key)] = ciJobs + len(ciObj.getJobs())
+        df.at[id, "NUM_JOBS"] = dfNJobs
 
         nTasks = 0
         for job in ciObj.getJobs():
             nTasks += len(job.getTasks())
 
-        df.at[id, "TOTAL_TASKS"] += nTasks
+        dfNTasks= df.at[id, "TOTAL_TASKS"]
+        ciTasks= 0
+        if dfNTasks != 0:
+            for nTasksJson in dfNTasks:
+                if ciObj.getCiTool().lower() == nTasksJson:
+                    ciTasks= int(dfNTasks[nTasksJson])
+                    break
+        else:
+            dfNTasks = dict()
 
-        tasks = df.at[id, "TOTAL_TASKS"]
-        jobs = df.at[id, "NUM_JOBS"]
+        vTasks = ciTasks + nTasks
+        dfNTasks[str(key)] = vTasks
+        df.at[id, "TOTAL_TASKS"] = dfNTasks
+
+        tasks = dfNTasks[str(key)]
+        jobs = dfNJobs[str(key)]
         if jobs == 0:
             taskAverage = -1
         else:
             taskAverage = tasks/jobs
 
-        df.at[id, "TASK_AVERAGE_PER_JOB"] = round(taskAverage,2)
+        dfNTasksAVG= df.at[id, "TASK_AVERAGE_PER_JOB"]
+        if dfNTasksAVG == 0:
+            dfNTasksAVG = dict()
+        dfNTasksAVG[str(key)] = round(taskAverage,2)
+        df.at[id, "TASK_AVERAGE_PER_JOB"] = dfNTasksAVG
+            
     
     return df,df6,lStagesProjectAdded
 
@@ -395,7 +435,7 @@ def makeLanguageAndCIStatisticsDF(resultsDF, languagesDF, boGitHub):
 
         if not isinstance(language, str):
             language = "None"
-            aux.writeInLogFile("makeLanguageAndCIStatisticsDF(resultsDF, languagesDF, boGitHub) - EMPTY language in proyect: " + index)
+            aux.writeInLogFile("> makeLanguageAndCIStatisticsDF(resultsDF, languagesDF, boGitHub) - EMPTY language in proyect: " + index)
 
         if boGitHub:
             id = language
@@ -439,25 +479,64 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfLanguages.iterrows():
         dfResultsLanguageMask = dfResults["Lenguaje Ppal."] == index
         dfResultsLanguage = dfResults[dfResultsLanguageMask]
-        median = dfResultsLanguage["NUM_JOBS"].median()
+
+        dfAux = pd.DataFrame([],index=[],columns=["NUM_JOBS"])
+        for index2,row in dfResultsLanguage.iterrows():
+            dictNJobs = dfResultsLanguage.at[index2, "NUM_JOBS"]
+            tJobs = 0
+            if isinstance(dictNJobs,dict):
+                for ciNJobs in dictNJobs:
+                    nJobs = dictNJobs[ciNJobs]
+                    tJobs += int(nJobs)
+            else:
+                tJobs += int(dictNJobs)
+            dfAux2 = pd.DataFrame([],index=[index2],columns=["NUM_JOBS"])
+            dfAux2.at[index2, "NUM_JOBS"] = tJobs
+            dfAux = dfAux.append(dfAux2)
+
+        median = dfAux["NUM_JOBS"].median()
         df1.at[index.lower(), "Mediana"] = round(median,2)
 
     c = 'Travis'
     dfResultsTravisMask = dfResults[c] == '***'
     dfResultsTravis = dfResults[dfResultsTravisMask]
-    median = dfResultsTravis["NUM_JOBS"].median()
+
+    dfAux = pd.DataFrame([],index=[],columns=["NUM_JOBS"])
+    for index,row in dfResultsTravis.iterrows():
+        dictNJobs = dfResultsTravis.at[index, "NUM_JOBS"]
+        dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
+        dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        dfAux = dfAux.append(dfAux2)
+
+    median = dfAux["NUM_JOBS"].median()
     df2.at[c.lower(), "Mediana"] = round(median,2)
     
     c = 'GitHub Actions'
     dfResultsGitHubActionsMask = dfResults[c] == '***'
     dfResultsGitHubActions = dfResults[dfResultsGitHubActionsMask]
-    median = dfResultsGitHubActions["NUM_JOBS"].median()
+
+    dfAux = pd.DataFrame([],index=[],columns=["NUM_JOBS"])
+    for index,row in dfResultsGitHubActions.iterrows():
+        dictNJobs = dfResultsGitHubActions.at[index, "NUM_JOBS"]
+        dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
+        dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        dfAux = dfAux.append(dfAux2)
+
+    median = dfAux["NUM_JOBS"].median()
     df2.at[c.lower(), "Mediana"] = round(median,2)
 
     c = 'GitLab CI'
     dfResultsGitLabMask = dfResults[c] == '***'
     dfResultsGitLab = dfResults[dfResultsGitLabMask]
-    median = dfResultsGitLab["NUM_JOBS"].median()
+
+    dfAux = pd.DataFrame([],index=[],columns=["NUM_JOBS"])
+    for index,row in dfResultsGitLab.iterrows():
+        dictNJobs = dfResultsGitLab.at[index, "NUM_JOBS"]
+        dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
+        dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        dfAux = dfAux.append(dfAux2)
+
+    median = dfAux["NUM_JOBS"].median()
     df2.at[c.lower(), "Mediana"] = round(median,2)
 
     return df1,df2
@@ -473,8 +552,21 @@ def addStatisticsDFRecord(df, id):
     return df
 
 def updateDataFrameStatistics(df, id, row):
+    boIsCiDF = id == ci.HerramientasCI.CI2.value.lower() or id == ci.HerramientasCI.CI4.value.lower() or id == ci.HerramientasCI.CI8.value.lower()
     df.at[id, "Num_repos"] += 1
-    nJobs = row["NUM_JOBS"]
+    nJobs = 0
+    ciDict = row["NUM_JOBS"]
+    if isinstance(ciDict, dict):
+        if boIsCiDF:
+            if id in ciDict.keys():
+                nJobs = ciDict[id]
+        else:
+            for ciD in ciDict:
+                if ciD in ciDict.keys():
+                    nJobs += ciDict[ciD]
+    else:
+        nJobs = int(ciDict)
+    
     df.at[id, "Total_jobs"] += nJobs
 
     minJobs = df.at[id, "Min"]
