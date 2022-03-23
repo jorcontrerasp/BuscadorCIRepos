@@ -53,7 +53,7 @@ if doTest:
         d.makeEXCEL(df2, "_counting")
     else:
         found,df,df3,df6 = ghs.searchLiteralPathFromRoot(repo, ciTool, df, df2, df3, df6)
-        #found,df,df3,df6 = ghs.searchLiteralPathFromRoot_REC(repo, ciTool, [], df, df2, df3, df6)
+        #found,df,df3,df6 = ghs.searchLiteralPathFromRoot_REC(repo, ciTool, [], df, df2, df3, df6, [])
         df,df2,df4,df5 = d.doAuxWithResultsDF(df, df2, df3, True)
 
         d.makeEXCEL(df, "github/_github_results")
