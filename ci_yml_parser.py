@@ -246,11 +246,17 @@ def parseGitHubActionsYAML(yamlFile, repoName):
                     
             if 'jobs' == topLevel and len(topLevelContent)>0:
                 for j in topLevelContent:
-                    job = CIJob()
-                    if len(when)==0:
-                        when = "non_stage"
+                    stg = []
+                    if len(when)<0:
+                        for w in when:
+                            stg.append(w)
 
-                    job.setStage(when)
+                    job = CIJob()
+
+                    '''if len(when)==0:
+                        when.append("non_stage")'''
+
+                    job.setStage(stg)
                     jobSteps = []
                     jobContent = getValueArrayParam(topLevelContent, j)
 
@@ -264,6 +270,13 @@ def parseGitHubActionsYAML(yamlFile, repoName):
 
                     job.setTasks(jobSteps)
                     jobs.append(job)
+
+        if len(when)==0:
+            when.append("?")
+        
+        for job in jobs:
+            if len(job.getStage())==0:
+                job.setStage(when)
                     
     ciObj = CIObj()
     ciObj.setStages(when)

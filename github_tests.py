@@ -28,7 +28,8 @@ ciTool = ci.HerramientasCI.CI2
 # freecad/freecad
 # vuejs/core
 # artf/grapesjs
-repoName = "vuejs/core"
+# cocoapods/cocoapods
+repoName = "cocoapods/cocoapods"
 doTest = True
 doSearchInAllCiTools = True
 
