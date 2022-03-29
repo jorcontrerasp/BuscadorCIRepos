@@ -146,6 +146,7 @@ def doSearch1By1GitLabApi(df, df2, df3, df6):
     return lFound,lResult
 
 def getGitLabProjects():
+    errorAttempts = 0
     i = 1
     lResult = []
     idAfter = 0

@@ -484,9 +484,20 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
         for index2,row in dfResultsLanguage.iterrows():
             dictNJobs = dfResultsLanguage.at[index2, "NUM_JOBS"]
             tJobs = 0
+
+            json_acceptable_string = str(dictNJobs).replace("'", "\"")
+            try:
+                loaded_json = json.loads(json_acceptable_string)
+            except:
+                aux.printLog("No ha sido posible cargar el contenido JSON de " + str(dictNJobs), logging.INFO)
+
             if isinstance(dictNJobs,dict):
                 for ciNJobs in dictNJobs:
                     nJobs = dictNJobs[ciNJobs]
+                    tJobs += int(nJobs)
+            elif isinstance(loaded_json,dict):
+                for ciNJobs in loaded_json:
+                    nJobs = loaded_json[ciNJobs]
                     tJobs += int(nJobs)
             else:
                 tJobs += int(dictNJobs)
@@ -505,11 +516,24 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfResultsTravis.iterrows():
         dictNJobs = dfResultsTravis.at[index, "NUM_JOBS"]
         dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
-        # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
-        if isinstance(dictNJobs, dict) and c.lower() in dictNJobs.keys():
-            dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+
+        json_acceptable_string = str(dictNJobs).replace("'", "\"")
+        try:
+            loaded_json = json.loads(json_acceptable_string)
+        except:
+            aux.printLog("No ha sido posible cargar el contenido JSON de " + str(dictNJobs), logging.INFO)
+        
+        if isinstance(dictNJobs, dict):
+            # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+            if c.lower() in dictNJobs.keys():
+                dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        elif isinstance(loaded_json, dict):
+            # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+            if c.lower() in loaded_json.keys():
+                dfAux2.at[index, "NUM_JOBS"] = loaded_json[c.lower()]
         else:
             dfAux2.at[index, "NUM_JOBS"] = 0
+
         dfAux = dfAux.append(dfAux2)
 
     median = dfAux["NUM_JOBS"].median()
@@ -523,11 +547,24 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfResultsGitHubActions.iterrows():
         dictNJobs = dfResultsGitHubActions.at[index, "NUM_JOBS"]
         dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
-        # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
-        if isinstance(dictNJobs, dict) and c.lower() in dictNJobs.keys():
-            dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+
+        json_acceptable_string = str(dictNJobs).replace("'", "\"")
+        try:
+            loaded_json = json.loads(json_acceptable_string)
+        except:
+            aux.printLog("No ha sido posible cargar el contenido JSON de " + str(dictNJobs), logging.INFO)
+        
+        if isinstance(dictNJobs, dict):
+            # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+            if c.lower() in dictNJobs.keys():
+                dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        elif isinstance(loaded_json, dict):
+            # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+            if c.lower() in loaded_json.keys():
+                dfAux2.at[index, "NUM_JOBS"] = loaded_json[c.lower()]
         else:
             dfAux2.at[index, "NUM_JOBS"] = 0
+
         dfAux = dfAux.append(dfAux2)
 
     median = dfAux["NUM_JOBS"].median()
@@ -541,11 +578,24 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfResultsGitLab.iterrows():
         dictNJobs = dfResultsGitLab.at[index, "NUM_JOBS"]
         dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
-        # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
-        if isinstance(dictNJobs, dict) and c.lower() in dictNJobs.keys():
-            dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+
+        json_acceptable_string = str(dictNJobs).replace("'", "\"")
+        try:
+            loaded_json = json.loads(json_acceptable_string)
+        except:
+            aux.printLog("No ha sido posible cargar el contenido JSON de " + str(dictNJobs), logging.INFO)
+        
+        if isinstance(dictNJobs, dict):
+            # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+            if c.lower() in dictNJobs.keys():
+                dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        elif isinstance(loaded_json, dict):
+            # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+            if c.lower() in loaded_json.keys():
+                dfAux2.at[index, "NUM_JOBS"] = loaded_json[c.lower()]
         else:
             dfAux2.at[index, "NUM_JOBS"] = 0
+
         dfAux = dfAux.append(dfAux2)
 
     median = dfAux["NUM_JOBS"].median()
@@ -568,6 +618,11 @@ def updateDataFrameStatistics(df, id, row):
     df.at[id, "Num_repos"] += 1
     nJobs = 0
     ciDict = row["NUM_JOBS"]
+    json_acceptable_string = str(ciDict).replace("'", "\"")
+    try:
+        loaded_json = json.loads(json_acceptable_string)
+    except:
+        aux.printLog("No ha sido posible cargar el contenido JSON de " + str(ciDict), logging.INFO)
     if isinstance(ciDict, dict):
         if boIsCiDF:
             if id in ciDict.keys():
@@ -576,6 +631,14 @@ def updateDataFrameStatistics(df, id, row):
             for ciD in ciDict:
                 if ciD in ciDict.keys():
                     nJobs += ciDict[ciD]
+    elif isinstance(loaded_json, dict):
+        if boIsCiDF:
+            if id in loaded_json.keys():
+                nJobs = loaded_json[id]
+        else:
+            for ciD in loaded_json:
+                if ciD in loaded_json.keys():
+                    nJobs += loaded_json[ciD]
     else:
         nJobs = int(ciDict)
     
