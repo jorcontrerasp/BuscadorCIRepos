@@ -29,7 +29,9 @@ ciTool = ci.HerramientasCI.CI2
 # vuejs/core
 # artf/grapesjs
 # cocoapods/cocoapods
-repoName = "cocoapods/cocoapods"
+# google/gvisor
+# adguardteam/adguardhome
+repoName = "google/gvisor"
 doTest = True
 doSearchInAllCiTools = True
 

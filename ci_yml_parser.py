@@ -237,7 +237,7 @@ def parseGitHubActionsYAML(yamlFile, repoName):
     if not strdl == "None":
         for topLevel in dataLoaded:
             topLevelContent = getValueArrayParam(dataLoaded, topLevel)
-            if topLevel == True: # on
+            if topLevel == "on" or topLevel == True: # on
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for w in topLevelContent:
                         when.append(w)
