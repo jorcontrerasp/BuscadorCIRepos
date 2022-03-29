@@ -505,7 +505,11 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfResultsTravis.iterrows():
         dictNJobs = dfResultsTravis.at[index, "NUM_JOBS"]
         dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
-        dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+        if isinstance(dictNJobs, dict) and c.lower() in dictNJobs.keys():
+            dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        else:
+            dfAux2.at[index, "NUM_JOBS"] = 0
         dfAux = dfAux.append(dfAux2)
 
     median = dfAux["NUM_JOBS"].median()
@@ -519,7 +523,11 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfResultsGitHubActions.iterrows():
         dictNJobs = dfResultsGitHubActions.at[index, "NUM_JOBS"]
         dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
-        dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+        if isinstance(dictNJobs, dict) and c.lower() in dictNJobs.keys():
+            dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        else:
+            dfAux2.at[index, "NUM_JOBS"] = 0
         dfAux = dfAux.append(dfAux2)
 
     median = dfAux["NUM_JOBS"].median()
@@ -533,7 +541,11 @@ def updateStaticsDFJobMean(df1,df2,dfResults,dfLanguages):
     for index,row in dfResultsGitLab.iterrows():
         dictNJobs = dfResultsGitLab.at[index, "NUM_JOBS"]
         dfAux2 = pd.DataFrame([],index=[index],columns=["NUM_JOBS"])
-        dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        # Esta validación en realidad es innecesaria, siempre va a venir c.lower() en el Dict. Se añade por seguridad.
+        if isinstance(dictNJobs, dict) and c.lower() in dictNJobs.keys():
+            dfAux2.at[index, "NUM_JOBS"] = dictNJobs[c.lower()]
+        else:
+            dfAux2.at[index, "NUM_JOBS"] = 0
         dfAux = dfAux.append(dfAux2)
 
     median = dfAux["NUM_JOBS"].median()
