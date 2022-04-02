@@ -8,6 +8,9 @@ import yaml
 import io
 import os
 
+# Puede darse el caso de que el "parseador" encuentre trabajos sin tarea (que no tenga etiquetas de script, install, etc.)
+# Puede darse el caso de que el "parseador" encuentre trabajos sin stage definido con claridad (etiqueta on, stage/stages, etc.)
+
 class FileObj:
     extension = ""
     content = ""
@@ -193,8 +196,10 @@ def parseGitLabYAML(yamlFile, repoName):
                     jobs.append(job)
             elif topLevel in getMainYMLStages():
                 job = CIJob()
-                job.setStage(topLevel)
                 jobTasks = []
+                jobStages = []
+                jobStages.append(topLevel)
+                job.setStage(jobStages)
                 if len(script)>0:
                     if isinstance(script, list) or isinstance(script, dict):
                         for task in script:
@@ -211,10 +216,14 @@ def parseGitLabYAML(yamlFile, repoName):
                 jobs.append(job)
             elif len(script)>0:
                 job = CIJob()
+                jobStages = []
                 if len(stage)==0:
-                    stage = "script"
+                    '''jobStages.append(topLevel)'''
+                    jobStages.append("script")
+                else:
+                    jobStages.append(stage)
                     
-                job.setStage(stage)
+                job.setStage(jobStages)
                 jobTasks = []
                 if isinstance(script, list) or isinstance(script, dict):
                     for task in script:
@@ -252,10 +261,6 @@ def parseGitHubActionsYAML(yamlFile, repoName):
                             stg.append(w)
 
                     job = CIJob()
-
-                    '''if len(when)==0:
-                        when.append("non_stage")'''
-
                     job.setStage(stg)
                     jobSteps = []
                     jobContent = getValueArrayParam(topLevelContent, j)
@@ -285,9 +290,9 @@ def parseGitHubActionsYAML(yamlFile, repoName):
 
 def parseTravisYAML(yamlFile, repoName):
     dataLoaded = loadData(yamlFile,repoName)
+    when = []
     jobs = []
     outJob = None
-    when = []
     strdl = str(dataLoaded)
     if not strdl == "None":
         for topLevel in dataLoaded:
@@ -311,8 +316,8 @@ def parseTravisYAML(yamlFile, repoName):
                 for j in includeContent:
                     jobSteps = []
                     jobStages = []
+
                     stage = getValueArrayParam(j, 'stage')
-                    install = getValueArrayParam(j, 'install')
                     if len(stage)>0:
                         if isinstance(stage, list) or isinstance(stage, dict):
                             for s in stage:
@@ -320,6 +325,7 @@ def parseTravisYAML(yamlFile, repoName):
                         else:
                             jobStages.append(stage)
 
+                    install = getValueArrayParam(j, 'install')
                     if len(install)>0:
                         if isinstance(install, list) or isinstance(install, dict):
                             for task in install:
@@ -341,6 +347,17 @@ def parseTravisYAML(yamlFile, repoName):
                         if len(jobStages)==0:
                             jobStages.append("script")
 
+                    '''env = getValueArrayParam(j, 'env')
+                    if len(env)>0:
+                        if isinstance(env, list) or isinstance(env, dict):
+                            for task in env:
+                                jobSteps.append(task)
+                        else:
+                            jobSteps.append(env)
+                        
+                        if len(jobStages)==0:
+                            jobStages.append("env")'''
+
                     job = CIJob()
                     job.setStage(jobStages)
                     job.setTasks(jobSteps)
@@ -348,9 +365,11 @@ def parseTravisYAML(yamlFile, repoName):
 
             elif topLevel in getMainYMLStages():
                 when.append(topLevel)
-                outJob = CIJob()
-                outJob.setStage(topLevel)
                 jobSteps = []
+                jobStages = []
+                jobStages.append(topLevel)
+                outJob = CIJob()
+                outJob.setStage(jobStages)
 
                 if isinstance(topLevelContent, list) or isinstance(topLevelContent, dict):
                     for tlc in topLevelContent:

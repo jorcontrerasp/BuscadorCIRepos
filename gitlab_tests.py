@@ -18,10 +18,13 @@ gl = gitlab.Gitlab('http://gitlab.com', private_token=token)
 # xonotic/xonotic-data.pk3dir
 # timvisee/ffsend
 # mailman/mailman
-# leapsight/bondy --> El fichero de configuración del GitHub Actions está mal: 
-#                     'while parsing a block collection expected <block end>, but found '<block sequence start>' in "tmp/ftmp_0.yaml", line 48, column 8'
 # gilrs-project/gilrs
-project_name_with_namespace = "gilrs-project/gilrs"
+# leapsight/bondy --> Sobre este repositorio GitLab:
+#   - Encuentra con *** un GitHub Actions, sin embargo a la hora de parsear el fichero yml falla porque está mal hecho (no está bien tabulado el fichero). 
+#     La librería PyYaml no lo consigue tratar.
+#     'while parsing a block collection expected <block end>, but found '<block sequence start>' in "tmp/ftmp_0.yaml", line 48, column 8' *Esto queda registrado en el fichero de LOG*
+#   - Encuentra un GitLab CI y lo trata bien (OK).
+project_name_with_namespace = "leapsight/bondy"
 project = gl.projects.get(project_name_with_namespace)
 
 doTest = True

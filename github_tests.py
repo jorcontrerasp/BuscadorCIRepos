@@ -31,7 +31,10 @@ ciTool = ci.HerramientasCI.CI2
 # cocoapods/cocoapods
 # google/gvisor
 # adguardteam/adguardhome
-repoName = "google/gvisor"
+# playframework/playframework
+# hackiftekhar/IQKeyboardManager  -> ¿etiqueta matrix?
+# neovim/neovim  -> en los jobs, ¿recojo la etiqueta 'env' como steps?
+repoName = "neovim/neovim"
 doTest = True
 doSearchInAllCiTools = True
 
