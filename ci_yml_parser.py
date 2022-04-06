@@ -347,6 +347,8 @@ def parseTravisYAML(yamlFile, repoName):
                         if len(jobStages)==0:
                             jobStages.append("script")
 
+                    # Esto no son instrucciones como tal, tiene pinta de que es configuración del entorno. 
+                    # No se añade como como job ni steps.
                     '''env = getValueArrayParam(j, 'env')
                     if len(env)>0:
                         if isinstance(env, list) or isinstance(env, dict):
