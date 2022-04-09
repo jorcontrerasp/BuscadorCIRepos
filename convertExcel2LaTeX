@@ -1,0 +1,57 @@
+import pandas as pd
+import os
+
+directory = "final_results"
+nExecution = "1"
+excelFilePath = directory + "/" + nExecution + "/counting.xlsx"
+doConvert2LaTeX = True
+
+def convertExcel2LaTeX():
+    if os.path.exists(excelFilePath):
+        dataFrame = pd.read_excel(excelFilePath, index_col=0)
+        texContent = dataFrame.to_latex(index=False)
+        print(texContent)
+
+        aaa = excelFilePath.split("/")
+        bbb = aaa[len(aaa) - 1].split(".")
+        ccc = bbb[0]
+
+        if not os.path.exists("LaTeX"):
+            os.mkdir("LaTeX")
+
+        writeInTxtFile(texContent, "LaTeX/" + ccc + ".tex")
+
+def convertAllExcel2LaTeX():
+    for dirName, dirs, files in os.walk(directory):
+        texDirName = dirName.replace("final_results", "LaTeX")
+        if not os.path.exists(texDirName):
+            os.mkdir(texDirName)
+        if len(files)>0:
+            for f in files:
+                if isExcel(str(f)):
+                    dataFrame = pd.read_excel(dirName + "/" + str(f), index_col=0)
+                    texContent = dataFrame.to_latex(index=False)
+                    parts = str(f).split(".")
+                    f = parts[0]
+                    fPath = texDirName + "/" + str(f) + ".tex"
+                    writeInTxtFile(texContent, fPath)
+                    print("Fichero " + fPath + " generado.")
+
+def writeInTxtFile(txt, fPath):
+    f = open(fPath, "a")
+    f.write(txt)
+    f.close
+
+def isExcel(file):
+    fAux = file.split(".")
+    extension = fAux[len(fAux) - 1]
+    if "xls" in extension:
+        return True
+    
+    return False
+
+if doConvert2LaTeX:
+    print("Iniciando generación de ficheros LaTeX...")
+    #convertExcel2LaTeX()
+    convertAllExcel2LaTeX()
+    print("Proceso finalizado.")

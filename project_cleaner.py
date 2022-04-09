@@ -15,6 +15,7 @@ deletePickles = True
 deleteResults = True
 deleteTmpFiles = True
 deleteLogs = True
+deleteLaTeX = True
 
 def cleanProject():
     try:
@@ -27,6 +28,8 @@ def cleanProject():
             rmtree("results")
         if deleteLogs and os.path.exists("logs"):
             rmtree("logs")
+        if deleteLogs and os.path.exists("LaTeX"):
+            rmtree("LaTeX")
         if deletePickles and os.path.exists("github_repos.pickle"):
             os.remove("github_repos.pickle")
         if deletePickles and os.path.exists("gitlab_repos.pickle"):
@@ -37,6 +40,8 @@ def cleanProject():
             os.mkdir("results")
         if not os.path.exists("logs"):
             os.mkdir("logs")
+        if not os.path.exists("LaTeX"):
+            os.mkdir("LaTeX")
 
         print("Proceso terminado...")
     except:
