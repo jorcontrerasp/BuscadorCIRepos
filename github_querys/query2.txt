@@ -1,1 +1,1 @@
-created:>2016-01-01 pushed:>2021-01-01 stars:>=9500 forks:>=800 archived:false is:public
+created:>2016-01-01 pushed:>2021-01-01 stars:>=9550 forks:>=850 archived:false is:public
