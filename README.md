@@ -31,4 +31,4 @@ $ pip install -r requirements.txt
 
 ## License 📄
 
-This project is under the license (Apache-2.0 License) - look at the file [LICENSE](https://github.com/jorcontrerasp/BuscadorCIRepos/blob/main/LICENSE) for details.
+This project is under the license (Apache-2.0 License) - look at the file [LICENSE](https://github.com/jorcontrerasp/CIReposFinder/blob/main/LICENSE) for details.
