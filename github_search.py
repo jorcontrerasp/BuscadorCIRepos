@@ -140,7 +140,7 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
         found4,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI4, df, df2, df3, df6)
         found5,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI5, df, df2, df3, df6)
         found6,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI6, df, df2, df3, df6)
-        found7,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, df, df2, df3, df6)
+        found7 = False #found7,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI7, df, df2, df3, df6)
         found8,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI8, df, df2, df3, df6)
         found9,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI9, df, df2, df3, df6)
         found10,df,df3,df6  = searchLiteralPathFromRoot(repo, ci.HerramientasCI.CI10, df, df2, df3, df6)
@@ -150,8 +150,7 @@ def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
 
         # Si lo ha encontrado:
         # - lo añadimos a la lista de encontrados.
-        found = found1 or found2 or found3 or found4 or found5 or found6 or found7 \
-                     or found8 or found9 or found10 or found11 or found12 or found13
+        found = found1 or found2 or found3 or found4 or found5 or found6 or found7 or found8 or found9 or found10 or found11 or found12 or found13
         if found:
             lFound.append(repo)
 

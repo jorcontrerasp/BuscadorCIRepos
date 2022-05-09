@@ -26,7 +26,7 @@ def getCIToolsValueList():
     lCITools.append(HerramientasCI.CI4.value)
     lCITools.append(HerramientasCI.CI5.value)
     lCITools.append(HerramientasCI.CI6.value)
-    lCITools.append(HerramientasCI.CI7.value)
+    #lCITools.append(HerramientasCI.CI7.value)
     lCITools.append(HerramientasCI.CI8.value)
     lCITools.append(HerramientasCI.CI9.value)
     lCITools.append(HerramientasCI.CI10.value)

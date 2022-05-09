@@ -342,8 +342,8 @@ def countRepos1FoundUnless(df):
             cont += 1
         elif row[ci.HerramientasCI.CI6.value] == pValue:
             cont += 1
-        elif row[ci.HerramientasCI.CI7.value] == pValue:
-            cont += 1
+        #elif row[ci.HerramientasCI.CI7.value] == pValue:
+            #cont += 1
         elif row[ci.HerramientasCI.CI8.value] == pValue:
             cont += 1
         elif row[ci.HerramientasCI.CI9.value] == pValue:
@@ -397,8 +397,8 @@ def updateDataFrameNumPositivesCIs(df):
             cont += 1
         if row[ci.HerramientasCI.CI6.value] == pValue:
             cont += 1
-        if row[ci.HerramientasCI.CI7.value] == pValue:
-            cont += 1
+        #if row[ci.HerramientasCI.CI7.value] == pValue:
+            #cont += 1
         if row[ci.HerramientasCI.CI8.value] == pValue:
             cont += 1
         if row[ci.HerramientasCI.CI9.value] == pValue:
