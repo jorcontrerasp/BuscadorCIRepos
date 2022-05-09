@@ -697,7 +697,7 @@ def updateStageStatisticsDF(ciObj, df, lStagesProjectAdded):
 
         if isinstance(lStage, list) or isinstance(lStage, dict):
             for stage in lStage:
-                stage = stage.lower()
+                stage = stage.lower() + "[" + ciObj.getCiTool().lower() + "]"
                 if not existsDFRecord(stage, dfAux):
                     dfAux = addStageStatisticsDFRecord(dfAux, stage)
                     dfAux.at[stage, "Num_projects_using"] += 1
@@ -705,7 +705,7 @@ def updateStageStatisticsDF(ciObj, df, lStagesProjectAdded):
                 else:
                     dfAux.at[stage, "Total_stages"] += 1
         elif isinstance(lStage, str):
-            lStage = lStage.lower()
+            lStage = lStage.lower() + "[" + ciObj.getCiTool().lower() + "]"
             if not existsDFRecord(lStage, dfAux):
                 dfAux = addStageStatisticsDFRecord(dfAux, lStage)
                 dfAux.at[lStage, "Num_projects_using"] += 1
@@ -724,44 +724,6 @@ def updateStageStatisticsDF(ciObj, df, lStagesProjectAdded):
                 lStagesProjectAdded.append(index)
 
         df.at[index, "Total_stages"] += dfAux.at[index, "Total_stages"]
-    
-    return df,lStagesProjectAdded
-
-def updateStageStatisticsDF2(lStage, df, lStagesProjectAdded):
-    if isinstance(lStage, list):
-        dfAux = makeEmptyStageStatisticsDataFrame()
-        for stage in lStage:
-            if isinstance(stage, str):
-                if not existsDFRecord(stage, dfAux):
-                    dfAux = addStageStatisticsDFRecord(dfAux, stage)
-                    dfAux.at[stage, "Num_projects_using"] += 1
-                    dfAux.at[stage, "Total_stages"] += 1
-                else:
-                    dfAux.at[stage, "Total_stages"] += 1
-        
-        for index, row in dfAux.iterrows():
-            if not existsDFRecord(index, df):
-                df = addStageStatisticsDFRecord(df, index)
-                df.at[index, "Num_projects_using"] += 1
-                lStagesProjectAdded.append(index)
-            else:
-                if not (index in lStagesProjectAdded):
-                    df.at[index, "Num_projects_using"] += 1
-                    lStagesProjectAdded.append(index)
-
-            df.at[index, "Total_stages"] += dfAux.at[index, "Total_stages"]
-
-    else:
-        if isinstance(lStage, str):
-            if not existsDFRecord(lStage, df):
-                df = addStageStatisticsDFRecord(df, lStage)
-                df.at[lStage, "Num_projects_using"] += 1
-            else:
-                if not (index in lStagesProjectAdded):
-                    df.at[index, "Num_projects_using"] += 1
-                    lStagesProjectAdded.append(index)
-
-            df.at[lStage, "Total_stages"] += 1
     
     return df,lStagesProjectAdded
 
