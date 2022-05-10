@@ -427,6 +427,14 @@ def getMainYMLStages():
     stages.append('before_script')
     stages.append('script')
     stages.append('after_script')
+    stages.append('before_cache')
+    stages.append('cache')
+    stages.append('after_cache')
+    stages.append('before_deploy')
+    stages.append('deploy')
+    stages.append('after_deploy')
+    stages.append('after_success')
+    stages.append('after_failure')
     return stages
 
 def parseConfigParam(l1, l2):
