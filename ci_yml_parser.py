@@ -179,6 +179,29 @@ def parseGitLabYAML(yamlFile, repoName):
 
             topLevelContent = getValueArrayParam(dataLoaded, topLevel)
             stage = getValueArrayParam(topLevelContent, 'stage')
+            whenAux = getValueArrayParam(topLevelContent, 'when')
+            lWhen = []
+            lWhenStages = []
+            if isinstance(whenAux, list) or isinstance(whenAux, dict):
+                for wAux in whenAux:
+                    lWhen.append(wAux)
+            else:
+                if len(whenAux)>0:
+                    lWhen.append(whenAux)
+
+            if len(stage)>0:
+                if len(lWhen)>0:
+                    for lw in lWhen:
+                        lWhenStages.append(stage + ">" + lw)
+                else:
+                    lWhenStages.append(stage)
+            else:
+                if len(lWhen)>0:
+                    for lw in lWhen:
+                        lWhenStages.append("script" + ">" + lw)
+                else:
+                    lWhenStages.append("script")
+
             script = getValueArrayParam(topLevelContent, 'script')
 
             if topLevel == "workflow":
@@ -217,11 +240,15 @@ def parseGitLabYAML(yamlFile, repoName):
             elif len(script)>0:
                 job = CIJob()
                 jobStages = []
-                if len(stage)==0:
-                    '''jobStages.append(topLevel)'''
-                    jobStages.append("script")
-                else:
-                    jobStages.append(stage)
+
+                #if len(stage)==0:
+                    #'''jobStages.append(topLevel)'''
+                    #jobStages.append("script")
+                #else:
+                    #jobStages.append(stage)
+
+                for whenStage in lWhenStages:
+                    jobStages.append(whenStage)
                     
                 job.setStage(jobStages)
                 jobTasks = []

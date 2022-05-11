@@ -99,6 +99,7 @@ def doApiRateLimitControl():
         rl = g.get_rate_limit()
         rl_core = rl.core
         core_remaining = rl_core.remaining
+        #aux.printLog("API core_remaining: " + str(core_remaining), logging.INFO)
         rl_search = rl.search
         search_remaining = rl_search.remaining
         if core_remaining <= 0:
@@ -108,7 +109,7 @@ def doApiRateLimitControl():
             time.sleep(sleep_time)
             g = authenticate()
     except:
-        aux.printLog("Error al aplicar el control del API rate limit exceded...", logging.ERROR)
+        aux.printLog("Control del API rate limit exceded NO aplicado...", logging.WARNING)
 
 def searchReposGitHubApi(lRepositories, df, df2, df3, df6):
     lFound = []
